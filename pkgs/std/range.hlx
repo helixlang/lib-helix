@@ -27,7 +27,7 @@
 ///
 /// ### Examples
 ///
-/// ```helix
+/// ```Helix
 /// for x in range(10) {
 ///     print(x); // Prints 0 through 9
 /// }
@@ -52,7 +52,7 @@
 /// - `..=` generates a range from the default value `T()` to an inclusive upper bound.
 ///
 /// For example:
-/// ```helix
+/// ```Helix
 /// for x in 0..5 { // Equivalent to range(5)
 ///     print(x);
 /// }
@@ -66,7 +66,7 @@
 ///
 /// The `RangeIncrementable` interface defines the following requirements:
 ///
-/// ```helix
+/// ```Helix
 /// interface RangeIncrementable {
 ///     op ++ fn (self)              -> self;  // Increment operation.
 ///     op <  fn (self, other: self) -> bool;  // Less-than comparison.
@@ -80,7 +80,7 @@
 ///
 /// Generates values from `T()` (the default constructor) up to, but not including, `last`.
 ///
-/// ```helix
+/// ```Helix
 /// fn range(last: T) -> yield T
 ///   requires <T> if T has RangeIncrementable;
 /// ```
@@ -99,7 +99,7 @@
 ///
 /// Generates values from `first` to, but not including, `last`, with a customizable step value.
 ///
-/// ```helix
+/// ```Helix
 /// fn range(first: T, last: T, step: T = 1) -> yield T
 ///   requires <T> if T has RangeIncrementable;
 /// ```
