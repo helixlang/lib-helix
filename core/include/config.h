@@ -16,7 +16,7 @@
 #ifndef __$LIBHELIX_CONFIG__
 #define __$LIBHELIX_CONFIG__
 
-namespace std {} // namespace std blank to allow for aliasing the std namespace
+namespace std {}  // namespace std
 
 #ifndef _LIBCPP_NODEBUG
 #define _LIBCPP_NODEBUG
@@ -39,12 +39,15 @@ namespace std {} // namespace std blank to allow for aliasing the std namespace
 #endif
 
 namespace helix {
-    namespace libcxx = ::std;
+namespace libcxx = ::std;
 }
 
 #define H_NAMESPACE_BEGIN namespace helix {
 #define H_NAMESPACE_END }
 #define H_STD_NAMESPACE_BEGIN namespace std {
 #define H_STD_NAMESPACE_END }
+#define H_STD_NAMESPACE helix::std
+#define H_NAMESPACE helix
+#define LIBCXX_NAMESPACE libcxx
 
 #endif

@@ -13,12 +13,13 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
+#ifndef __$LIBHELIX_CONCEPTS__
+#define __$LIBHELIX_CONCEPTS__
+
+#include "concepts.h"
 #include "config.h"
 #include "dtypes.h"
 #include "traits.h"
-
-#ifndef __$LIBHELIX_CONCEPTS__
-#define __$LIBHELIX_CONCEPTS__
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -26,12 +27,12 @@ namespace concepts {
 
 template <typename T>
 concept HasToString = requires(T a) {
-    { a.to_string() } -> libcxx::convertible_to<string>;
+    { a.to_string() } -> LIBCXX_NAMESPACE::convertible_to<string>;
 };
 
 template <typename T>
-concept SupportsOStream = requires(libcxx::ostream &os, T a) {
-    { os << a } -> std::traits::convertible_to<libcxx::ostream &>;
+concept SupportsOStream = requires(LIBCXX_NAMESPACE::ostream &os, T a) {
+    { os << a } -> H_STD_NAMESPACE::traits::convertible_to<LIBCXX_NAMESPACE::ostream &>;
 };
 
 template <typename _Ty, typename _Up>
@@ -41,7 +42,7 @@ concept SupportsPointerCast = requires(_Ty from) {
 
 template <typename T, typename U>
 concept SafelyCastable = requires(T t, U *u) {
-    { t.$cast(u) } -> std::traits::same_as<string>;
+    { t.$cast(u) } -> H_STD_NAMESPACE::traits::same_as<string>;
 };
 
 template <typename T>

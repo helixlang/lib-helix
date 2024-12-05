@@ -32,13 +32,14 @@
 #include "config.h"
 #include "dtypes.h"
 #include "finally.h"
+#include "function.h"
 #include "generator.h"
 #include "libc.h"
 #include "libcxx.h"
 #include "print.h"
+#include "question.h"
 #include "refs.h"
 #include "traits.h"
 #include "types.h"
-#include "question.h"
 
 #endif

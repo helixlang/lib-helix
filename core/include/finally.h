@@ -13,13 +13,12 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
-#include <functional>
-
-#include "config.h"
-#include "refs.h"
-
 #ifndef __$LIBHELIX_FINALLY__
 #define __$LIBHELIX_FINALLY__
+
+#include "config.h"
+#include "function.h"
+#include "refs.h"
 
 H_NAMESPACE_BEGIN
 
@@ -49,7 +48,7 @@ class $finally {
         : m_fn{std::forward<Fn>(fn)} {}
 
   private:
-    libcxx::function<void()> m_fn;
+    H_STD_NAMESPACE::$function<void()> m_fn;
 };
 
 H_NAMESPACE_END

@@ -13,10 +13,11 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
-#include "config.h"
-
 #ifndef __$LIBHELIX_LIBC__
 #define __$LIBHELIX_LIBC__
+
+#include "config.h"
+#include "types.h"
 
 H_NAMESPACE_BEGIN
 
@@ -24,7 +25,7 @@ namespace libc {
 template <typename T>
 using va_array = T[];
 
-template <typename T, size_t N>
+template <typename T, usize N>
 using array = T[N];
 }  // namespace libc
 

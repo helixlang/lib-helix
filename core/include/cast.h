@@ -13,11 +13,12 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
-#include "concepts.h"
-#include "config.h"
-
 #ifndef __$LIBHELIX_CAST__
 #define __$LIBHELIX_CAST__
+
+#include "concepts.h"
+#include "config.h"
+#include "traits.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -25,18 +26,18 @@ H_STD_NAMESPACE_BEGIN
 // ----- as_cast ----- //
 template <typename _Ty, typename _Up>
 constexpr _Ty as_cast(_Up &value) noexcept {
-    if constexpr (libcxx::is_const_v<libcxx::remove_reference_t<_Up>> &&
-                  libcxx::is_same_v<libcxx::remove_const_t<_Up>, _Ty>) {
+    if constexpr (LIBCXX_NAMESPACE::is_const_v<LIBCXX_NAMESPACE::remove_reference_t<_Up>> &&
+                  LIBCXX_NAMESPACE::is_same_v<LIBCXX_NAMESPACE::remove_const_t<_Up>, _Ty>) {
         return const_cast<_Ty>(value);
-    } else if constexpr (libcxx::is_pointer_v<_Ty>) {
-        if constexpr (std::concepts::SupportsPointerCast<_Up, _Ty>) {
+    } else if constexpr (LIBCXX_NAMESPACE::is_pointer_v<_Ty>) {
+        if constexpr (H_STD_NAMESPACE::concepts::SupportsPointerCast<_Up, _Ty>) {
             return dynamic_cast<_Ty>(value);
         } else {
             return static_cast<_Ty>(value);
         }
-    } else if constexpr (libcxx::is_reference_v<_Ty>) {
+    } else if constexpr (LIBCXX_NAMESPACE::is_reference_v<_Ty>) {
         return static_cast<_Ty>(value);
-    } else if constexpr (std::concepts::SafelyCastable<_Up, _Ty>) {
+    } else if constexpr (H_STD_NAMESPACE::concepts::SafelyCastable<_Up, _Ty>) {
         return value.$cast(static_cast<_Ty *>(nullptr));
     } else {
         return static_cast<_Ty>(value);
@@ -67,8 +68,8 @@ constexpr _Ty as_unsafe(_Up value) noexcept {
 
 template <typename _Ty, typename _Up>
 constexpr const _Ty as_unsafe(const _Up value) noexcept
-    requires(std::traits::_const::utils::is_const_v<_Up> ||
-             std::traits::_const::utils::is_const_v<_Ty>)
+    requires(H_STD_NAMESPACE::traits::_const::utils::is_const_v<_Up> ||
+             H_STD_NAMESPACE::traits::_const::utils::is_const_v<_Ty>)
 {
     return reinterpret_cast<const _Ty>(value);
 }

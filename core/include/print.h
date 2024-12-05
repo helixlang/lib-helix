@@ -13,10 +13,13 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
+#ifndef __$LIBHELIX_PRINT__
+#define __$LIBHELIX_PRINT__
+
 #include <sstream>
 
 #ifndef _MSC_VER
-#include <cxxabi.h>
+#include "cxxabi.h"
 #endif
 
 #include "concepts.h"
@@ -24,10 +27,7 @@
 #include "dtypes.h"
 #include "refs.h"
 #include "traits.h"
-
-
-#ifndef __$LIBHELIX_PRINT__
-#define __$LIBHELIX_PRINT__
+#include "types.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -114,7 +114,7 @@ template <typename... _Ty>
 constexpr string stringf(string s, _Ty &&...t) {
     const array<string, sizeof...(t)> EAS = {to_string(std::forward<_Ty>(t))...};
 
-    size_t pos = 0;
+    usize pos = 0;
 
 #ifdef __GNUG__
 #pragma unroll

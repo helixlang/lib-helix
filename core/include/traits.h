@@ -13,10 +13,10 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
-#include "config.h"
-
 #ifndef __$LIBHELIX_TRAITS__
 #define __$LIBHELIX_TRAITS__
+
+#include "config.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -86,13 +86,14 @@ template <class _Tp, class _Up>
 inline constexpr bool is_same_v = same_as_v<_Tp, _Up>;
 
 template <class _Bp, class _Dp>
-struct _LIBCPP_TEMPLATE_VIS is_derived_of : public integral_constant<bool, __is_base_of(_Bp, _Dp)> {};
+struct _LIBCPP_TEMPLATE_VIS is_derived_of
+    : public integral_constant<bool, __is_base_of(_Bp, _Dp)> {};
 
 template <class _Bp, class _Dp>
 inline constexpr bool is_derived_of_v = __is_base_of(_Bp, _Dp);
 
 template <class _Tp>
-struct is_class : integral_constant<bool, __is_class(_Tp)> {}; // determine whether _Tp is a class
+struct is_class : integral_constant<bool, __is_class(_Tp)> {};  // determine whether _Tp is a class
 
 template <class _Tp>
 constexpr bool is_class_v = __is_class(_Tp);

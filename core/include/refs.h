@@ -13,10 +13,10 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
-#include "config.h"
-
 #ifndef __$LIBHELIX_REFS__
 #define __$LIBHELIX_REFS__
+
+#include "config.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -71,8 +71,8 @@ template <typename T>
 using remove_cvref_t = typename remove_cvref<T>::t;
 
 template <class _Ty>
-constexpr remove_ref_t<_Ty>&& move(_Ty&& _Arg) noexcept {
-    return static_cast<remove_ref_t<_Ty>&&>(_Arg);
+constexpr remove_ref_t<_Ty> &&move(_Ty &&_Arg) noexcept {
+    return static_cast<remove_ref_t<_Ty> &&>(_Arg);
 }
 }  // end namespace ref
 

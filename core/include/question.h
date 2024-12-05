@@ -12,22 +12,28 @@
 ///   Copyright (c) 2024 The Helix Project (CC BY 4.0)                                           ///
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
+///                                                                                              ///
+///  this is still a work in progress, the $question class is a work in progress and is not yet  ///
+///  fully implemented, the $question class is a class that is similar to the std::optional but  ///
+///  also adds std::expected like functionality, the $question class is a class that can hold    ///
+///  one of 3 states: value, an error, or be null.                                               ///
+///                                                                                              ///
+///  the $question class is a class that is to be used inside the core since its required by the ///
+///  compiler to allow for `?` type syntax.                                                      ///
+///                                                                                              ///
+///----------------------------------------------------------------------------------------------///
 
-#include <exception>
+#ifndef __$LIBHELIX_QUESTION__
+#define __$LIBHELIX_QUESTION__
+
 #include <typeinfo>
 
-#include "concepts.h"
 #include "config.h"
 #include "dtypes.h"
-#include "libc.h"
-#include "libcxx.h"
 #include "print.h"
 #include "refs.h"
 #include "traits.h"
 #include "types.h"
-
-#ifndef __$LIBHELIX_QUESTION__
-#define __$LIBHELIX_QUESTION__
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -53,29 +59,28 @@ class null_t {};
 inline constexpr null_t null;
 
 template <class T, typename... Es>
-class question;
+class $question;
 
-// template <class T, typename... Es>
-//     requires std::traits::is_class_v<T> && (std::traits::is_class_v<Es> && ...)
-// class question<T, Es...> : public T {
-//   public:
-//     /// this is for classes
-// };
+template <class T, typename... Es> requires std::traits::is_class_v<T> && (std::traits::is_class_v<Es> && ...)
+class $question<T, Es...> : public T {
+  public:
+    /// this is for classes
+};
 
 template <class T, typename... Es>
-    requires (std::traits::is_class_v<Es> && ...)
-class question<T, Es...> {
+    requires(std::traits::is_class_v<Es> && ...)
+class $question<T, Es...> {
   public:
     enum class State : char { Value, Null, Error };
 
     template <typename... Et>
     union LikelyError {
-         LikelyError() {}
+        LikelyError() {}
         ~LikelyError() {}
-         LikelyError(const LikelyError &other)                = default;
-         LikelyError &operator=(const LikelyError &other)     = default;
-         LikelyError(LikelyError &&other) noexcept            = default;
-         LikelyError &operator=(LikelyError &&other) noexcept = default;
+        LikelyError(const LikelyError &other)                = default;
+        LikelyError &operator=(const LikelyError &other)     = default;
+        LikelyError(LikelyError &&other) noexcept            = default;
+        LikelyError &operator=(LikelyError &&other) noexcept = default;
 
         alignas(Et...) array<byte, libcxx::max({sizeof(Et)...})> storage{};
     };
@@ -84,7 +89,7 @@ class question<T, Es...> {
         libcxx::conditional_t<sizeof...(Es) == 0, LikelyError<Error>, LikelyError<Es...>>;
 
     /// \brief defines the '?' operator to see if the value is null
-    [[nodiscard]] constexpr bool $inspect() const { return state == State::Value; }
+    [[nodiscard]] constexpr bool operator$question() const { return state == State::Value; }
     constexpr T                 &operator*() {
         switch (state) {
             case State::Value:
@@ -127,15 +132,15 @@ class question<T, Es...> {
         return ((state == State::Error) && error_type_index == type_index<E>());
     }
 
-    constexpr question()
+    constexpr $question()
         : state(State::Null) {}
 
-    constexpr question(const T &value)  // NOLINT(google-explicit-constructor)
+    constexpr $question(const T &value)  // NOLINT(google-explicit-constructor)
         : state(State::Value) {
         this->value = value;
     }
 
-    constexpr question(T &&value)  // NOLINT(google-explicit-constructor)
+    constexpr $question(T &&value)  // NOLINT(google-explicit-constructor)
         : state(State::Value) {
         this->value = std::ref::move(value);
     }
@@ -143,7 +148,7 @@ class question<T, Es...> {
     template <typename E,
               typename = libcxx::enable_if_t<(std::traits::is_same_v<E, Error> ||
                                               (std::traits::is_same_v<E, Es> || ...))>>
-    constexpr question(const E &err)  // NOLINT(google-explicit-constructor)
+    constexpr $question(const E &err)  // NOLINT(google-explicit-constructor)
         : state(State::Error) {
         new (&error.storage) E(err);
     }
@@ -151,25 +156,25 @@ class question<T, Es...> {
     template <typename E,
               typename = libcxx::enable_if_t<(std::traits::is_same_v<E, Error> ||
                                               (std::traits::is_same_v<E, Es> || ...))>>
-    constexpr question(E &&err)  // NOLINT(google-explicit-constructor)
+    constexpr $question(E &&err)  // NOLINT(google-explicit-constructor)
         : state(State::Error)
         , error_type_index(type_index<E>()) {
         new (&error.storage) E(std::forward<E>(err));
     }
 
-    constexpr ~question() {
+    constexpr ~$question() {
         if (state == State::Error) {
             destroy_error();
         }
     }
 
-    constexpr question(const null_t & /*unused*/)  // NOLINT(google-explicit-constructor)
+    constexpr $question(const null_t & /*unused*/)  // NOLINT(google-explicit-constructor)
         : state(State::Null) {}
 
-    constexpr question(null_t && /*unused*/)  // NOLINT(google-explicit-constructor)
+    constexpr $question(null_t && /*unused*/)  // NOLINT(google-explicit-constructor)
         : state(State::Null) {}
 
-    constexpr question(const question &other) {
+    constexpr $question(const $question &other) {
         switch (other.state) {
             case State::Value:
                 value = other.value;
@@ -185,7 +190,7 @@ class question<T, Es...> {
         state = other.state;
     }
 
-    constexpr question(question &&other) noexcept {
+    constexpr $question($question &&other) noexcept {
         switch (other.state) {
             case State::Value:
                 value = std::ref::move(other.value);
@@ -201,29 +206,29 @@ class question<T, Es...> {
         state = other.state;
     }
 
-    constexpr question &operator=(const T &val) {
+    constexpr $question &operator=(const T &val) {
         this->value = val;
         state       = State::Value;
         return *this;
     }
 
-    constexpr question &operator=(T &&val) {
+    constexpr $question &operator=(T &&val) {
         this->value = std::ref::move(val);
         state       = State::Value;
         return *this;
     }
 
-    constexpr question &operator=(const null_t & /*unused*/) {
+    constexpr $question &operator=(const null_t & /*unused*/) {
         state = State::Null;
         return *this;
     }
 
-    constexpr question &operator=(null_t && /*unused*/) {
+    constexpr $question &operator=(null_t && /*unused*/) {
         state = State::Null;
         return *this;
     }
 
-    constexpr question &operator=(const question &other) {
+    constexpr $question &operator=(const $question &other) {
         switch (other.state) {
             case State::Value:
                 value = other.value;
@@ -240,7 +245,7 @@ class question<T, Es...> {
         return *this;
     }
 
-    constexpr question &operator=(question &&other) noexcept {
+    constexpr $question &operator=($question &&other) noexcept {
         switch (other.state) {
             case State::Value:
                 value = std::ref::move(other.value);
@@ -261,7 +266,7 @@ class question<T, Es...> {
     T      value;
     ErrorT error;
     State  state            = State::Null;
-    size_t error_type_index = 0;
+    usize  error_type_index = 0;
 
     constexpr void destroy_error() {
         visit_error([&](auto *errPtr) {
@@ -277,7 +282,7 @@ class question<T, Es...> {
     }
 
     template <typename E>
-    static constexpr size_t type_index() {
+    static constexpr usize type_index() {
         return typeid(E).hash_code();
     }
 
