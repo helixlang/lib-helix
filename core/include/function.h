@@ -16,10 +16,10 @@
 #ifndef __$LIBHELIX_FUNCTION__
 #define __$LIBHELIX_FUNCTION__
 
-#include <type_traits>
-
 #include "config.h"
+#include "libcxx.h"
 #include "refs.h"
+
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -45,12 +45,17 @@ class $function<_Rt(_Tp...)> {
     template <typename T>
     struct Callable : $callable {
         T callable;
-        
-        Callable(typename ref::remove_ref<T> &&callable) : callable(H_STD_NAMESPACE::forward<T>(callable)) {}
-        Callable(T&& $call_o) : callable(H_STD_NAMESPACE::forward<T>($call_o)) {}
-        Callable(const T &callable) : callable(callable) {}
-    
-        _Rt invoke(_Tp... args)  override { return callable(H_STD_NAMESPACE::forward<_Tp>(args)...); }
+
+        Callable(typename ref::remove_ref<T> &&callable)
+            : callable(H_STD_NAMESPACE::forward<T>(callable)) {}
+        Callable(T &&$call_o)
+            : callable(H_STD_NAMESPACE::forward<T>($call_o)) {}
+        Callable(const T &callable)
+            : callable(callable) {}
+
+        _Rt invoke(_Tp... args) override {
+            return callable(H_STD_NAMESPACE::forward<_Tp>(args)...);
+        }
         $callable *clone() const override { return new Callable(callable); }
     };
 
@@ -75,7 +80,8 @@ class $function<_Rt(_Tp...)> {
 
     template <typename T>
     $function(T $call_o)
-        : callable(new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::forward<T>($call_o))) {}
+        : callable(
+              new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::forward<T>($call_o))) {}
 
     $function(_Rt (*func)(_Tp...))
         : callable(func ? new Callable<ref::remove_cv_t<_Rt (*)(_Tp...)>>(func) : nullptr) {}

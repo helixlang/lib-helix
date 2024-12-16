@@ -16,6 +16,21 @@
 #ifndef __$LIBHELIX_LIBCXX__
 #define __$LIBHELIX_LIBCXX__
 
+#include <array>
+#include <cstddef>
+#include <map>
+#include <set>
+#include <string>
+#include <tuple>
+#include <vector>
+
+#include <coroutine>
+#include <iterator>
+#include <optional>
+#include <sstream>
+#include <type_traits>
+#include <typeinfo>
+
 #include "config.h"
 #include "refs.h"
 
@@ -23,7 +38,7 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 template <typename _Tp, typename... _Ty>
-constexpr _Tp *_new(_Ty &&...t) {
+constexpr _Tp *$new(_Ty &&...t) {
     return new _Tp(std::forward<_Ty>(t)...);
 }
 

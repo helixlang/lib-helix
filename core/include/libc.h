@@ -37,7 +37,11 @@ namespace libc {
 // #include <stdarg.h>
 // #include <stdbool.h>
 // #include <stdint.h>
-// #include <stdio.h>
+#include <stdio.h>
+#include <signal.h>
+#ifndef _MSC_VER
+#include "cxxabi.h"
+#endif
 // #include <stdlib.h>
 // #include <string.h>
 // #include <time.h>

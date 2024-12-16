@@ -16,7 +16,6 @@
 #ifndef __$LIBHELIX_CONCEPTS__
 #define __$LIBHELIX_CONCEPTS__
 
-#include "concepts.h"
 #include "config.h"
 #include "dtypes.h"
 #include "traits.h"

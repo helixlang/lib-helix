@@ -16,16 +16,8 @@
 #ifndef __$LIBHELIX_DTYPES__
 #define __$LIBHELIX_DTYPES__
 
-#include <array>
-#include <cstddef>
-#include <map>
-#include <set>
-#include <string>
-#include <tuple>
-#include <vector>
-
 #include "config.h"
-#include "dtypes.h"
+#include "libcxx.h"
 #include "refs.h"
 #include "types.h"
 
@@ -144,8 +136,6 @@ class map : public LIBCXX_NAMESPACE::map<_Kt, _Vt> {
 
     explicit operator string() { return $cast(static_cast<string *>(nullptr)); }
 };
-
-using $int = int;
 
 H_NAMESPACE_END
 #endif

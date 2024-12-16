@@ -26,14 +26,14 @@
 #ifndef __$LIBHELIX_QUESTION__
 #define __$LIBHELIX_QUESTION__
 
-#include <typeinfo>
-
 #include "config.h"
 #include "dtypes.h"
+#include "libcxx.h"
 #include "print.h"
 #include "refs.h"
 #include "traits.h"
 #include "types.h"
+
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -61,7 +61,8 @@ inline constexpr null_t null;
 template <class T, typename... Es>
 class $question;
 
-template <class T, typename... Es> requires std::traits::is_class_v<T> && (std::traits::is_class_v<Es> && ...)
+template <class T, typename... Es>
+    requires std::traits::is_class_v<T> && (std::traits::is_class_v<Es> && ...)
 class $question<T, Es...> : public T {
   public:
     /// this is for classes

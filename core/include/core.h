@@ -41,5 +41,6 @@
 #include "refs.h"
 #include "traits.h"
 #include "types.h"
+#include "int.h"
 
 #endif

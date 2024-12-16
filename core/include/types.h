@@ -16,7 +16,6 @@
 #ifndef __$LIBHELIX_TYPES__
 #define __$LIBHELIX_TYPES__
 
-
 using byte = unsigned char;
 
 using u8  = unsigned char;
@@ -38,21 +37,21 @@ using f80 = long double;
     defined(__mips64el__) || defined(__mips64el) || defined(__s390x__)
 using usize = u64;
 using isize = i64;
-
+#define __HELIX_64BIT__
 #elif defined(__ILP32__) || defined(_WIN32) || defined(__i386__)   || defined(__arm__)  || \
     defined(__mips__)    || defined(__mips) || defined(__mipsel__) || defined(__mipsel) || \
     defined(__s390__)
 using usize = u32;
 using isize = i32;
-
+#define __HELIX_32BIT__
 #elif defined(__16BIT__) || defined(__MSP430__) || defined(__AVR__)
 using usize = u16;
 using isize = i16;
-
+#define __HELIX_16BIT__
 #elif defined(__8BIT__)
 using usize = u8;
 using isize = i8;
-
+#define __HELIX_8BIT__
 #else
 #error \
     "Helix core: Unable to determine platform bitness. Supported macros: __LP64__, __ILP32__, __16BIT__, __8BIT__. Define one explicitly using '-D' during compilation."
