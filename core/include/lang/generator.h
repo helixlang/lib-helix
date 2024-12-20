@@ -20,11 +20,10 @@
 #ifndef __$LIBHELIX_GENERATOR__
 #define __$LIBHELIX_GENERATOR__
 
-#include "config.h"
-#include "libcxx.h"
-#include "refs.h"
-#include "types.h"
-
+#include "../config.h"
+#include "../libcxx.h"
+#include "../primitives.h"
+#include "../refs.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -41,6 +40,8 @@ class $generator {
             current_value = H_STD_NAMESPACE::ref::move(value);
             return {};
         }
+
+        void return_void() noexcept {}
 
         void                     await_transform() = delete;
         [[noreturn]] static void unhandled_exception() { throw; }

@@ -30,6 +30,7 @@
 #include <sstream>
 #include <type_traits>
 #include <typeinfo>
+#include <any>
 
 #include "config.h"
 #include "refs.h"

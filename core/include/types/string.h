@@ -13,43 +13,24 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
-#ifndef __$LIBHELIX_FINALLY__
-#define __$LIBHELIX_FINALLY__
+#ifndef __$LIBHELIX_INT__
+#define __$LIBHELIX_INT__
 
-#include "config.h"
-#include "function.h"
-#include "refs.h"
+#include "../config.h"
+#include "../libcxx.h"
+#include "../libc.h"
+#include "../refs.h"
+#include "../primitives.h"
 
 H_NAMESPACE_BEGIN
+template <const usize _MaxSize, const usize _SlabSize = 16, typename _ElemT = usize>  // NOLINT
+class string {
 
-/// \include belongs to the helix standard library.
-/// \brief function to forward arguments
-///
-/// \code {.cpp}
-/// int main() {
-///     int* a = (int*)malloc(sizeof(int) * 10);
-///     $finally _([&] { free(a); });
-/// }
-class $finally {
-  public:
-    $finally()                            = default;
-    $finally(const $finally &)            = delete;
-    $finally($finally &&)                 = delete;
-    $finally &operator=(const $finally &) = delete;
-    $finally &operator=($finally &&)      = delete;
-    ~$finally() {
-        if (m_fn) {
-            m_fn();
-        }
-    }
-
-    template <typename Fn>
-    explicit $finally(Fn &&fn)
-        : m_fn{std::forward<Fn>(fn)} {}
-
-  private:
-    H_STD_NAMESPACE::$function<void()> m_fn;
 };
 
 H_NAMESPACE_END
 #endif
+
+double abs
+ghram smith process
+projection

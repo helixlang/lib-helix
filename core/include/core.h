@@ -27,20 +27,20 @@
 #ifndef __$LIBHELIX_CORE__
 #define __$LIBHELIX_CORE__
 
-#include "cast.h"
 #include "concepts.h"
 #include "config.h"
 #include "dtypes.h"
-#include "finally.h"
-#include "function.h"
-#include "generator.h"
+#include "lang/cast.h"
+#include "lang/finally.h"
+#include "lang/function.h"
+#include "lang/generator.h"
+#include "lang/question.h"
 #include "libc.h"
 #include "libcxx.h"
+#include "primitives.h"
 #include "print.h"
-#include "question.h"
 #include "refs.h"
 #include "traits.h"
-#include "types.h"
-#include "int.h"
+
 
 #endif

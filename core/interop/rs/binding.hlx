@@ -1,7 +1,7 @@
 import helix::interfaces::FFI;
 import helix::ast;
 
-extend ffi for "rs" impl FFI {
+extend FFI::<"rust"> {
     ast::Identifier demangle(ast::Identifier mangled_name) {
         return rust_demangler(mangled_name);
     }

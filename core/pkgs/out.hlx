@@ -1,72 +1,36 @@
-//===----------------------------------------- Helix ------------------------------------------===//
-//                                                                                                //
-// Part of the Helix Project, under the Attribution 4.0 International license (CC BY 4.0).        //
-// You are allowed to use, modify, redistribute, and create derivative works, even for commercial //
-// purposes, provided that you give appropriate credit, and indicate if changes were made.        //
-// For more information, please visit: https://creativecommons.org/licenses/by/4.0/               //
-//                                                                                                //
-// SPDX-License-Identifier: CC-BY-4.0                                                             //
-// Copyright (c) 2024 (CC BY 4.0)                                                                 //
-//                                                                                                //
-//===------------------------------------------------------------------------------------------===//
-/// std::io::out - this is the internal code for print
+///--- The Helix Project ------------------------------------------------------------------------///
+///                                                                                              ///
+///   Part of the Helix Project, under the Attribution 4.0 International license (CC BY 4.0).    ///
+///   You are allowed to use, modify, redistribute, and create derivative works, even for        ///
+///   commercial purposes, provided that you give appropriate credit, and indicate if changes    ///
+///   were made.                                                                                 ///
+///                                                                                              ///
+///   For more information on the license terms and requirements, please visit:                  ///
+///     https://creativecommons.org/licenses/by/4.0/                                             ///
+///                                                                                              ///
+///   SPDX-License-Identifier: CC-BY-4.0                                                         ///
+///   Copyright (c) 2024 The Helix Project (CC BY 4.0)                                           ///
+///                                                                                              ///
+///------------------------------------------------------------------------------------ Helix ---///
+///                                                                                              ///
+///  The process of this file is special, the helix compiler will compile this file first, like  ///
+///  core.h but this file is the runtime defs written in helix, the compiler will compile this   ///
+///  file first along with the core.h file, then the compiler will compile the rest of the code. ///
+///                                                                                              ///
+///  All files in this Directory will be automatically included in the compilation process.      ///
+///                                                                                              ///
+///  WARNING: Do not remove this file, it is required for the helix compiler to work properly.   ///
+///                                                                                              ///
+///----------------------------------------------------------------------------------------------///
 
-ffi "c++" priv import <iostream> as cpp__io;
-
-interface StringConvert {
-    fn to_string() -> string;
+fn foo(a: &const string) -> void {
+    
 }
 
-// Monomorphized generic
-fn print(...args: T | U, sep: T = " ", end: T = "\n", flush: bool = false)
-  requires <T, U> if T is StringConvert {
-    let out: string = "";
-
-    for arg in args {
-        if arg is T {
-            out += arg.to_string();
-        } else {
-            out += f"<Non-StringConvert at {*arg as hex}>";
-        }
-    }
-
-    out = out.strip(*sep) + *end;
-
-    ffi "C++" {
-        cpp__io::std::cout << out;
-
-        if flush {
-            cpp__io::std::cout.flush();
-        }
-    }
-}
-
-/* ---------------------------------- usage --------------------------------- */
-
-/*
-    Deriving from `StringConvert` is optional as long as `Foo` implements all
-    methods of the interface. This allows `Foo` to satisfy generic constraints:
-
-    - `Foo` will pass a generic constraint like `T: StringConvert`.
-    - However, `Foo` will fail a direct type check for the interface, e.g.,
-        `if foo is StringConvert`. If `Foo` does not explicitly derive `StringConvert`,
-        it will fail this check.
-    - Conversely, `Foo` will pass type-based checks such as:
-        `type StringConvertType requires <T> if StringConvert;`
-        `let foo: StringConvertType<Foo> = Foo{};`
-
-    In this case, `Foo` would be valid because it contains all the methods of
-    `StringConvert` without necessarily deriving from it.
-*/
-struct Foo : StringConvert {
-    fn to_string() -> string {
-        return "Foo";
-    }
-}
-
-class Bar {}
-
-fn main() {
-    print("Hello, ", Foo(), "World!", end="\n"); // Hello, Foo World!
-    print("Hello, ", Bar(), "World!"); // Hello, <Non-StringConvert at 0x...> World!
+fn other() -> void {
+    foo("hello"); // OK
+    let x = "world";
+    foo(x); // FAIL - cannot pass a value
+    foo(&x); // FAIL - cannot pass a mutable reference
+    foo(&const x); // OK
 }

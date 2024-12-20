@@ -13,48 +13,44 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
-#ifndef __$LIBHELIX_LIBC__
-#define __$LIBHELIX_LIBC__
+#ifndef __$LIBHELIX_FINALLY__
+#define __$LIBHELIX_FINALLY__
 
-#include "config.h"
-#include "primitives.h"
+#include "../config.h"
+#include "../refs.h"
+#include "function.h"
+
 
 H_NAMESPACE_BEGIN
 
-namespace libc {
-// #include <assert.h>
-// #include <ctype.h>
-// #include <errno.h>
-// #include <fenv.h>
-// #include <float.h>
-// #include <inttypes.h>
-// #include <iso646.h>
-// #include <limits.h>
-// #include <locale.h>
-// #include <math.h>
-// #include <setjmp.h>
-// #include <signal.h>
-// #include <stdarg.h>
-// #include <stdbool.h>
-// #include <stdint.h>
-#include <stdio.h>
-#include <signal.h>
-#ifndef _MSC_VER
-#include "cxxabi.h"
-#endif
-// #include <stdlib.h>
-// #include <string.h>
-// #include <time.h>
-// #include <uchar.h>
-// #include <wchar.h>
-// #include <wctype.h>
+/// \include belongs to the helix standard library.
+/// \brief function to forward arguments
+///
+/// \code {.cpp}
+/// int main() {
+///     int* a = (int*)malloc(sizeof(int) * 10);
+///     $finally _([&] { free(a); });
+/// }
+class $finally {
+  public:
+    $finally()                            = default;
+    $finally(const $finally &)            = delete;
+    $finally($finally &&)                 = delete;
+    $finally &operator=(const $finally &) = delete;
+    $finally &operator=($finally &&)      = delete;
+    ~$finally() {
+        if (m_fn) {
+            m_fn();
+        }
+    }
 
-template <typename T>
-using va_array = T[];
+    template <typename Fn>
+    explicit $finally(Fn &&fn)
+        : m_fn{std::forward<Fn>(fn)} {}
 
-template <typename T, usize N>
-using array = T[N];
-}  // namespace libc
+  private:
+    H_STD_NAMESPACE::$function<void()> m_fn;
+};
 
 H_NAMESPACE_END
 #endif

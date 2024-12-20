@@ -16,9 +16,9 @@
 #ifndef __$LIBHELIX_CAST__
 #define __$LIBHELIX_CAST__
 
-#include "concepts.h"
-#include "config.h"
-#include "traits.h"
+#include "../concepts.h"
+#include "../config.h"
+#include "../traits.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

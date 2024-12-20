@@ -16,10 +16,9 @@
 #ifndef __$LIBHELIX_FUNCTION__
 #define __$LIBHELIX_FUNCTION__
 
-#include "config.h"
-#include "libcxx.h"
-#include "refs.h"
-
+#include "../config.h"
+#include "../libcxx.h"
+#include "../refs.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

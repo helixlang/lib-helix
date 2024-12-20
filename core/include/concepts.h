@@ -24,13 +24,13 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 namespace concepts {
 
-template <typename T>
-concept HasToString = requires(T a) {
+template <typename _Ty>
+concept HasToString = requires(_Ty a) {
     { a.to_string() } -> LIBCXX_NAMESPACE::convertible_to<string>;
 };
 
-template <typename T>
-concept SupportsOStream = requires(LIBCXX_NAMESPACE::ostream &os, T a) {
+template <typename _Ty>
+concept SupportsOStream = requires(LIBCXX_NAMESPACE::ostream &os, _Ty a) {
     { os << a } -> H_STD_NAMESPACE::traits::convertible_to<LIBCXX_NAMESPACE::ostream &>;
 };
 
@@ -39,13 +39,13 @@ concept SupportsPointerCast = requires(_Ty from) {
     dynamic_cast<_Up>(from);  // Dynamic cast requirement
 };
 
-template <typename T, typename U>
-concept SafelyCastable = requires(T t, U *u) {
+template <typename _Ty, typename _Up>
+concept SafelyCastable = requires(_Ty t, _Up *u) {
     { t.$cast(u) } -> H_STD_NAMESPACE::traits::same_as<string>;
 };
 
-template <typename T>
-concept ConvertibleToString = HasToString<T> || SupportsOStream<T> || SafelyCastable<T, string>;
+template <typename _Ty>
+concept ConvertibleToString = HasToString<_Ty> || SupportsOStream<_Ty> || SafelyCastable<_Ty, string>;
 
 }  // namespace concepts
 H_STD_NAMESPACE_END

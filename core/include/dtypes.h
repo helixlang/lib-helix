@@ -19,11 +19,10 @@
 #include "config.h"
 #include "libcxx.h"
 #include "refs.h"
-#include "types.h"
+#include "primitives.h"
 
 H_NAMESPACE_BEGIN
 
-using byte   = LIBCXX_NAMESPACE::byte;
 using string = LIBCXX_NAMESPACE::string;
 
 H_STD_NAMESPACE_BEGIN
