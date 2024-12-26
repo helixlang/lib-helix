@@ -13,8 +13,8 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
-#ifndef __$LIBHELIX_INT__
-#define __$LIBHELIX_INT__
+#ifndef __$LIBHELIX_STRING__
+#define __$LIBHELIX_STRING__
 
 #include "../config.h"
 #include "../libcxx.h"
@@ -23,6 +23,7 @@
 #include "../primitives.h"
 
 H_NAMESPACE_BEGIN
+
 template <const usize _MaxSize, const usize _SlabSize = 16, typename _ElemT = usize>  // NOLINT
 class string {
 
@@ -30,7 +31,3 @@ class string {
 
 H_NAMESPACE_END
 #endif
-
-double abs
-ghram smith process
-projection

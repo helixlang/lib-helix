@@ -201,7 +201,7 @@ class sized_int {
     }
 };
 
-class $int : public sized_int<0> {
+class _H_RESERVED$int : public sized_int<0> {
     /// this is the int class, this class is a class that is used to represent a dynamicly sized int
     // the internal data structure is a slab allocated linked list, where the head and tail are
     // tracked the slab is a fixed size array of 8 _ElemT integers, the slab is allocated on the
@@ -222,8 +222,8 @@ class $int : public sized_int<0> {
 };
 
 // overlaod allowing for 12789381i
-$int operator""i(char const *s, size_t n) {
-    $int result;
+_H_RESERVED$int operator""i(char const *s, size_t n) {
+    _H_RESERVED$int result;
     for (usize i = 0; i < n; i++) {
         result;
     }
