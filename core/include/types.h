@@ -44,7 +44,7 @@ class tuple : public LIBCXX_NAMESPACE::tuple<_Tv...> {
     tuple(Ts &&...args)
         : LIBCXX_NAMESPACE::tuple<_Tv...>(std::forward<Ts>(args)...) {}
 
-    inline auto $cast(string * /* unused */) -> string {  // cast to string op to allow for printing
+    inline auto operator$cast(string * /* unused */) -> string {  // cast to string op to allow for printing
         string result = "(";
 
         for (usize i = 0; i < sizeof...(_Tv); i++) {
@@ -58,7 +58,7 @@ class tuple : public LIBCXX_NAMESPACE::tuple<_Tv...> {
         return result + ")";
     }
 
-    explicit operator string() { return $cast(static_cast<string *>(nullptr)); }
+    explicit operator string() { return operator$cast(static_cast<string *>(nullptr)); }
 };
 
 template <typename _Ty>
@@ -69,7 +69,7 @@ class list : public LIBCXX_NAMESPACE::vector<_Ty> {
     list(LIBCXX_NAMESPACE::initializer_list<_Ty> init)
         : LIBCXX_NAMESPACE::vector<_Ty>(init) {}
 
-    inline auto $cast(string * /* unused */) -> string {  // cast to string op to allow for printing
+    inline auto operator$cast(string * /* unused */) -> string {  // cast to string op to allow for printing
         string result = "[";
 
         for (usize i = 0; i < this->size(); i++) {
@@ -83,7 +83,7 @@ class list : public LIBCXX_NAMESPACE::vector<_Ty> {
         return result + "]";
     }
 
-    explicit operator string() { return $cast(static_cast<string *>(nullptr)); }
+    explicit operator string() { return operator$cast(static_cast<string *>(nullptr)); }
 };
 
 template <typename _Ty>
@@ -94,7 +94,7 @@ class set : public LIBCXX_NAMESPACE::set<_Ty> {
     set(LIBCXX_NAMESPACE::initializer_list<_Ty> init)
         : LIBCXX_NAMESPACE::set<_Ty>(init) {}
 
-    inline auto $cast(string * /* unused */) -> string {  // cast to string op to allow for printing
+    inline auto operator$cast(string * /* unused */) -> string {  // cast to string op to allow for printing
         string result = "{";
 
         for (auto it = this->begin(); it != this->end(); it++) {
@@ -108,7 +108,7 @@ class set : public LIBCXX_NAMESPACE::set<_Ty> {
         return result + "}";
     }
 
-    explicit operator string() { return $cast(static_cast<string *>(nullptr)); }
+    explicit operator string() { return operator$cast(static_cast<string *>(nullptr)); }
 };
 
 template <typename _Kt, typename _Vt>
@@ -119,7 +119,7 @@ class map : public LIBCXX_NAMESPACE::map<_Kt, _Vt> {
     map(LIBCXX_NAMESPACE::initializer_list<LIBCXX_NAMESPACE::pair<const _Kt, _Vt>> init)
         : LIBCXX_NAMESPACE::map<_Kt, _Vt>(init) {}
 
-    inline auto $cast(string * /* unused */) -> string {  // cast to string op to allow for printing
+    inline auto operator$cast(string * /* unused */) -> string {  // cast to string op to allow for printing
         string result = "{";
 
         for (auto it = this->begin(); it != this->end(); it++) {
@@ -133,7 +133,7 @@ class map : public LIBCXX_NAMESPACE::map<_Kt, _Vt> {
         return result + "}";
     }
 
-    explicit operator string() { return $cast(static_cast<string *>(nullptr)); }
+    explicit operator string() { return operator$cast(static_cast<string *>(nullptr)); }
 };
 
 H_NAMESPACE_END

@@ -17,7 +17,7 @@
 #define __$LIBHELIX_CONCEPTS__
 
 #include "config.h"
-#include "dtypes.h"
+#include "types.h"
 #include "traits.h"
 
 H_NAMESPACE_BEGIN
@@ -41,7 +41,7 @@ concept SupportsPointerCast = requires(_Ty from) {
 
 template <typename _Ty, typename _Up>
 concept SafelyCastable = requires(_Ty t, _Up *u) {
-    { t.$cast(u) } -> H_STD_NAMESPACE::traits::same_as<string>;
+    { t.operator$cast(u) } -> H_STD_NAMESPACE::traits::same_as<_Up>; // castable to the requested type
 };
 
 template <typename _Ty>

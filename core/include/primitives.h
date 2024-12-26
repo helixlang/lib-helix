@@ -61,4 +61,7 @@ using isize = i8;
 static_assert(sizeof(usize) == sizeof(void *), "usize must match the size of a pointer.");
 static_assert(sizeof(isize) == sizeof(void *), "isize must match the size of a pointer.");
 
+class null_t {};
+inline constexpr null_t null;
+
 #endif  // __$LIBHELIX_TYPES__

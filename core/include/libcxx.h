@@ -17,6 +17,7 @@
 #define __$LIBHELIX_LIBCXX__
 
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <map>
 #include <set>
@@ -37,12 +38,11 @@
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
-
 template <typename _Tp, typename... _Ty>
-constexpr _Tp *$new(_Ty &&...t) {
+constexpr _Tp *_H_RESERVED$new(_Ty &&...t) {
     return new _Tp(std::forward<_Ty>(t)...);
 }
-
-H_STD_NAMESPACE_END
 H_NAMESPACE_END
+H_STD_NAMESPACE_END
+
 #endif

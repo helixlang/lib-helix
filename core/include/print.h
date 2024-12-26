@@ -18,13 +18,11 @@
 
 #include "concepts.h"
 #include "config.h"
-#include "dtypes.h"
+#include "types.h"
 #include "libc.h"
-#include "libcxx.h"
 #include "refs.h"
 #include "traits.h"
 #include "primitives.h"
-
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -43,12 +41,12 @@ class endl {
         : end_l(std::ref::move(end)) {}
 
     explicit endl(const char *end)
-        : end_l(end ? end : "\n") {}
+        : end_l((end != nullptr) ? end : "\n") {}
 
     explicit endl(char end)
         : end_l(1, end) {}
 
-    friend libcxx::ostream &operator<<(libcxx::ostream &oss, const endl &end) {
+    friend LIBCXX_NAMESPACE::ostream &operator<<(LIBCXX_NAMESPACE::ostream &oss, const endl &end) {
         oss << end.end_l;
         return oss;
     }
@@ -66,27 +64,29 @@ class endl {
 /// - if the argument is an arithmetic type, it will use std::to_string
 /// - if all else fails, it will convert the address of the argument to a string
 ///
-template <typename _Ty>
-constexpr string to_string(_Ty &&t) {
-    if constexpr (std::concepts::HasToString<_Ty>) {
+template <typename Ty>
+constexpr string to_string(Ty &&t) {
+    if constexpr (std::concepts::HasToString<Ty>) {
         return t.to_string();
-    } else if constexpr (std::concepts::SupportsOStream<_Ty>) {
-        libcxx::stringstream ss;
+    } else if constexpr (std::concepts::SupportsOStream<Ty>) {
+        LIBCXX_NAMESPACE::stringstream ss;
         ss << t;
         return ss.str();
-    } else if constexpr (std::concepts::SafelyCastable<_Ty, string>) {
-        return t.$cast(static_cast<string *>(nullptr));
-    } else if constexpr (libcxx::is_arithmetic_v<_Ty>) {
-        return libcxx::to_string(t);
+    } else if constexpr (std::concepts::SafelyCastable<Ty, string>) {
+        return t.operator$cast(static_cast<string *>(nullptr));
+    } else if constexpr (std::traits::is_same_v<Ty, bool>) {
+        return t ? "true" : "false";
+    } else if constexpr (LIBCXX_NAMESPACE::is_arithmetic_v<Ty>) {
+        return LIBCXX_NAMESPACE::to_string(t);
     } else {
-        libcxx::stringstream ss;
+        LIBCXX_NAMESPACE::stringstream ss;
 
 #ifdef _MSC_VER
-        ss << "[" << typeid(t).name() << " at 0x" << libcxx::hex << &t << "]";
+        ss << "[" << typeid(t).name() << " at 0x" << LIBCXX_NAMESPACE::hex << &t << "]";
 #else
         int   st;
-        char *rn = abi::__cxa_demangle(typeid(t).name(), 0, 0, &st);
-        ss << "[" << rn << " at 0x" << libcxx::hex << &t << "]";
+        char *rn = libc::abi::__cxa_demangle(typeid(t).name(), 0, 0, &st);
+        ss << "[" << rn << " at 0x" << LIBCXX_NAMESPACE::hex << &t << "]";
         free(rn);
 #endif
 
@@ -107,9 +107,9 @@ constexpr string to_string(_Ty &&t) {
 /// f"hi: {(some_expr() + 12)=}" -> stringf("hi: (some_expr() + 12)=\{\}", some_expr())
 /// f"hi: {some_expr() + 12}"    -> stringf("hi: \{\}", some_expr() + 12)
 ///
-template <typename... _Ty>
-constexpr string stringf(string s, _Ty &&...t) {
-    const array<string, sizeof...(t)> EAS = {to_string(std::forward<_Ty>(t))...};
+template <typename... Ty>
+constexpr string stringf(string s, Ty &&...t) {
+    const array<string, sizeof...(t)> EAS = {to_string(std::forward<Ty>(t))...};
 
     usize pos = 0;
 
@@ -121,7 +121,7 @@ constexpr string stringf(string s, _Ty &&...t) {
         pos = s.find("\\{\\}", pos);
 
         if (pos == string::npos) [[unlikely]] {
-            throw libcxx::runtime_error(
+            throw LIBCXX_NAMESPACE::runtime_error(
                 "error: [f-stirng engine]: format argument count mismatch, this should not "
                 "happen, please open a issue on github");
         }
@@ -147,7 +147,7 @@ inline constexpr void print(Args &&...t) {
     if constexpr (sizeof...(t) > 0) {
         if constexpr (!std::traits::same_as_v<
                           std::ref::remove_cv_t<std::ref::remove_ref_t<
-                              decltype(libcxx::get<sizeof...(t) - 1>(tuple<Args...>(t...)))>>,
+                              decltype(LIBCXX_NAMESPACE::get<sizeof...(t) - 1>(tuple<Args...>(t...)))>>,
                           std::endl>) {
             printf("\n");
         }

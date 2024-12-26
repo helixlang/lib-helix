@@ -38,6 +38,10 @@ namespace std {}  // namespace std
 #define _NOEXCEPT noexcept
 #endif
 
+#ifndef _NEW
+#define _NEW(x) new x
+#endif
+
 namespace helix {
 namespace libcxx = ::std;
 }

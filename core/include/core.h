@@ -29,12 +29,12 @@
 
 #include "concepts.h"
 #include "config.h"
-#include "dtypes.h"
-#include "lang/cast.h"
-#include "lang/finally.h"
-#include "lang/function.h"
-#include "lang/generator.h"
-#include "lang/question.h"
+#include "types.h"
+#include "lang/cast.hh"
+#include "lang/finally.hh"
+#include "lang/function.hh"
+#include "lang/generator.hh"
+#include "lang/question.hh"
 #include "libc.h"
 #include "libcxx.h"
 #include "primitives.h"
@@ -42,5 +42,12 @@
 #include "refs.h"
 #include "traits.h"
 
+/*
+cast.hh
+finally.hh
+function.hh
+generator.hh
+panic.hh
+*/
 
 #endif
