@@ -28,6 +28,106 @@
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
+/// \class $generator
+///
+/// A core component of the Helix runtime, `$generator` provides support for generator semantics,
+/// enabling `yield` types and `yield return` statements in Helix programs. Generators are an
+/// abstraction for managing lazily-evaluated sequences, providing an efficient and expressive way
+/// to produce and consume elements in a coroutine-based workflow.
+///
+/// ### Overview
+/// `$generator` is implemented using C++ coroutines and integrates seamlessly with the Helix
+/// runtime. It supports the definition of functions that can produce multiple values lazily using
+/// the `yield` keyword. Generators simplify writing iterators, state machines, and other
+/// sequence-producing constructs.
+///
+/// ### Key Features
+/// - **Generator Semantics**:
+///   - Allows the definition of generator functions with `fn ... -> yield T;`.
+///   - Supports the `yield` keyword to produce values one at a time.
+///   - Compatible with range-based loops and manual iteration.
+/// - **Coroutines Integration**:
+///   - Leverages C++ coroutines for efficient state management.
+///   - Manages coroutine lifecycle, including proper destruction and cleanup.
+/// - **Iterators**:
+///   - Provides an `Iter` class to navigate through the yielded values.
+///   - Supports standard iteration constructs, such as `for` loops and `begin`/`end` methods.
+///
+/// ### Generator Lifecycle
+/// 1. **Initialization**:
+///    - A generator function initializes a `$generator` object when called.
+///    - The coroutine state is suspended initially and resumes upon iteration.
+/// 2. **Yielding Values**:
+///    - Each `yield` statement suspends the coroutine and provides a value to the caller.
+///    - The coroutine resumes execution on the next iteration.
+/// 3. **Completion**:
+///    - When the generator function completes, the coroutine is destroyed.
+///    - All resources used by the generator are cleaned up.
+///
+/// ### Integration with `yield`
+/// In Helix, functions with a `yield` return type (`fn ... -> yield T;`) automatically generate a
+/// `$generator<T>` as their return type. This allows developers to use `yield` to produce values
+/// incrementally:
+///
+/// ```helix
+/// fn range(start: int, end: int) -> yield int {
+///     for i in start..end {
+///         yield i;
+///     }
+/// }
+///
+/// let g = range(1, 5);
+/// for val in g {
+///     print(val); // Output: 1, 2, 3, 4
+/// }
+/// ```
+///
+/// ### Components
+/// #### `promise_type`
+/// - Represents the coroutine promise associated with the generator.
+/// - Manages the yielded values and coroutine state.
+/// - Provides the `yield_value` method for handling `yield` expressions.
+/// - Responsible for the coroutine's initial and final suspension points.
+///
+/// #### `Iter`
+/// - Provides iterator support for navigating the generator's yielded values.
+/// - Implements increment (`operator++`), dereference (`operator*`), and comparison operators.
+///
+/// #### `Handle`
+/// - Alias for the coroutine handle associated with the generator.
+/// - Facilitates the management and destruction of the coroutine.
+///
+/// ### Functions
+/// #### `next($generator<T> &gen)`
+/// - Retrieves the next value from the generator.
+/// - Automatically resumes the coroutine and fetches the current value:
+///   ```helix
+///   let g = range(1, 5);
+///   print(next(g)); // Output: 1
+///   ```
+///
+/// ### Example Usage
+/// ```helix
+/// fn some_generator(start: int, end: int) -> yield int {
+///     for i in start..end {
+///         yield i;
+///     }
+/// }
+///
+/// let g = some_generator(10, 15);
+/// for val in g {
+///     print(val); // Output: 10, 11, 12, 13, 14
+/// }
+/// ```
+///
+/// ### Notes
+/// - `$generator` is a Helix runtime feature and is part of the standard library.
+/// - The implementation currently relies on `libc++` and may be subject to refactoring to remove
+///   external dependencies in future versions.
+///
+/// ### Related Concepts
+/// - `yield`: Used in Helix to produce values in generator functions.
+/// - `Iter`: The iterator class for navigating generator results.
 template <LIBCXX_NAMESPACE::movable T>
 class $generator {
   public:
