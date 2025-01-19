@@ -11,16 +11,10 @@
 //===------------------------------------------------------------------------------------------===//
 // build.hx - The build script for std
 
-// this is a hypotechical build script in helix
+// this is a hypothetical build script in helix
 // syntax is not final tho.
 
 import build_tools as bt;
-
-class Array {
-    fn map(self, func: fn (Element_Ty) -> Element_Ty) requires <Element_Ty::yessir> {
-
-    }
-}
 
 module build_tools {
 class InvalidInput derives BaseError {
@@ -59,23 +53,6 @@ class BuildConfig {
 }
 } // end module build_tools
 
-print<string::sad, ste::ss>()
-
-macro higher(a: int, b: int) -> int {
-    "a": case "b": case "c"
-};
-
-define higher(a, b) {
-    "a": case "b": case "c"
-};
-
-higher!
-
-switch a {
-    case higher!:
-
-}
-
 import git;
 
 import python_ffi;
@@ -100,6 +77,9 @@ fn build() -> noreturn! {
     if (git::file_changed("src/test.py")) {
         bt::run();
     }
+
+    builder.watch_file("test.hlx");
+    builder.watch_dir("src");
 
     builder.compile();
     bt::run_tests();

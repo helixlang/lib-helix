@@ -1,3 +1,5 @@
+#[trivially_import(true)] // prevents wrapping IR in a `unwind` module, keeping the handler globally accessible
+
 ///--- The Helix Project ------------------------------------------------------------------------///
 ///                                                                                              ///
 ///   Part of the Helix Project, under the Attribution 4.0 International license (CC BY 4.0).    ///
@@ -12,25 +14,9 @@
 ///   Copyright (c) 2024 The Helix Project (CC BY 4.0)                                           ///
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
-///                                                                                              ///
-///  The process of this file is special, the helix compiler will compile this file first, like  ///
-///  core.h but this file is the runtime defs written in helix, the compiler will compile this   ///
-///  file first along with the core.h file, then the compiler will compile the rest of the code. ///
-///                                                                                              ///
-///  All files in this Directory will be automatically included in the compilation process.      ///
-///                                                                                              ///
-///  WARNING: Do not remove this file, it is required for the helix compiler to work properly.   ///
-///                                                                                              ///
-///----------------------------------------------------------------------------------------------///
 
-fn foo(a: &const string) -> void {
-    
-}
-
-fn other() -> void {
-    foo("hello"); // OK
-    let x = "world";
-    foo(x); // FAIL - cannot pass a value
-    foo(&x); // FAIL - cannot pass a mutable reference
-    foo(&const x); // OK
-}
+/// this contains all the core interfaces for the helix language
+// References:
+// - Referenceable
+// - Copyable
+// - Moveable

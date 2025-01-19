@@ -1,0 +1,67 @@
+
+// this needs to work like:
+// string   : private basic<char32_t> {};
+// stirng8  : private basic<char16_t> {};
+// stirng16 : private basic<char8_t> {};
+
+// string32 = string;
+/* string must contain:
+
+append(string) // both CharT* and const CharT* get implicitly converted to string
+
+pop()         // removes the last char
+pop_segment() // pops the last added segment
+
+insert(usize n = 0, string)
+
+additionally:
+capitalize() -> string
+lower() -> string
+upper() -> string
+title() -> string
+casefold() -> string
+
+static center_align(string, usize w, const string fill = " ") -> string
+static left_align(string, usize w, const string fill = " ") -> string
+static right_align(string, usize w, const string fill = " ") -> string
+
+center_align(usize w, const string fill = " ") -> string
+left_align(usize w, const string fill = " ") -> string
+right_align(usize w, const string fill = " ") -> string
+
+static count(string, const CharT*) -> usize
+static count(string, const CharT) -> usize
+
+count(const string) -> usize
+count(const CharT) -> usize
+
+ends_with(string) -> bool
+replace_tabs(usize tab_size = 4) -> string
+find_replace(const string, const string) -> string
+find_replace(const CharT, const CharT) -> string
+
+static format(string, ...) -> string // takes a string in the form of "hello {}" and replaces the
+                                     // {} with the arguments passed
+
+static mapped_format(string, ...{args}) -> string // takes a string in the form of "hello {name}"
+                                                  // and replaces the {name} with the args passed
+                                                  // in the map
+
+
+Collections:
+    contains(string) -> bool
+
+*/
+
+interface AssociativeCollection requires <ElmT> {
+    /* iterator */ op in fn (self)              -> yield ElmT;
+    /* contains */ op in fn (self, value: ElmT) -> bool;
+    /* get      */ op [] fn (self, idx: usize, reverse: bool = false) -> ElmT;
+    fn length(self)   -> usize; // num of elements
+    fn capacity(self) -> usize; // allocated space
+    fn find(self, value: ElmT) -> usize?; // null if not found else index
+    fn copy(self)     -> AssociativeCollection;
+    fn count(self, value: ElmT) -> usize;
+    /* symmetric_difference */ op ^ fn (self, const other: AssociativeCollection) -> AssociativeCollection; // returns a new collection who's elements in are not in both collections.
+
+}

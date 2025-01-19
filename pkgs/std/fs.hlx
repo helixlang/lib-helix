@@ -1,0 +1,7 @@
+// the fs module provides filesystem utilities for helix programs. (along with path manipulation, file reading, etc.)
+
+interface IPath {
+    // this is pathlib usefull for path manipulation
+    
+}
+
