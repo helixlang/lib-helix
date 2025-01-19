@@ -20,7 +20,7 @@ module mem {
 
     }
 
-    class slice with <T,Alloc> if Alloc derives Allocator {
+    class slice requires <T,Alloc> if Alloc derives Allocator {
         let ptr: Borrowed<T>, 
             len: Alloc::Size;
     }
@@ -69,7 +69,7 @@ module sync::lock {
 /// I propose that types can be conditional to give them more power than just being aliases.
 module contracts {
 
-    type MoreThan with <const RHS:size,Then, const LHS:size, Otherwise> = if RHS > LSH: Then else Otherwise;
+    type MoreThan requires <const RHS:size,Then, const LHS:size, Otherwise> = if RHS > LSH: Then else Otherwise;
 
     /// as we need a way to stipulate that all things should implement sync or not sync
 
@@ -98,7 +98,7 @@ module sync::channel {
 
 
 
-    interface Channel with <Sender, Receiver> {
+    interface Channel requires <Sender, Receiver> {
         
     }
 
@@ -120,22 +120,22 @@ module sync::channel {
 module core::ptr {
 
     // A borrow checked pointer.
-    class Unique with <T> {
+    class Unique requires <T> {
         ptr: *unsafe T;
     }
 
-    class Shared with <T,Inc> if Inc derives Count {
+    class Shared requires <T,Inc> if Inc derives Count {
         ptr:Unique<T>,
 
     }  
     
     
-    class Shared with <T> {
+    class Shared requires <T> {
         ptr:Unique<T>,
     }  
 
 
-    class Cow with <Then>
+    class Cow requires <Then>
 
 
 
@@ -143,11 +143,11 @@ module core::ptr {
 }
 /* end -------------------------- core/ptr.hlx -------------------------- end */
 
-class list   with <T      >;
-class array  with <T, Size>;
-class vec    with <T      >;
+class list   requires <T      >;
+class array  requires <T, Size>;
+class vec    requires <T      >;
 
-class string with <C = char, Container = collection::vec> derives String {
+class string requires <C = char, Container = collection::vec> derives String {
     let container:Container<C>;
 
 
@@ -172,7 +172,7 @@ interface String {
 
 
 
-class map    with <
+class map    requires <
 
 
 
@@ -199,7 +199,7 @@ module core::prelude {
 module primitive {
     import ::char::Char;
 
-    class String with <C> if C derives Char {
+    class String requires <C> if C derives Char {
 
         type Char = Char;
         
@@ -241,7 +241,7 @@ module hash {
     interface Hasher {
         fn finish(self) -> u64;
 
-        fn write(self, value: T) with <T> ;
+        fn write(self, value: T) requires <T> ;
     }
 }
 
@@ -253,7 +253,7 @@ module hash {
     
     interface Hasher {
         fn self(seed: int = 0);
-        fn write(self, val: T) with <T> if T has As::<slice::<byte>>;
+        fn write(self, val: T) requires <T> if T has As::<slice::<byte>>;
     }
     
     interface Hash {
@@ -267,7 +267,7 @@ module hash {
             hash = seed;
         }
         
-        fn write(self, val: T) with <T> if T has As::<slice::<byte>> {
+        fn write(self, val: T) requires <T> if T has As::<slice::<byte>> {
             hash += (self.hash * 31) ^ (val as int);
         }
     }
@@ -280,11 +280,11 @@ fn main() -> i32 {
 
 
 /// Maps one type to another
-interface Transform with <T,U,E> {
+interface Transform requires <T,U,E> {
     fn apply(self, f: fn (*T) -> E?);
 }
 
-extend T with <T,U,E> derives Transform 
+extend T requires <T,U,E> derives Transform 
     if T derives Iterator<U> {
     /// Iterates in place and applies the transform
     fn apply(self, func: fn (*T) -> E?) R {
@@ -310,11 +310,11 @@ module collection::list {
 
 module math {
 
-    interface Min with <T = self> {
+    interface Min requires <T = self> {
         fn min (self) -> T;
     }
 
-    interface Max with <T = self> {
+    interface Max requires <T = self> {
         fn max(self) -> T;
     }
 
@@ -326,7 +326,7 @@ module math {
         fn ceil(self) -> self
     }
 
-    class Ratio with <N,D=N> {
+    class Ratio requires <N,D=N> {
 
     }
 
@@ -391,7 +391,7 @@ interface Error if self has Debug {}
 
 
 /// Guarantees that a T is stored sequentially 
-interface Sequential with <T> {}
+interface Sequential requires <T> {}
 
 interface Allocator {
     // The max number of items that can be allocated at once.
@@ -400,7 +400,7 @@ interface Allocator {
 
 
 interface Collection 
-    with <Key, Val, Alloc> 
+    requires <Key, Val, Alloc> 
     if Alloc has Allocator & self has Index<Key,Value>
     {
 
@@ -427,7 +427,7 @@ interface Collection
 
 }
 
-interface Record with <Key, Val> extend Collection<Key, Val> {
+interface Record requires <Key, Val> extend Collection<Key, Val> {
     type Entry = (Key, Val);
     
     fn keys(self)            -> yield Key;
@@ -437,7 +437,7 @@ interface Record with <Key, Val> extend Collection<Key, Val> {
     fn extend(self, iter: yield Entry);
 }
 
-interface Generator with <T> {
+interface Generator requires <T> {
     
     op ++ fn next(self) -> yield T
 
@@ -469,7 +469,7 @@ interface Set {
 }
 
 
-struct Function with <Args,Return> {
+struct Function requires <Args,Return> {
 
     type Args = Args;
     type Return = Return;
@@ -478,7 +478,7 @@ struct Function with <Args,Return> {
 
 }
 
-interface Context with <Fn> if Fn derives Function  {
+interface Context requires <Fn> if Fn derives Function  {
 
 
     op as fn (self, action: Action) -> Return;
@@ -509,7 +509,7 @@ interface Compare {
 
 
 /// Last In, First Out (LIFO)
-interface Stack with <T,Err=Error> if Err derives Error {
+interface Stack requires <T,Err=Error> if Err derives Error {
 
     fn push(self, value:T) -> Err?;
 
@@ -518,7 +518,7 @@ interface Stack with <T,Err=Error> if Err derives Error {
 }
 
 /// First In, First Out (FIFO)
-interface Queue with <T,Err=Error> if Err derives Error {
+interface Queue requires <T,Err=Error> if Err derives Error {
 
     fn enqueue(self, value:T) -> Err?;
 
@@ -535,7 +535,7 @@ interface PriorityQueue<T, P> {
 
 
 
-interface Index with <Idx>  {
+interface Index requires <Idx>  {
 
     /// The type to return
     type Output;

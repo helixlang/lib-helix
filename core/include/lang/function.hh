@@ -18,11 +18,9 @@
 
 #include "../config.h"
 #include "../libcxx.h"
-#include "../refs.h"
+#include "../memory.h"
 
 H_NAMESPACE_BEGIN
-H_STD_NAMESPACE_BEGIN
-
 /// \class $function
 ///
 /// The `$function` class is a type-erased, dynamically allocated wrapper for callable entities.
@@ -174,29 +172,29 @@ class $function<Rt(Tp...)> {
     /// f(42);  // Internally calls `$callable::invoke`.
     /// ```
     struct $callable {
-        $callable()                                 = default;
-        $callable(const $callable &)                = default;
-        $callable &operator=(const $callable &)     = default;
-        $callable($callable &&) noexcept            = default;
-        $callable &operator=($callable &&) noexcept = default;
-        virtual ~$callable()                        = default;
-        virtual Rt         invoke(Tp... args)       = 0;
-        virtual $callable *clone() const            = 0;
+        constexpr $callable()                                 = default;
+        constexpr $callable(const $callable &)                = default;
+        constexpr $callable &operator=(const $callable &)     = default;
+        constexpr $callable($callable &&) noexcept            = default;
+        constexpr $callable &operator=($callable &&) noexcept = default;
+        constexpr virtual ~$callable()                        = default;
+        constexpr virtual Rt         invoke(Tp... args)       = 0;
+        constexpr virtual $callable *clone() const            = 0;
     };
 
     template <typename T>
     struct Callable : $callable {
         alignas(alignof(LIBCXX_NAMESPACE::max_align_t)) T callable;
 
-        Callable(typename ref::remove_ref<T> &&callable)  // NOLINT(google-explicit-constructor)
-            : callable(H_STD_NAMESPACE::forward<T>(callable)) {}
+        constexpr Callable(typename H_STD_NAMESPACE::meta::remove_reference_t<T> &&callable)  // NOLINT(google-explicit-constructor)
+            : callable(H_STD_NAMESPACE::memory::forward<T>(callable)) {}
 
-        Callable(const T &callable)  // NOLINT(google-explicit-constructor)
+        constexpr Callable(const T &callable)  // NOLINT(google-explicit-constructor)
             : callable(callable) {}
 
-        Rt invoke(Tp... args) override { return callable(H_STD_NAMESPACE::forward<Tp>(args)...); }
+        constexpr Rt invoke(Tp... args) override { return callable(H_STD_NAMESPACE::memory::forward<Tp>(args)...); }
 
-        $callable *clone() const override {
+        constexpr $callable *clone() const override {
             return new (LIBCXX_NAMESPACE::align_val_t(alignof(Callable<T>))) Callable(callable); // NOLINT
         }
     };
@@ -204,33 +202,33 @@ class $function<Rt(Tp...)> {
     $callable *callable;
 
   public:
-    $function()
+    constexpr $function()
         : callable(nullptr) {}
 
-    $function($function &&other) noexcept
+    constexpr $function($function &&other) noexcept
         : callable(other.callable) {
         other.callable = nullptr;
     }
 
-    $function(const $function &other)
+    constexpr $function(const $function &other)
         : callable(other.callable ? other.callable->clone() : nullptr) {}
 
     template <typename T>
-    $function(typename ref::remove_ref_t<T> $call_o) {  // NOLINT(google-explicit-constructor)
-        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::forward<T>($call_o)); // NOLINT
+    constexpr $function(typename H_STD_NAMESPACE::meta::remove_reference_t<T> $call_o) {  // NOLINT(google-explicit-constructor)
+        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::memory::forward<T>($call_o)); // NOLINT
     }
 
     template <typename T>
-    $function(T $call_o) {  // NOLINT(google-explicit-constructor)
-        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::forward<T>($call_o)); // NOLINT
+    constexpr $function(T $call_o) {  // NOLINT(google-explicit-constructor)
+        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::memory::forward<T>($call_o)); // NOLINT
     }
 
-    $function(Rt (*func)(Tp...))  // NOLINT(google-explicit-constructor)
-        : callable(func ? new Callable<ref::remove_cv_t<Rt (*)(Tp...)>>(func) : nullptr) {}
+    constexpr $function(Rt (*func)(Tp...))  // NOLINT(google-explicit-constructor)
+        : callable(func ? new Callable<H_STD_NAMESPACE::meta::remove_const_volatile_t<Rt (*)(Tp...)>>(func) : nullptr) {}
 
-    ~$function() { reset(); }
+    constexpr ~$function() { reset(); }
 
-    $function &operator=($function &&other) noexcept {
+    constexpr $function &operator=($function &&other) noexcept {
         if (this != &other) {
             reset();
 
@@ -241,7 +239,7 @@ class $function<Rt(Tp...)> {
         return *this;
     }
 
-    $function &operator=(const $function &other) {
+    constexpr $function &operator=(const $function &other) {
         if (this != &other) {
             reset();
             callable = other.callable ? other.callable->clone() : nullptr;
@@ -250,31 +248,31 @@ class $function<Rt(Tp...)> {
     }
 
     template <typename T>
-    $function &operator=(T $call_o) {
+    constexpr $function &operator=(T $call_o) {
         delete callable;
-        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::forward<T>($call_o)); // NOLINT
+        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::memory::forward<T>($call_o)); // NOLINT
         return *this;
     }
 
     // Assignment for function pointers
-    $function &operator=(Rt (*func)(Tp...)) {
+    constexpr $function &operator=(Rt (*func)(Tp...)) {
         delete callable;
-        callable = func ? new Callable<Rt (*)(typename ref::remove_ref_t<Tp>...)>(func) : nullptr;
+        callable = func ? new Callable<Rt (*)(typename H_STD_NAMESPACE::meta::remove_reference_t<Tp>...)>(func) : nullptr;
         return *this;
     }
 
-    explicit           operator bool() const noexcept { return callable != nullptr; }
-    [[nodiscard]] bool operator$question() const noexcept { return callable != nullptr; }
+    explicit constexpr operator bool() const noexcept { return callable != nullptr; }
+    [[nodiscard]] constexpr bool operator$question() const noexcept { return callable != nullptr; }
 
-    Rt operator()(Tp... args) {
+    constexpr Rt operator()(Tp... args) {
         if (!callable) {
             throw "called an unset function pointer";
         }
 
-        return callable->invoke(H_STD_NAMESPACE::forward<Tp>(args)...);
+        return callable->invoke(H_STD_NAMESPACE::memory::forward<Tp>(args)...);
     }
 
-    void reset() noexcept {
+    constexpr void reset() noexcept {
         if (callable) {
             delete callable;
             callable = nullptr;
@@ -282,6 +280,7 @@ class $function<Rt(Tp...)> {
     }
 };
 
+H_STD_NAMESPACE_BEGIN
 /// \typedef Function
 ///
 /// A type alias for the `$function` class, providing a more concise and readable syntax for

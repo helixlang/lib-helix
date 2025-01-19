@@ -17,11 +17,10 @@
 #define __$LIBHELIX_FINALLY__
 
 #include "../config.h"
-#include "../refs.h"
+#include "../memory.h"
 #include "../lang/function.hh"
 
 H_NAMESPACE_BEGIN
-
 /// \class $finally
 ///
 /// Provides "finally" semantics in Helix, allowing guaranteed execution of cleanup or other
@@ -101,10 +100,10 @@ class $finally {
 
     template <typename Fn>
     explicit $finally(Fn &&fn)
-        : m_fn{std::forward<Fn>(fn)} {}
+        : m_fn{H_STD_NAMESPACE::memory::forward<Fn>(fn)} {}
 
   private:
-    H_STD_NAMESPACE::$function<void()> m_fn;
+    $function<void()> m_fn;
 };
 
 H_NAMESPACE_END

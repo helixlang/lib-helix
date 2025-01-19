@@ -21,12 +21,10 @@
 #define __$LIBHELIX_GENERATOR__
 
 #include "../config.h"
-#include "../libcxx.h"
-#include "../primitives.h"
-#include "../refs.h"
+#include "../memory.h"
 
 H_NAMESPACE_BEGIN
-H_STD_NAMESPACE_BEGIN
+
 
 /// \class $generator
 ///
@@ -130,20 +128,22 @@ H_STD_NAMESPACE_BEGIN
 /// - `Iter`: The iterator class for navigating generator results.
 template <LIBCXX_NAMESPACE::movable T>
 class $generator {
-  public:
+public:
     struct promise_type {
-        static LIBCXX_NAMESPACE::suspend_always initial_suspend() noexcept { return {}; }
-        static LIBCXX_NAMESPACE::suspend_always final_suspend() noexcept { return {}; }
-        $generator<T> get_return_object() { return $generator{Handle::from_promise(*this)}; }
+        constexpr static LIBCXX_NAMESPACE::suspend_always initial_suspend() noexcept { return {}; }
+        constexpr static LIBCXX_NAMESPACE::suspend_always final_suspend() noexcept { return {}; }
+
+        $generator get_return_object() noexcept {
+            return $generator{Handle::from_promise(*this)};
+        }
 
         LIBCXX_NAMESPACE::suspend_always yield_value(T value) noexcept {
-            current_value = H_STD_NAMESPACE::ref::move(value);
+            current_value = H_STD_NAMESPACE::memory::move(value);
             return {};
         }
 
         void return_void() noexcept {}
-
-        void                     await_transform() = delete;
+        void await_transform() = delete;
         [[noreturn]] static void unhandled_exception() { throw; }
 
         LIBCXX_NAMESPACE::optional<T> current_value;
@@ -151,25 +151,23 @@ class $generator {
 
     using Handle = LIBCXX_NAMESPACE::coroutine_handle<promise_type>;
 
-    $generator()                              = default;
-    $generator(const $generator &)            = delete;
+    constexpr $generator() noexcept = default;
+
+    explicit $generator(Handle coroutine) noexcept
+        : m_coroutine(coroutine) {}
+
+    $generator(const $generator &) = delete;
     $generator &operator=(const $generator &) = delete;
-    explicit $generator(const Handle coroutine)
-        : m_coroutine{coroutine} {}
 
     $generator($generator &&other) noexcept
-        : m_coroutine{other.m_coroutine} {
-        other.m_coroutine = {};
-    }
+        : m_coroutine(H_STD_NAMESPACE::memory::exchange(other.m_coroutine, {})) {}
 
     $generator &operator=($generator &&other) noexcept {
         if (this != &other) {
             if (m_coroutine) {
                 m_coroutine.destroy();
             }
-
-            m_coroutine       = other.m_coroutine;
-            other.m_coroutine = {};
+            m_coroutine = H_STD_NAMESPACE::memory::exchange(other.m_coroutine, {});
         }
         return *this;
     }
@@ -178,45 +176,44 @@ class $generator {
         if (m_coroutine) {
             m_coroutine.destroy();
         }
-
-        delete m_iter;
     }
 
     class Iter {
-      public:
-        void     operator++() { m_coroutine.resume(); }
-        const T &operator*() const { return *m_coroutine.promise().current_value; }
-        bool     operator==(LIBCXX_NAMESPACE::default_sentinel_t /*unused*/) const {
+    public:
+        explicit Iter(Handle coroutine) noexcept
+            : m_coroutine(coroutine) {}
+
+        void operator++() noexcept { m_coroutine.resume(); }
+
+        const T &operator*() const noexcept {
+            return *m_coroutine.promise().current_value;
+        }
+
+        constexpr bool operator==(LIBCXX_NAMESPACE::default_sentinel_t) const noexcept {
             return !m_coroutine || m_coroutine.done();
         }
 
-        explicit Iter(const Handle coroutine)
-            : m_coroutine{coroutine} {}
-
-        usize index() const { return m_coroutine.promise().index; }
-
-      private:
+    private:
         Handle m_coroutine;
     };
 
-    Iter begin() {
+    Iter begin() noexcept {
         if (m_coroutine) {
             m_coroutine.resume();
         }
-
-        if (m_iter == nullptr) {
-            m_iter = new Iter{m_coroutine};  // NOLINT
-        }
-
-        return *m_iter;
+        return Iter{m_coroutine};
     }
 
-    LIBCXX_NAMESPACE::default_sentinel_t end() { return {}; }
+    constexpr LIBCXX_NAMESPACE::default_sentinel_t end() noexcept { return {}; }
 
-  private:
-    Handle m_coroutine;
-    Iter  *m_iter = nullptr;
+private:
+    Handle m_coroutine = nullptr;
 };
+
+H_STD_NAMESPACE_BEGIN
+
+template <LIBCXX_NAMESPACE::movable T>
+using Generator = $generator<T>;
 
 template <LIBCXX_NAMESPACE::movable T>
 inline T next($generator<T> &gen) {

@@ -22,13 +22,14 @@
 #define __$LIBHELIX_PANIC__
 
 #include "../config.h"
-#include "../types.h"
 #include "../lang/function.hh"
 #include "../primitives.h"
-#include "../refs.h"
-#include "../traits.h"
+#include "../memory.h"
+#include "../meta.h"
+#include "../types.h"
 #include "../types/erase.h"
 #include "../types/errors.h"
+#include "../libc.h"
 
 /// \def $CrashWithPanic
 ///
@@ -49,7 +50,7 @@
 ///
 /// ### Example Usage
 /// ```cpp
-/// $CrashWithPanic(std::errors::RuntimeError("Critical error occurred."));
+/// $CrashWithPanic(H_STD_NAMESPACE::errors::RuntimeError("Critical error occurred."));
 /// ```
 /// This results in an immediate panic, halting execution and propagating the error.
 ///
@@ -58,7 +59,7 @@
 /// control to a panic handler.
 /// - Should be used in critical failure paths where recovery is not possible.
 #ifndef $CrashWithPanic
-#define $CrashWithPanic(err) Panic::Frame(err, __FILE__, __LINE__).operator$panic();
+#define $CrashWithPanic(err) H_STD_NAMESPACE::Panic::Frame(err, __FILE__, __LINE__).operator$panic();
 #endif
 
 /// \def $panic
@@ -78,7 +79,7 @@
 ///
 /// ### Example Usage
 /// ```cpp
-/// $panic(std::errors::RuntimeError("Recoverable error occurred."));
+/// $panic(H_STD_NAMESPACE::errors::RuntimeError("Recoverable error occurred."));
 /// ```
 /// This creates a `Panic::Frame` with the given error and contextual details and returns it to the
 /// caller.
@@ -89,11 +90,66 @@
 /// - It does not invoke the panic operator directly, allowing the caller to determine the next
 /// course of action.
 #ifndef $panic
-#define $panic(err) return ::helix::std::Panic::Frame(err, __FILE__, __LINE__);
+#define $panic(err) return H_STD_NAMESPACE::Panic::Frame(err, __FILE__, __LINE__);
 #endif
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
+
+namespace Panic {
+class Frame;
+}
+
+H_STD_NAMESPACE_END
+
+/// \fn _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv
+///
+/// \brief Handles panic events triggered during runtime.
+///
+/// \details The `_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv` function is
+///          invoked when a panic is triggered. It performs necessary operations, such as invoking
+///          registered panic hooks or logging the error context.
+///
+/// \param f A pointer to a `Panic::Frame` object that encapsulates the panic context.
+/// \return This function does not return a value.
+///
+/// \note This function is a forward declaration and is typically invoked by Helix's internal panic
+///       mechanisms. It is not intended for direct use by developers.
+///
+/// \see Panic::Frame
+/// \see ../../panic_handler.hlx
+///
+/// \note The function name follows a specific naming convention to ensure consistency and
+///       readability, the ABI scheme is as follows:
+///           [_HX] - Helix prefix.
+///           [_FN] - Function entity.
+///           [_Vi] - Visibility internal.
+///           [_Q5_13_helixpanic_handler]:
+///               [_Q]  - Qualified.
+///               [5_]  - Length of the namespace (`helix`).
+///               [13_] - Length of the function name (`panic_handler`).
+///           [_Q3_5_5_stdPanicFrame_C_PK]:
+///               [_Q]  - Qualified parameter.
+///               [3_]  - Length of the namespace (`std`).
+///               [5_]  - Length of the nested namespace (`Panic`).
+///               [5_]  - Length of the entity (`Frame`).
+///               [_C]  - Const.
+///               [_PK] - Pointer.
+///           [_Rv]: Return prefix (`void`).
+///
+/// \example
+/// \code{.hlx}
+/// // This sets the panic handler function for Helix's panic system, this can be changed by the
+/// //      user to provide custom panic handling.
+/// // Add the following directive to the main file of your Helix program:
+/// //     the passed parameter can be any function pointer that satisfies the signature:
+/// //     fn (*H_STD_NAMESPACE::Panic::Frame) -> void
+/// #[panic(&_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv)]
+/// \endcode
+extern "C" [[noreturn]]
+void _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const H_STD_NAMESPACE::Panic::Frame * /* f */); // NOLINT(bugprone-reserved-identifier)
+
+H_STD_NAMESPACE_BEGIN 
 
 /// \namespace Panic
 ///
@@ -105,7 +161,8 @@ H_STD_NAMESPACE_BEGIN
 /// - `Panic::Frame`: Represents a context for managing and propagating panic errors.
 /// - Concepts for identifying and validating panic-capable types (`Panicking`, `PanickingStatic`,
 /// `PanickingInstance`).
-/// - `$internal_panic_handler`: A function to manage panic events triggered during runtime.
+/// - `_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv`: A function to manage panic events
+/// triggered during runtime.
 ///
 /// ### Overview
 /// The `Panic` namespace is foundational to Helix's error-handling architecture. It ensures that
@@ -127,7 +184,8 @@ namespace Panic {
 ///
 /// ### Related
 /// - See the full definition of `Panic::Frame` for detailed documentation.
-/// - Used in conjunction with `Panicking` concepts and `$internal_panic_handler`.
+/// - Used in conjunction with `Panicking` interfaces and
+/// `_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv`.
 class Frame;
 
 /// \concept Panicking
@@ -151,9 +209,9 @@ class Frame;
 /// ```
 template <typename T>
 concept Panicking = requires(T obj) {
-    { obj.operator$panic() } -> std::traits::convertible_to<string>;
+    { obj.operator$panic() } -> H_STD_NAMESPACE::meta::convertible_to<string>;
 } || requires {
-    { T::operator$panic() } -> std::traits::convertible_to<string>;
+    { T::operator$panic() } -> H_STD_NAMESPACE::meta::convertible_to<string>;
 };
 
 /// \concept PanickingStatic
@@ -175,7 +233,7 @@ concept Panicking = requires(T obj) {
 /// ```
 template <typename T>
 concept PanickingStatic = requires(T obj) {
-    { T::operator$panic() } -> std::traits::convertible_to<string>;
+    { T::operator$panic() } -> H_STD_NAMESPACE::meta::convertible_to<string>;
 };
 
 /// \concept PanickingInstance
@@ -197,32 +255,9 @@ concept PanickingStatic = requires(T obj) {
 /// ```
 template <typename T>
 concept PanickingInstance = requires(T obj) {
-    { obj.operator$panic() } -> std::traits::convertible_to<string>;
+    { obj.operator$panic() } -> H_STD_NAMESPACE::meta::convertible_to<string>;
 };
 }  // namespace Panic
-
-/// \fn $internal_panic_handler
-///
-/// Handles panic events triggered during runtime.
-///
-/// ### Purpose
-/// The `$internal_panic_handler` function is invoked when a panic is triggered. It performs
-/// necessary operations, such as invoking registered panic hooks or logging the error context.
-///
-/// ### Parameters
-/// - `f`: A pointer to a `Panic::Frame` object that encapsulates the panic context.
-///
-/// ### Notes
-/// - This function is typically invoked by Helix's internal panic mechanisms.
-/// - It is not intended for direct use by developers.
-///
-/// ### Example
-/// ```cpp
-/// void handlePanic(const Panic::Frame *frame) {
-///     $internal_panic_handler(frame);
-/// }
-/// ```
-void $internal_panic_handler(const Panic::Frame * /* f */);
 
 namespace Panic {
 /// \class FrameContext
@@ -278,11 +313,11 @@ namespace Panic {
 /// \endcode
 class FrameContext {
   private:
-    std::TypeErasure                   *$object;
-    $function<void(std::TypeErasure *)> $throw;
+    H_STD_NAMESPACE::TypeErasure                   *$object;
+    $function<void(H_STD_NAMESPACE::TypeErasure *)> $throw;
 
     template <typename T>
-    [[noreturn]] static void throw_object(std::TypeErasure *$object) {
+    [[noreturn]] constexpr static void throw_object(H_STD_NAMESPACE::TypeErasure *$object) {
         if ($object == nullptr) {
             throw errors::RuntimeError("Tried to crash with a null object.");
         }
@@ -296,7 +331,7 @@ class FrameContext {
     }
 
   public:
-    ~FrameContext() {
+    constexpr ~FrameContext() {
         if ($object != nullptr) {
             $object->destroy();
             delete $object;
@@ -304,14 +339,14 @@ class FrameContext {
         }
     }
 
-    FrameContext()
+    constexpr FrameContext()
         : $object(nullptr) {}
 
-    FrameContext(const FrameContext &other)
+    constexpr FrameContext(const FrameContext &other)
         : $object((other.$object != nullptr) ? other.$object->clone() : nullptr)
         , $throw(other.$throw) {}
 
-    FrameContext &operator=(const FrameContext &other) {
+    constexpr FrameContext &operator=(const FrameContext &other) {
         if (this != &other) {
             if ($object != nullptr) {
                 $object->destroy();
@@ -323,28 +358,28 @@ class FrameContext {
         return *this;
     }
 
-    FrameContext(FrameContext &&other) noexcept
+    constexpr FrameContext(FrameContext &&other) noexcept
         : $object(other.$object)
-        , $throw(std::ref::move(other.$throw)) {
+        , $throw(H_STD_NAMESPACE::memory::move(other.$throw)) {
         other.$object = nullptr;
     }
 
-    FrameContext &operator=(FrameContext &&other) noexcept {
+    constexpr FrameContext &operator=(FrameContext &&other) noexcept {
         if (this != &other) {
             if ($object != nullptr) {
                 $object->destroy();
                 delete $object;
             }
             $object       = other.$object;
-            $throw        = std::ref::move(other.$throw);
+            $throw        = H_STD_NAMESPACE::memory::move(other.$throw);
             other.$object = nullptr;
         }
         return *this;
     }
 
     template <typename T>
-    explicit FrameContext(T *obj)
-        : $object(std::erase_type(obj)) {
+    constexpr explicit FrameContext(T *obj)
+        : $object(H_STD_NAMESPACE::erase_type(obj)) {
         if constexpr (!Panic::Panicking<T>) {
             static_assert(Panic::Panicking<T>,
                           "Frame invoked with an object that does not have a panic method, add "
@@ -356,7 +391,7 @@ class FrameContext {
         $throw = &FrameContext::throw_object<T>;
     }
 
-    [[nodiscard]] void *object() const { return ($object != nullptr) ? **$object : nullptr; }
+    [[nodiscard]] constexpr void *object() const { return ($object != nullptr) ? **$object : nullptr; }
 
     [[noreturn]] void crash() {
         $throw($object);
@@ -364,13 +399,42 @@ class FrameContext {
                                    "' failed to panic.");
     }
 
-    bool operator!=(const LIBCXX_NAMESPACE::type_info *rhs) const { return !(*this == rhs); }
-    bool operator==(const LIBCXX_NAMESPACE::type_info *rhs) const {
+    constexpr bool operator!=(const LIBCXX_NAMESPACE::type_info *rhs) const { return !(*this == rhs); }
+    constexpr bool operator==(const LIBCXX_NAMESPACE::type_info *rhs) const {
         if (this->$object != nullptr) {
             return this->$object->type_info() == rhs;
         }
 
         return false;
+    }
+
+    [[nodiscard]] constexpr string type_name() const {
+        if ($object != nullptr) {
+        #if defined(_MSC_VER)
+            return $object->type_info()->name();
+        #else
+            const char* mangled_name = $object->type_info()->name();
+
+            if ((mangled_name == nullptr) || (*mangled_name == 0)) {
+                return {};
+            }
+
+            int status = 0;
+
+            // __cxa_demangle returns a malloc-allocated string
+            char* demangle = LIBC_NAMESPACE::abi::__cxa_demangle(mangled_name, nullptr, nullptr, &status);
+            if (status == 0 && (demangle != nullptr)) {
+                string result(demangle);
+            
+                free(demangle); // NOLINT
+                return result;
+            }
+            
+            return mangled_name;
+        #endif
+        }
+
+        return "null";
     }
 };
 
@@ -402,7 +466,7 @@ class FrameContext {
 /// ### Constructor Use
 /// This class is typically constructed using the `panic` keyword in Helix:
 /// ```helix
-/// panic std::Panic::Frame(std::errors::RuntimeError(), "yes.hlx", 12);
+/// panic H_STD_NAMESPACE::Panic::Frame(H_STD_NAMESPACE::errors::RuntimeError(), "yes.hlx", 12);
 /// ```
 /// The `Frame` class can also be extracted into a variable and then passed to the `panic`
 /// system. These are the only valid ways to create and utilize `Frame` objects.
@@ -421,7 +485,7 @@ class FrameContext {
 /// ### Example Usage
 /// ```cpp
 /// // Triggering a panic with a custom error
-/// Frame frame(std::errors::RuntimeError("Some error occurred"), "example.hlx", 42);
+/// Frame frame(H_STD_NAMESPACE::errors::RuntimeError("Some error occurred"), "example.hlx", 42);
 /// frame.operator$panic();
 /// ```
 ///
@@ -458,14 +522,14 @@ class FrameContext {
 ///   - `operator$panic()`: Propagates the panic.
 class Frame {
   private:
-    FrameContext context;
-    string       _reason;
-    string       _file;
-    usize        _line = 0;
+    mutable FrameContext context;
+    string               _reason;
+    string               _file;
+    usize                _line = 0;
 
     template <typename T>
         requires __is_class
-    (T) inline void initialize(const T &obj) {
+    (T) constexpr inline void initialize(const T &obj) {
         if constexpr (PanickingStatic<T>) {
             _reason = T::operator$panic();
         } else if constexpr (PanickingInstance<T>) {
@@ -479,12 +543,13 @@ class Frame {
 
         T *object = nullptr;
 
-        static_assert(LIBCXX_NAMESPACE::is_copy_constructible_v<T> || LIBCXX_NAMESPACE::is_move_constructible_v<T>,
+        static_assert(LIBCXX_NAMESPACE::is_copy_constructible_v<T> ||
+                          LIBCXX_NAMESPACE::is_move_constructible_v<T>,
                       "Frame invoked with a type that is not copy or move constructible.");
 
         try {
             if constexpr (LIBCXX_NAMESPACE::is_move_constructible_v<T>) {
-                object        = new T(std::ref::move(obj));  // NOLINT
+                object        = new T(H_STD_NAMESPACE::memory::move(obj));  // NOLINT
                 this->context = FrameContext(object);
             } else if constexpr (LIBCXX_NAMESPACE::is_copy_constructible_v<T>) {
                 object        = new T(obj);  // NOLINT
@@ -498,40 +563,37 @@ class Frame {
 
   public:
     template <typename T>
-    Frame(T obj, const char *filename, usize lineno)
+    constexpr Frame(T obj, const char *filename, usize lineno)
         : _file(filename)
         , _line(lineno) {
         initialize<T>(obj);
     }
 
     template <typename T>
-    Frame(T obj, string filename, usize lineno)
-        : _file(std::ref::move(filename))
+    constexpr Frame(T obj, string filename, usize lineno)
+        : _file(H_STD_NAMESPACE::memory::move(filename))
         , _line(lineno) {
         initialize<T>(obj);
     }
 
-    Frame()  = delete;
-    ~Frame() = default;
+    constexpr Frame()  = delete;
+    constexpr ~Frame() = default;
 
-    Frame(const Frame &)            = delete;
-    Frame &operator=(const Frame &) = delete;
+    constexpr Frame(const Frame &)            = delete;
+    constexpr Frame &operator=(const Frame &) = delete;
 
     Frame(Frame &&other) noexcept            = default;
     Frame &operator=(Frame &&other) noexcept = default;
 
-    [[noreturn]] Frame(Frame &obj, const string &filename, usize lineno) { obj.operator$panic(); }
+    [[noreturn]] Frame(Frame  &obj, const string &filename, usize lineno) { obj.operator$panic(); }
     [[noreturn]] Frame(Frame &&obj, const string &filename, usize lineno) { obj.operator$panic(); }
 
-    [[nodiscard]] string        file() const { return this->_file; }
-    [[nodiscard]] usize         line() const { return this->_line; }
-    [[nodiscard]] string        reason() const { return this->_reason; }
-    [[nodiscard]] FrameContext &get_context() { return context; }
+    [[nodiscard]] constexpr string        file()        const { return this->_file; }
+    [[nodiscard]] constexpr usize         line()        const { return this->_line; }
+    [[nodiscard]] constexpr string        reason()      const { return this->_reason; }
+    [[nodiscard]] constexpr FrameContext &get_context() const { return context; }
 
-    [[noreturn]] void operator$panic() {
-        $internal_panic_handler(this);
-        context.crash();
-    }
+    [[noreturn]] void operator$panic() const { _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(this); }
 };
 }  // namespace Panic
 

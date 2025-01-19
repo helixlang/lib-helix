@@ -52,7 +52,7 @@
 ///                                                                                              ///
 /// ### Notes                                                                                    ///
 /// - The `as_cast` function intelligently selects the appropriate casting method based on type  ///
-///   traits and user-defined concepts, ensuring both safety and flexibility.                    ///
+///   traits and user-defined interfaces, ensuring both safety and flexibility.                    ///
 /// - Unsafe casting (`as_unsafe`) should be used sparingly and only when absolutely necessary.  ///
 ///                                                                                              ///
 /// ### Limitations                                                                              ///
@@ -61,7 +61,7 @@
 /// - The `as_unsafe` function bypasses all safety checks, and misuse can lead to ub.            ///
 ///                                                                                              ///
 /// ### Implementation Details                                                                   ///
-/// - `as_cast` leverages concepts like `SupportsPointerCast` and `SafelyCastable` to ensure     ///
+/// - `as_cast` leverages interfaces like `SupportsPointerCast` and `Castable` to ensure           ///
 ///   compatibility with Helix-specific features.                                                ///
 /// - `as_const` and `as_unsafe` provide implementations for const and unsafe casting.           ///
 ///                                                                                              ///
@@ -70,9 +70,9 @@
 #ifndef __$LIBHELIX_CAST__
 #define __$LIBHELIX_CAST__
 
-#include "../concepts.h"
+#include "../interfaces.h"
 #include "../config.h"
-#include "../traits.h"
+#include "../meta.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -127,22 +127,22 @@ constexpr Ty as_unsafe(Up value);
 /// \return The value reinterpret-cast to the target type.
 template <typename Ty, typename Up>
 constexpr const Ty as_unsafe(const Up value)  // NOLINT
-    requires(H_STD_NAMESPACE::traits::_const::utils::is_const_v<Up> ||
-             H_STD_NAMESPACE::traits::_const::utils::is_const_v<Ty>);
+    requires(H_STD_NAMESPACE::meta::is_const<Up> ||
+             H_STD_NAMESPACE::meta::is_const<Ty>);
 
 // ------------------------------------------- as_cast ------------------------------------------ //
 template <typename Ty, typename Up>
 constexpr Ty as_cast(Up &value) {
-    if constexpr (LIBCXX_NAMESPACE::is_const_v<LIBCXX_NAMESPACE::remove_reference_t<Up>> &&
-                  LIBCXX_NAMESPACE::is_same_v<LIBCXX_NAMESPACE::remove_const_t<Up>, Ty>) {
+    if constexpr (H_STD_NAMESPACE::meta::is_const<H_STD_NAMESPACE::meta::remove_reference_t<Up>> &&
+                  H_STD_NAMESPACE::meta::same_as<H_STD_NAMESPACE::meta::remove_const_t<Up>, Ty>) {
         return const_cast<Ty>(value);
     } else if constexpr (LIBCXX_NAMESPACE::is_pointer_v<Ty>) {
-        if constexpr (H_STD_NAMESPACE::concepts::SupportsPointerCast<Up, Ty>) {
+        if constexpr (H_STD_NAMESPACE::interfaces::SupportsPointerCast<Up, Ty>) {
             return dynamic_cast<Ty>(value);
         } else {
             return static_cast<Ty>(value);
         }
-    } else if constexpr (H_STD_NAMESPACE::concepts::SafelyCastable<Up, Ty>) {
+    } else if constexpr (H_STD_NAMESPACE::interfaces::Castable<Up, Ty>) {
         return value.operator$cast(static_cast<Ty *>(nullptr));
     } else {
         return static_cast<Ty>(value);
@@ -173,8 +173,8 @@ constexpr Ty as_unsafe(Up value) {
 
 template <typename Ty, typename Up>
 constexpr const Ty as_unsafe(const Up value)  // NOLINT
-    requires(H_STD_NAMESPACE::traits::_const::utils::is_const_v<Up> ||
-             H_STD_NAMESPACE::traits::_const::utils::is_const_v<Ty>) {
+    requires(H_STD_NAMESPACE::meta::is_const<Up> ||
+             H_STD_NAMESPACE::meta::is_const<Ty>) {
     return reinterpret_cast<const Ty>(value);  // NOLINT
 }
 

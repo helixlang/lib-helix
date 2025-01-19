@@ -14,8 +14,8 @@
 ///------------------------------------------------------------------------------------ Helix ---///
 ///                                                                                              ///
 ///  this is still a work in progress, the $question class is a work in progress and is not yet  ///
-///  fully implemented, the $question class is a class that is similar to the std::optional but  ///
-///  also adds std::expected like functionality, the $question class is a class that can hold    ///
+///  fully implemented, the $question class is a class that is similar to the H_STD_NAMESPACE::optional but  ///
+///  also adds H_STD_NAMESPACE::expected like functionality, the $question class is a class that can hold    ///
 ///  one of 3 states: value, an error, or be null.                                               ///
 ///                                                                                              ///
 ///  the $question class is a class that is to be used inside the core since its required by the ///
@@ -30,25 +30,19 @@
 #include "../types.h"
 #include "../lang/panic.hh"
 #include "../primitives.h"
-#include "../print.h"
-#include "../refs.h"
-#include "../traits.h"
+#include "../memory.h"
+#include "../meta.h"
 #include "../types/errors.h"
 
 H_NAMESPACE_BEGIN
-H_STD_NAMESPACE_BEGIN
 
-// FIXME: $internal_panic_handler should be a fuction pointer not a function...
-void $internal_panic_handler(const Panic::Frame *f) {  // TODO: move to helix itself
-    print("exit: ", (*f).file(), ":", (*f).line(), " - ", (*f).reason());
-};
 
 /// \class $question
 ///
 /// Represents Helix's `?` type, also known as the **quantum type**. This type can hold either:
 /// - A valid value of type `T`,
 /// - A null state, or
-/// - An error represented by a `Panic::Frame`.
+/// - An error represented by a `H_STD_NAMESPACE::Panic::Frame`.
 ///
 /// ### Unique Concept
 /// The `$question` type is unique to Helix and is a core component of Helix's type system, coined
@@ -61,11 +55,11 @@ void $internal_panic_handler(const Panic::Frame *f) {  // TODO: move to helix it
 /// `$question` operates in one of three states:
 /// - **Value**: Holds a valid object of type `T`.
 /// - **Null**: Represents the absence of a value.
-/// - **Error**: Encapsulates an error using a `Panic::Frame`.
+/// - **Error**: Encapsulates an error using a `H_STD_NAMESPACE::Panic::Frame`.
 ///
 /// ### Key Features
 /// - **Type Safety**: Enforces constraints such as copy and move constructibility for valid types.
-/// - **Error Containment**: Encodes errors using `Panic::Frame`, enabling structured error
+/// - **Error Containment**: Encodes errors using `H_STD_NAMESPACE::Panic::Frame`, enabling structured error
 ///                          handling.
 /// - **State Inspection**: Provides methods to determine whether the instance is null, contains a
 ///                         value, or holds an error of a specific type.
@@ -84,7 +78,7 @@ void $internal_panic_handler(const Panic::Frame *f) {  // TODO: move to helix it
 /// `$question` supports the following constructions:
 /// - **Default (Null)**: `T? x;` or `T? x = null;` creates a null instance.
 /// - **Value Initialization**: `T? x = value;` stores a valid value.
-/// - **Error Initialization**: `T? x = Panic::Frame(...);` stores an error state.
+/// - **Error Initialization**: `T? x = H_STD_NAMESPACE::Panic::Frame(...);` stores an error state.
 ///
 /// ### Core Behaviors
 /// - **State Queries**:
@@ -105,20 +99,20 @@ void $internal_panic_handler(const Panic::Frame *f) {  // TODO: move to helix it
 ///
 /// ### Guarantees
 /// 1. Default initialization creates a null state.
-/// 2. Errors are always stored as `Panic::Frame` objects.
+/// 2. Errors are always stored as `H_STD_NAMESPACE::Panic::Frame` objects.
 /// 3. Errors and values are managed with proper resource allocation and destruction to avoid leaks
 ///    or undefined behavior.
 ///
 /// ### Related
-/// - `Panic::Frame`: Represents the error state.
-/// - `Panic::Panicking`: Concept for types supporting the `operator$panic()` function.
-/// - `Panic::PanickingInstance`: Concept for instances supporting `operator$panic()`.
-/// - `Panic::PanickingStatic`: Concept for types supporting static `operator$panic()`.
+/// - `H_STD_NAMESPACE::Panic::Frame`: Represents the error state.
+/// - `H_STD_NAMESPACE::Panic::Panicking`: Concept for types supporting the `operator$panic()` function.
+/// - `H_STD_NAMESPACE::Panic::PanickingInstance`: Concept for instances supporting `operator$panic()`.
+/// - `H_STD_NAMESPACE::Panic::PanickingStatic`: Concept for types supporting static `operator$panic()`.
 ///
 /// ### Example Usage
 /// ```helix
 /// fn process_data() -> int? {
-///     panic std::errors::RuntimeError("Data processing failed.");
+///     panic H_STD_NAMESPACE::errors::RuntimeError("Data processing failed.");
 /// }
 ///
 /// fn main() -> i32 {
@@ -143,236 +137,180 @@ void $internal_panic_handler(const Panic::Frame *f) {  // TODO: move to helix it
 /// ensures type safety and enforces proper construction and destruction of resources.
 template <class T>
 class $question {
-  private:
+private:
     enum class $State : char { Value, Null, Error };
-    union $StorageT {  // NOLINT(cppcoreguidelines-special-member-functions)
-        mutable Panic::Frame error;
-        mutable T            value;
 
-        $StorageT()
-            : value() {}
-        ~$StorageT() {}
+    union $StorageT {
+        mutable H_STD_NAMESPACE::Panic::Frame error;
+        mutable T                             value;
+
+        constexpr $StorageT() noexcept : value() {}
+        constexpr ~$StorageT() noexcept {}
     };
 
-    mutable $State state = $State::Null;
-    $StorageT      data;
+    mutable $State    state = $State::Null;
+    $StorageT         data;
 
-    [[nodiscard]] bool is_null() const { return this->state == $State::Null; }
-    [[nodiscard]] bool is_err() const { return this->state == $State::Error; }
-    [[nodiscard]] bool is_err(const LIBCXX_NAMESPACE::type_info *type) const {
-        if (this->state != $State::Error) {
-            return false;
-        }
-
-        return data.error.get_context() == type;
+    [[nodiscard]] constexpr bool is_null() const noexcept { return state == $State::Null; }
+    [[nodiscard]] constexpr bool is_err() const noexcept { return state == $State::Error; }
+    [[nodiscard]] constexpr bool is_err(const LIBCXX_NAMESPACE::type_info *type) const noexcept {
+        return state == $State::Error && data.error.get_context() == type;
     }
 
-    void set_value(const T &value) { new (&this->data.value) T(value); }
-    void set_value(T &&value) { new (&this->data.value) T(std::ref::move(value)); }
-    void set_err(Panic::Frame &&error) {
-        new (&this->data.error) Panic::Frame(std::ref::move(error));
+    constexpr void set_value(const T &value) { new (&data.value) T(value); }
+    constexpr void set_value(T &&value) { new (&data.value) T(H_STD_NAMESPACE::memory::move(value)); }
+    constexpr void set_err(H_STD_NAMESPACE::Panic::Frame &&error) {
+        new (&data.error) H_STD_NAMESPACE::Panic::Frame(H_STD_NAMESPACE::memory::move(error));
     }
 
-    void delete_error() { this->data.error.~Frame(); }
-    void delete_value() { this->data.value.~T(); }
+    constexpr void delete_error() noexcept { data.error.~Frame(); }
+    constexpr void delete_value() noexcept { data.value.~T(); }
 
-  public:
-    // ----------------------------------- constructors (null) -----------------------------------
-    $question()
-        : state($State::Null) {}
-    explicit $question(const null_t & /*unused*/)
-        : state($State::Null) {};
-    explicit $question(const null_t && /*unused*/)
-        : state($State::Null) {}
-    explicit $question(null_t && /*unused*/)
-        : state($State::Null) {}
+public:
+    /// ------------------------------- Constructors (Null) -------------------------------
+    constexpr $question() noexcept : state($State::Null) {}
+    constexpr $question(const null_t &) noexcept : state($State::Null) {}
+    constexpr $question(null_t &&) noexcept : state($State::Null) {}
 
-    /// ----------------------------------- constructors (value) -----------------------------------
-    $question(T &&value)  // NOLINT(google-explicit-constructor)
-        : state($State::Value) {
-        set_value(std::ref::move(value));
+    /// ------------------------------- Constructors (Value) -------------------------------
+    constexpr $question(const T &value) : state($State::Value) { set_value(value); }
+    constexpr $question(T &&value) : state($State::Value) { set_value(H_STD_NAMESPACE::memory::move(value)); }
+
+    /// ------------------------------- Constructors (Error) -------------------------------
+    constexpr $question(const H_STD_NAMESPACE::Panic::Frame &error) : state($State::Error) { set_err(error); }
+    constexpr $question(H_STD_NAMESPACE::Panic::Frame &&error) : state($State::Error) {
+        set_err(H_STD_NAMESPACE::memory::move(error));
     }
 
-    $question(const T &&value)  // NOLINT(google-explicit-constructor)
-        : state($State::Value) {
-        set_value(std::ref::move(value));
-    }
-
-    $question(const T &value)  // NOLINT(google-explicit-constructor)
-        : state($State::Value) {
-        set_value(value);
-    }
-
-    /// ----------------------------------- constructors (error) -----------------------------------
-    $question(Panic::Frame &&error)  // NOLINT(google-explicit-constructor)
-        : state($State::Error) {
-        set_err(std::ref::move(error));
-    }
-
-    $question(const Panic::Frame &&error)  // NOLINT(google-explicit-constructor)
-        : state($State::Error) {
-        set_err(std::ref::move(error));
-    }
-
-    $question(const Panic::Frame &error)  // NOLINT(google-explicit-constructor)
-        : state($State::Error) {
-        set_err(error);
-    }
-
-    /// ------------------------------------- move constructors ------------------------------------
-    $question($question &&other) noexcept {
-        if (other.state == $State::Error) {
-            set_err(std::ref::move(other));
-        } else if (other.state == $State::Value) {
-            set_value(std::ref::move(other));
+    /// ------------------------------- Move Constructor & Assignment -------------------------------
+    constexpr $question($question &&other) noexcept : state(other.state) {
+        if (state == $State::Error) {
+            set_err(H_STD_NAMESPACE::memory::move(other.data.error));
+        } else if (state == $State::Value) {
+            set_value(H_STD_NAMESPACE::memory::move(other.data.value));
         }
     }
-    $question &operator=($question &&other) noexcept {
-        if (other.state == $State::Error) {
-            set_err(std::ref::move(other));
-            other.delete_error();
-        } else if (other.state == $State::Value) {
-            set_value(std::ref::move(other));
-            other.~$question();
-        }
 
+    constexpr $question &operator=($question &&other) noexcept {
+        if (this != &other) {
+            if (state == $State::Error) {
+                delete_error();
+            } else if (state == $State::Value) {
+                delete_value();
+            }
+
+            state = other.state;
+            if (state == $State::Error) {
+                set_err(H_STD_NAMESPACE::memory::move(other.data.error));
+            } else if (state == $State::Value) {
+                set_value(H_STD_NAMESPACE::memory::move(other.data.value));
+            }
+        }
         return *this;
     }
 
-    /// ------------------------------------- copy constructors ------------------------------------
-    $question(const $question &other) {
-        if (other.state == $State::Error) {
-            set_err(other);
-        } else if (other.state == $State::Value) {
-            set_value(other);
+    /// ------------------------------- Copy Constructor & Assignment -------------------------------
+    constexpr $question(const $question &other) : state(other.state) {
+        if (state == $State::Error) {
+            set_err(other.data.error);
+        } else if (state == $State::Value) {
+            set_value(other.data.value);
         }
     }
-    $question &operator=(const $question &other) {
-        if (other.state == $State::Error) {
-            set_err(other);
-        } else if (other.state == $State::Value) {
-            set_value(other);
-        }
 
+    constexpr $question &operator=(const $question &other) {
+        if (this != &other) {
+            if (state == $State::Error) {
+                delete_error();
+            } else if (state == $State::Value) {
+                delete_value();
+            }
+
+            state = other.state;
+            if (state == $State::Error) {
+                set_err(other.data.error);
+            } else if (state == $State::Value) {
+                set_value(other.data.value);
+            }
+        }
         return *this;
     }
 
-    /// ---------------------------------------- destructor ----------------------------------------
-    ~$question() {
-        if (this->state == $State::Error) {
+    /// ------------------------------- Destructor -------------------------------
+    constexpr ~ $question() {
+        if (state == $State::Error) {
             delete_error();
-        } else if (this->state == $State::Value) {
-            // call the destructor (if the type has a destructor)
+        } else if (state == $State::Value) {
             if constexpr (LIBCXX_NAMESPACE::is_destructible_v<T>) {
                 delete_value();
             }
         }
     }
 
-    /// ------------------------------------- equality (null) --------------------------------------
-    constexpr bool operator==(const null_t & /*unused*/) const { return is_null(); }
-    constexpr bool operator!=(const null_t & /*unused*/) const { return !is_null(); }
+    /// ------------------------------- Operators -------------------------------
+    constexpr bool operator==(const null_t &) const noexcept { return is_null(); }
+    constexpr bool operator!=(const null_t &) const noexcept { return !is_null(); }
 
-    // equality operators (error)
-    // ... == T,x
-    // this checks against the error type not an error instance (the eq op would check with E's eq
-    // op if it has one to make sure only exact errors are caught) this allows for diffent errors to
-    // be caught and handled differently (like, SomeCustomError(ThisIsAEnumValue) ==
-    // SomeCustomError(AnotherEnumValue) would be false)
-    // -------------------------------------- equality (error) -------------------------------------
     template <typename E>
-    constexpr bool operator==(const E & /*unused*/) const {
-        if constexpr (Panic::Panicking<E>) {
+    constexpr bool operator==(const E &) const noexcept {
+        if constexpr (H_STD_NAMESPACE::Panic::Panicking<E>) {
             return is_err(&typeid(E));
         }
 
-        $CrashWithPanic(
-            errors::TypeMismatchError("Invalid: error type does not match any panic state."));
+        $CrashWithPanic(H_STD_NAMESPACE::errors::TypeMismatchError("Invalid: error type does not match any panic state."));
     }
 
     template <typename E>
-    constexpr bool operator==(E &&_) const {
-        return *this == static_cast<const E &>(_);
-    }
+    constexpr bool operator!=(const E &other) const noexcept { return !(*this == other); }
 
     template <typename E>
-    constexpr bool operator!=(const E &_) const {
-        return !(*this == _);
-    }
+    constexpr bool operator$contains(const E &other) const noexcept { return *this == other; }
 
+    [[nodiscard]] constexpr bool operator$question() const noexcept { return state == $State::Value; }
+
+    /// ------------------------------- Casting -------------------------------
     template <typename E>
-    constexpr bool operator!=(E &&_) const {
-        return !(*this == static_cast<const E &>(_));
-    }
-
-    // --------------------------------------- 'has' (null) ---------------------------------------
-    constexpr bool operator$contains(const null_t &_) const { return is_null(); }
-
-    // --------------------------------------- 'has' (error) ---------------------------------------
-    template <typename E>
-    constexpr bool operator$contains(const E &_) const {
-        return *this == _;
-    }
-
-    template <typename E>
-    constexpr bool operator$contains(E &&_) const {
-        return *this == static_cast<const E &>(_);
-    }
-
-    // --------------------------------------- 'has' (value) ---------------------------------------
-    constexpr bool operator$contains(const T &_) const { return this->state == $State::Value; }
-
-    // ---------------------------------------- '?' operator ---------------------------------------
-    [[nodiscard]] bool operator$question() const { return this->state == $State::Value; }
-
-    // -------------------------------------------- 'as' -------------------------------------------
-    template <typename E>
-        requires Panic::Panicking<E>
-    E operator$cast(E * /*unused*/) const {
-        if (this->state == $State::Value) {
-            if constexpr (traits::same_as_v<T, E>) {
-                return this->data.value;
-            }
-
-            $CrashWithPanic(errors::TypeMismatchError("Invalid cast: value type does not"
-                                                      "match requested type."));
-        }
-
-        if (this->state == $State::Error) {
+        requires H_STD_NAMESPACE::Panic::Panicking<E>
+    constexpr E operator$cast(E * /*unused*/) const {
+        if (state == $State::Error) {
             if (is_err(&typeid(E))) {
-                auto *obj = this->data.error.get_context().object();
-
-                if (obj != nullptr) {
-                    return *reinterpret_cast<E *>(obj);  // NOLINT
+                auto *obj = data.error.get_context().object();
+                if (obj) {
+                    return *reinterpret_cast<E *>(obj);
                 }
-
-                $CrashWithPanic(
-                    errors::NullValueError("Invalid Decay: error context object is null."));
+                $CrashWithPanic(H_STD_NAMESPACE::errors::NullValueError("Invalid Decay: error context object is null."));
+            }
+            data.error.operator$panic();
+        }
+        
+        if (state == $State::Value) {
+            if constexpr (H_STD_NAMESPACE::meta::same_as<T, E>) {
+                return data.value;
             }
 
-            /* no return */ this->data.error.operator$panic();
+            $CrashWithPanic(H_STD_NAMESPACE::errors::TypeMismatchError("Invalid cast: value type does not match requested type."));
         }
 
-        $CrashWithPanic(errors::NullValueError("Invalid Decay: value is null."));
+        $CrashWithPanic(H_STD_NAMESPACE::errors::NullValueError("Invalid Decay: value is null."));
     }
 
-    T operator$cast(T * /*unused*/) const {
-        if (this->state == $State::Value) {
-            return this->data.value;
+    constexpr T operator$cast(T * /*unused*/) const {
+        if (state == $State::Value) {
+            return data.value;
         }
 
-        if (this->state == $State::Error) {
-            /* no return */ this->data.error.operator$panic();
+        if (state == $State::Error) {
+            data.error.operator$panic();
         }
 
-        $CrashWithPanic(errors::NullValueError("Invalid Decay: value is null."));
+        $CrashWithPanic(H_STD_NAMESPACE::errors::NullValueError("Invalid Decay: value is null."));
     }
 
-    [[nodiscard]] T &operator*() { return operator$cast(static_cast<T *>(nullptr)); }
-    [[nodiscard]]   operator T() { return operator$cast(static_cast<T *>(nullptr)); } // NOLINT
-    [[nodiscard]] explicit operator T &() { return operator*(); }
-    [[nodiscard]] T       *operator->() { return &this->operator*(); }
+    [[nodiscard]] constexpr T &operator*() { return operator$cast(static_cast<T *>(nullptr)); }
+    [[nodiscard]] constexpr operator T()   { return operator$cast(static_cast<T *>(nullptr)); }  // NOLINT
 };
+
+H_STD_NAMESPACE_BEGIN
 
 /// \typedef Questionable
 ///
