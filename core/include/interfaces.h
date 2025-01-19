@@ -13,41 +13,36 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
-#ifndef __$LIBHELIX_CONCEPTS__
-#define __$LIBHELIX_CONCEPTS__
+#ifndef __$LIBHELIX_INTERFACES__
+#define __$LIBHELIX_INTERFACES__
 
 #include "config.h"
 #include "types.h"
-#include "traits.h"
+#include "meta.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
-namespace concepts {
-
-template <typename _Ty>
-concept HasToString = requires(_Ty a) {
-    { a.to_string() } -> LIBCXX_NAMESPACE::convertible_to<string>;
+namespace interfaces {
+template <typename T>
+concept SupportsOStream = requires(LIBCXX_NAMESPACE::ostream &os, T a) {
+    { os << a } -> H_STD_NAMESPACE::meta::convertible_to<LIBCXX_NAMESPACE::ostream &>;
 };
 
-template <typename _Ty>
-concept SupportsOStream = requires(LIBCXX_NAMESPACE::ostream &os, _Ty a) {
-    { os << a } -> H_STD_NAMESPACE::traits::convertible_to<LIBCXX_NAMESPACE::ostream &>;
+template <typename T, typename U>
+concept SupportsPointerCast = requires(T from) {
+    dynamic_cast<U>(from);  // Dynamic cast requirement
 };
 
-template <typename _Ty, typename _Up>
-concept SupportsPointerCast = requires(_Ty from) {
-    dynamic_cast<_Up>(from);  // Dynamic cast requirement
+template <typename T, typename U>
+concept Castable = requires(T t, U *u) {
+    { t.operator$cast(u) } -> H_STD_NAMESPACE::meta::same_as<U>; // cast to the requested type
+} || requires(T t, U *u) {
+    { t.operator U() } -> H_STD_NAMESPACE::meta::same_as<U>; // call the implicit cast
 };
 
-template <typename _Ty, typename _Up>
-concept SafelyCastable = requires(_Ty t, _Up *u) {
-    { t.operator$cast(u) } -> H_STD_NAMESPACE::traits::same_as<_Up>; // castable to the requested type
-};
-
-template <typename _Ty>
-concept ConvertibleToString = HasToString<_Ty> || SupportsOStream<_Ty> || SafelyCastable<_Ty, string>;
-
-}  // namespace concepts
+template <typename T>
+concept ConvertibleToString = SupportsOStream<T> || Castable<T, string>;
+}  // namespace interfaces
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
 #endif

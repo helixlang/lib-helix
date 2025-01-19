@@ -56,5 +56,7 @@ template <typename T, usize N>
 using array = T[N];
 }  // namespace libc
 
+using _H_RESERVED$char = char;
+
 H_NAMESPACE_END
 #endif

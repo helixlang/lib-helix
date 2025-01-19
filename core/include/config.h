@@ -53,5 +53,6 @@ namespace libcxx = ::std;
 #define H_STD_NAMESPACE helix::std
 #define H_NAMESPACE helix
 #define LIBCXX_NAMESPACE libcxx
+#define LIBC_NAMESPACE libc
 
 #endif
