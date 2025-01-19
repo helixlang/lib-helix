@@ -19,7 +19,7 @@
 #include "../config.h"
 #include "../libcxx.h"
 #include "../libc.h"
-#include "../refs.h"
+#include "../memory.h"
 #include "../primitives.h"
 
 H_NAMESPACE_BEGIN

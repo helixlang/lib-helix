@@ -16,12 +16,12 @@
 #ifndef __$LIBHELIX_PRINT__
 #define __$LIBHELIX_PRINT__
 
-#include "concepts.h"
+#include "interfaces.h"
 #include "config.h"
 #include "types.h"
 #include "libc.h"
-#include "refs.h"
-#include "traits.h"
+#include "memory.h"
+#include "meta.h"
 #include "primitives.h"
 
 H_NAMESPACE_BEGIN
@@ -38,7 +38,7 @@ class endl {
     ~endl() = default;
 
     explicit endl(string end)
-        : end_l(std::ref::move(end)) {}
+        : end_l(H_STD_NAMESPACE::memory::move(end)) {}
 
     explicit endl(const char *end)
         : end_l((end != nullptr) ? end : "\n") {}
@@ -61,20 +61,18 @@ class endl {
 /// This function will try to convert the argument to a string using the following methods:
 /// - if the argument has a to_string method, it will use that
 /// - if the argument has a ostream operator, it will use that
-/// - if the argument is an arithmetic type, it will use std::to_string
+/// - if the argument is an arithmetic type, it will use H_STD_NAMESPACE::to_string
 /// - if all else fails, it will convert the address of the argument to a string
 ///
 template <typename Ty>
 constexpr string to_string(Ty &&t) {
-    if constexpr (std::concepts::HasToString<Ty>) {
-        return t.to_string();
-    } else if constexpr (std::concepts::SupportsOStream<Ty>) {
+    if constexpr (H_STD_NAMESPACE::interfaces::SupportsOStream<Ty>) {
         LIBCXX_NAMESPACE::stringstream ss;
         ss << t;
         return ss.str();
-    } else if constexpr (std::concepts::SafelyCastable<Ty, string>) {
+    } else if constexpr (H_STD_NAMESPACE::interfaces::Castable<Ty, string>) {
         return t.operator$cast(static_cast<string *>(nullptr));
-    } else if constexpr (std::traits::is_same_v<Ty, bool>) {
+    } else if constexpr (H_STD_NAMESPACE::meta::same_as<Ty, bool>) {
         return t ? "true" : "false";
     } else if constexpr (LIBCXX_NAMESPACE::is_arithmetic_v<Ty>) {
         return LIBCXX_NAMESPACE::to_string(t);
@@ -109,7 +107,7 @@ constexpr string to_string(Ty &&t) {
 ///
 template <typename... Ty>
 constexpr string stringf(string s, Ty &&...t) {
-    const array<string, sizeof...(t)> EAS = {to_string(std::forward<Ty>(t))...};
+    const array<string, sizeof...(t)> EAS = {to_string(H_STD_NAMESPACE::memory::forward<Ty>(t))...};
 
     usize pos = 0;
 
@@ -142,13 +140,13 @@ inline constexpr void print(Args &&...t) {
         return;
     }
 
-    ((printf("%s", std::to_string(std::forward<Args>(t)).c_str())), ...);
+    ((printf("%s", H_STD_NAMESPACE::to_string(H_STD_NAMESPACE::memory::forward<Args>(t)).c_str())), ...);
 
     if constexpr (sizeof...(t) > 0) {
-        if constexpr (!std::traits::same_as_v<
-                          std::ref::remove_cv_t<std::ref::remove_ref_t<
+        if constexpr (!H_STD_NAMESPACE::meta::same_as<
+                          H_STD_NAMESPACE::meta::remove_const_volatile_t<H_STD_NAMESPACE::meta::remove_reference_t<
                               decltype(LIBCXX_NAMESPACE::get<sizeof...(t) - 1>(tuple<Args...>(t...)))>>,
-                          std::endl>) {
+                          H_STD_NAMESPACE::endl>) {
             printf("\n");
         }
     }

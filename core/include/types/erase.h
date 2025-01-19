@@ -74,18 +74,18 @@ H_STD_NAMESPACE_BEGIN
 /// \endcode
 class TypeErasure {
   public:
-    virtual ~TypeErasure() = default;
+    constexpr virtual ~TypeErasure() = default;
 
-    TypeErasure()                                   = default;
-    TypeErasure(const TypeErasure &)                = default;
-    TypeErasure &operator=(const TypeErasure &)     = default;
-    TypeErasure(TypeErasure &&) noexcept            = default;
-    TypeErasure &operator=(TypeErasure &&) noexcept = default;
+    constexpr TypeErasure()                                   = default;
+    constexpr TypeErasure(const TypeErasure &)                = default;
+    constexpr TypeErasure &operator=(const TypeErasure &)     = default;
+    constexpr TypeErasure(TypeErasure &&) noexcept            = default;
+    constexpr TypeErasure &operator=(TypeErasure &&) noexcept = default;
 
-    virtual void                                   destroy()         = 0;
-    virtual void                                  *operator*()       = 0;
-    [[nodiscard]] virtual const LIBCXX_NAMESPACE::type_info *type_info() const = 0;
-    [[nodiscard]] virtual TypeErasure             *clone() const     = 0;
+    constexpr virtual void                                   destroy()         = 0;
+    constexpr virtual void                                  *operator*()       = 0;
+    [[nodiscard]] constexpr virtual const LIBCXX_NAMESPACE::type_info *type_info() const = 0;
+    [[nodiscard]] constexpr virtual TypeErasure             *clone() const     = 0;
 };
 
 /// \class TypeErasureImpl
