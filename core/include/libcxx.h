@@ -33,14 +33,23 @@
 #include <typeinfo>
 #include <any>
 
+#include "meta.h"
 #include "config.h"
-#include "refs.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
+
+namespace memory {
+template <typename T>
+T &&forward(meta::remove_reference_t<T> &t) noexcept;
+
+template <typename T>
+T &&forward(meta::remove_reference_t<T> &&t) noexcept;
+}
+
 template <typename _Tp, typename... _Ty>
-constexpr _Tp *_H_RESERVED$new(_Ty &&...t) {
-    return new _Tp(std::forward<_Ty>(t)...);
+constexpr _Tp *_H_RESERVED$new(_Ty &&...t) { // NOLINT
+    return new _Tp(H_STD_NAMESPACE::memory::forward<_Ty>(t)...); // NOLINT
 }
 H_NAMESPACE_END
 H_STD_NAMESPACE_END

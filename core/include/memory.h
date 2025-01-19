@@ -13,81 +13,50 @@
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
 
-#ifndef __$LIBHELIX_REFS__
-#define __$LIBHELIX_REFS__
+#ifndef __$LIBHELIX_MMEMORY__
+#define __$LIBHELIX_MMEMORY__
 
 #include "config.h"
+#include "libcxx.h"
+#include "meta.h"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
-namespace ref {
-template <typename T>
-struct remove_ref {
-    using t = T;
-};
+
+namespace memory {
+using LIBCXX_NAMESPACE::move;
 
 template <typename T>
-struct remove_ref<T &> {
-    using t = T;
-};
-
-template <typename T>
-struct remove_ref<T &&> {
-    using t = T;
-};
-
-template <typename T>
-struct remove_cv {
-    using t = T;
-};
-
-template <typename T>
-struct remove_cv<const T> {
-    using t = T;
-};
-
-template <typename T>
-struct remove_cv<volatile T> {
-    using t = T;
-};
-
-template <typename T>
-struct remove_cv<const volatile T> {
-    using t = T;
-};
-
-template <typename T>
-struct remove_cvref {
-    using t = typename remove_cv<typename remove_ref<T>::t>::t;
-};
-
-template <typename T>
-using remove_ref_t = typename remove_ref<T>::t;
-
-template <typename T>
-using remove_cv_t = typename remove_cv<T>::t;
-
-template <typename T>
-using remove_cvref_t = typename remove_cvref<T>::t;
-
-template <class _Ty>
-constexpr remove_ref_t<_Ty> &&move(_Ty &&_Arg) noexcept {
-    return static_cast<remove_ref_t<_Ty> &&>(_Arg);
-}
-}  // end namespace ref
-
-// namespace std
-
-template <typename T>
-T &&forward(typename ref::remove_ref_t<T> &t) noexcept {
+T &&forward(meta::remove_reference_t<T> &t) noexcept {
     return static_cast<T &&>(t);
 }
 
 template <typename T>
-T &&forward(typename ref::remove_ref_t<T> &&t) noexcept {
+T &&forward(meta::remove_reference_t<T> &&t) noexcept {
     return static_cast<T &&>(t);
+}
+
+template <typename T>
+    requires(!meta::is_add_lvalue_reference<T>)
+constexpr meta::reference_to_pointer_t<T> as_pointer(T &&ref) noexcept {
+    return &ref;
+}
+
+template <typename T>
+constexpr T &&as_reference(T *ptr) noexcept {
+    return *ptr;
+}
+
+template <class T, class U = T>
+inline constexpr T exchange(T &obj, U &&new_value) noexcept
+  requires(meta::is_nothrow_move_constructible<T> && meta::is_nothrow_assignable<T &, U>) {
+    T old_value = move(obj);
+    obj         = forward<U>(new_value);
+    return old_value;
+}
 }
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
-#endif
+
+#endif  // __$LIBHELIX_MMEMORY__
