@@ -1,124 +1,272 @@
-# this documents all the parts of the langauge core thats written in helix
-# the core is also the prelude
-# the core is split into 2 parts
-# the first part is the C++ part
-# the second part is the Helix part
-# both parts are globally accessible in the Helix language
-# both parts are equally important to the language
+# Helix Core Documentation
 
-# this document specifies the C++ and Helix parts of the core
+## Core Overview
+The Helix Core provides essential utilities and constructs central to the language’s runtime and type system. These components are designed for efficient integration, robust error handling, and advanced type management, ensuring a solid foundation for building high-performance applications.
+
+---
+
+#### The Core is Also the Prelude
+#### The Core is Split into 2 Parts
+#### The First Part is the C++ Part
+#### The Second Part is the Helix Part
+#### Both Parts are Globally Accessible in the Helix Language
+#### Both Parts are Equally Important to the Language
+
+---
+
 ## C++ part - Exposed Functions
-### Language Features
-#### Casting `... as ...`
-- `as_cast`   | `template <typename _Ty, typename _Up> _Ty        as_cast(_Up &value);`
-- `as_cast`   | `template <typename _Ty, typename _Up> _Ty        as_cast(const _Up &value);`
-- `as_const`  | `template <typename _Ty, typename _Up> const _Ty &as_const(_Up &value);`
-- `as_const`  | `template <typename _Ty, typename _Up> const _Ty &as_const(const _Up &value);`
-- `as_unsafe` | `template <typename _Ty, typename _Up> _Ty        as_unsafe(_Up value);`
-- `as_unsafe` | `template <typename _Ty, typename _Up> const _Ty  as_unsafe(const _Up value)`
+### Casting Utilities
+#### `std::as_cast`
+- **Purpose**: Casts a value from type `Up` to `Ty`, choosing the most appropriate casting mechanism.
+- **Variants**:
+  - `Ty std::as_cast(Up &value);`
+  - `Ty std::as_cast(const Up &value);`
+- **Behavior**: Removes `const` qualifiers where necessary.
 
-#### Finally `finally { ... }`
-The `$finally` class cannot be used directly, it only works with the `finally` keyword.
-- `$finally` | `class $finally`
+#### `std::as_const`
+- **Purpose**: Performs a `const`-correct cast from `Up` to `Ty`.
+- **Variants**:
+  - `const Ty &std::as_const(Up &value);`
+  - `const Ty &std::as_const(const Up &value);`
+- **Behavior**: Returns a `const`-qualified reference to the input value.
 
-#### Generators `yield ...`
-The `$generator` class cannot be used directly, Helix provides a `Range` class that can be used to create generators.
-- `$generator` | `template <LIBCXX_NAMESPACE::movable T> class $generator`
+#### `std::as_unsafe`
+- **Purpose**: Executes an unsafe reinterpretation cast from `Up` to `Ty`.
+- **Variants**:
+  - `Ty std::as_unsafe(Up value);`
+  - `const Ty std::as_unsafe(const Up value)` (with `requires` clause).
 
-#### Questionable `...?`
-`$question`           | `template <class T, typename... Es> class $question;`
-`null`                | `null`
-`std::null_t`         | `class null_t;`
+---
 
-### Panic
-- `std::Panic::Frame`         | `class Frame;`
-- `std::Panic::FrameContext`  | `class FrameContext;`
-- `std::Panic::Frame`         | `class Frame;`
+### Control Flow Constructs
+#### `$finally`
+- **Purpose**: Guarantees the execution of a cleanup function at the end of a scope.
+- **Features**:
+  - Executes upon scope exit, regardless of exceptions.
+  - Designed for integration with `try-catch-finally` constructs.
+- **Implementation**: Wraps a callable and invokes it in the destructor.
 
-### Helpers
-#### Concepts (helpers)
-- `std::concepts::HasToString`         | `template <typename T>                 HasToString`
-- `std::concepts::SupportsOStream`     | `template <typename T>                 SupportsOStream`
-- `std::concepts::SupportsPointerCast` | `template <typename _Ty, typename _Up> SupportsPointerCast`
-- `std::concepts::SafelyCastable`      | `template <typename _Ty, typename _Up> SafelyCastable`
-- `std::concepts::ConvertibleToString` | `template <typename T>                 ConvertibleToString`
-- `std::Panic::Panicking`
-- `std::Panic::PanickingStatic`
-- `std::Panic::PanickingInstance`
+#### `$function`
+- **Purpose**: Type-erased wrapper for callable entities.
+- **Features**:
+  - Supports lambdas, function pointers, and functors.
+  - Seamless integration with Helix’s `fn` type.
+  - Copyable and movable.
+  - Evaluates to `true` if a callable is present.
+- **Aliases**:
+  - `std::Function`: Concise alias for `$function`.
 
-#### Concepts (traits)
-- `std::meta::integral_constant` | `template <class _Tp, _Tp __v>   struct integral_constant;`
-- `std::meta::__declval`         | `template <class _Tp>            _Tp &&__declval(int);`
-- `std::meta::__declval`         | `template <class _Tp>            _Tp __declval(long);`
-- `std::meta::declval`           | `template <class _Tp>            decltype(__declval<_Tp>(0)) declval() _NOEXCEPT;`
-- `std::meta::is_convertible_v`  | `template <class _Up, class _Tp> constexpr bool is_convertible_v;`
-- `std::meta::convertible_to`    | `template <class _Up, class _Tp> concept convertible_to;`
-- `std::meta::same_as`         | `template <class _Tp, class _Up> constexpr bool same_as;`
-- `std::meta::same_as`           | `template <class _Tp, class _Up> concept same_as;`
-- `std::meta::same_as`         | `template <class _Tp, class _Up> inline constexpr bool same_as;`
-- `std::meta::is_derived_of`     | `template <class _Bp, class _Dp> struct is_derived_of;`
-- `std::meta::is_derived_of_v`   | `template <class _Bp, class _Dp> inline constexpr bool is_derived_of_v;`
-- `std::meta::is_class`          | `template <class _Tp>            struct is_class;`
-- `std::meta::is_class_v`        | `template <class _Tp>            constexpr bool is_class_v;`
-- `std::meta::is_const_v`        | `template <class>                constexpr bool is_const_v;`
-- `std::meta::is_const_v`        | `template <class _Tp>            constexpr bool is_const_v<const _Tp>;`
-- `std::meta::is_const`          | `template <class _Tp>            struct is_const;`
+---
 
-##### Reference Traits
-- `std::remove_ref`     | `template <typename T> struct remove_ref;`
-- `std::remove_ref`     | `template <typename T> struct remove_ref<T &>;`
-- `std::remove_ref`     | `template <typename T> struct remove_ref<T &&>;`
-- `std::remove_cv`      | `template <typename T> struct remove_cv;`
-- `std::remove_cv`      | `template <typename T> struct remove_cv<const T>;`
-- `std::remove_cv`      | `template <typename T> struct remove_cv<volatile T>;`
-- `std::remove_cv`      | `template <typename T> struct remove_cv<const volatile T>;`
-- `std::remove_cvref`   | `template <typename T> struct remove_cvref;`
-- `std::remove_ref_t`   | `template <typename T> using remove_ref_t = typename remove_ref<T>::t;`
-- `std::remove_cv_t`    | `template <typename T> using remove_cv_t = typename remove_cv<T>::t;`
-- `std::remove_cvref_t` | `template <typename T> using remove_cvref_t = typename remove_cvref<T>::t;`
+### Generators
+#### `$generator`
+- **Purpose**: Implements generator semantics using C++ coroutines.
+- **Features**:
+  - Supports `yield` for lazy value production.
+  - Provides `Iter` for iterator-style access.
+- **Components**:
+  - `promise_type`: Manages coroutine lifecycle and state.
+  - `Iter`: Facilitates navigation of yielded values.
+- **Aliases**:
+  - `std::Generator`: Type alias for `$generator`.
+- **Utility**:
+  - `T std::next($generator<T> &gen);`: Fetches the next value from a generator.
 
-### Types
-#### Core Derived Data Types (these are types that cannot be defined in helix since helix relies on them)
-Example a list: `[1, 2, 3]` is either a array or a list type (undecided for now), but the type is a core type, since without it, the `[..., ...]` syntax would not work.
+---
 
-`to_string` | `template <typename _Ty> string to_string(_Ty &&t)`
-`string`    | `using string = LIBCXX_NAMESPACE::string;`
-`array`     | `template <typename _Ty, usize _Size>  using array;`
-`tuple`     | `template <typename... _Tv>            class tuple;`
-`list`      | `template <typename _Ty>               class list;`
-`set`       | `template <typename _Ty>               class set;`
-`map`       | `template <typename _Kt, typename _Vt> class map;`
-`int`       | `class $int;`
-`float`     | `class $float;`
+### Error Handling
+#### `_HX_MC_Q7_INTERNAL_CRASH_PANIC_M`
+- **Purpose**: Triggers an immediate and unrecoverable panic with a `Panic::Frame`.
+- **Usage**:
+  - Constructs a `Frame` with contextual details and invokes `operator$panic`.
 
-#### Primitive Data Types
-- `byte`  | `using byte;`
-- `u8`    | `using u8;`
-- `u16`   | `using u16;`
-- `u32`   | `using u32;`
-- `u64`   | `using u64;`
-- `i8`    | `using i8;`
-- `i16`   | `using i16;`
-- `i32`   | `using i32;`
-- `i64`   | `using i64;`
-- `f32`   | `using f32;`
-- `f64`   | `using f64;`
-- `f80`   | `using f80;`
-- `usize` | `using usize;`
-- `isize` | `using isize;`
+#### `$panic`
+- **Purpose**: Returns a `Panic::Frame` encapsulating an error.
+- **Usage**:
+  - `return Panic::Frame(err, __FILE__, __LINE__);`
 
-### Functions
-#### Built-in Functions
-- `print`   | `template <typename... Args> inline constexpr void print(Args &&...t)`
-- `next`    | `template <LIBCXX_NAMESPACE::movable T> inline T next($generator<T> &gen)`
+#### `Panic::Frame`
+- **Purpose**: Represents the context of a panic event.
+- **Features**:
+  - Stores file, line, and error details.
+  - Manages the panic object lifecycle via `FrameContext`.
 
-- `std::endl`      | `class endl`
-- `std::to_string` | `template <typename _Ty>     constexpr string to_string(_Ty &&t)`
-- `std::stringf`   | `template <typename... _Ty>  constexpr string stringf(string s, _Ty &&...t)`
+#### `Panic::FrameContext`
+- **Purpose**: Manages dynamically allocated objects for panic propagation.
+- **Features**:
+  - Encapsulates objects using type erasure.
+  - Supports cleanup and propagation of panic states.
 
-- `std::move` | `template <class _Ty>  constexpr remove_ref_t<_Ty> &&move(_Ty &&_Arg) noexcept;`
-- `std::forward`   | `template <typename T> T &&forward(typename remove_ref_t<T> &t) noexcept;`
-- `std::forward`   | `template <typename T> T &&forward(typename remove_ref_t<T> &&t) noexcept;`
+#### Concepts
+- `Panic::Panicking`: Validates if a type implements `operator$panic`.
+- `Panic::PanickingStatic`: Checks for static panic operators.
+- `Panic::PanickingInstance`: Checks for instance-level panic operators.
+
+#### `_HX_FN_Vi_Q5_13_helixpanic_handler`
+- **Purpose**: Helix’s internal panic handler function.
+- **Behavior**:
+  - Invoked during panic events to log and propagate errors.
+
+---
+
+### Quantum Type
+#### `$question`
+- **Purpose**: Represents a nullable or error-prone value (`T?`).
+- **States**:
+  - **Value**: Holds a valid `T`.
+  - **Null**: Represents absence.
+  - **Error**: Encapsulates a `Panic::Frame`.
+- **Features**:
+  - Safe state queries (`is_null`, `is_err`).
+  - Value and error access with type safety.
+  - Error type matching (`$contains`).
+- **Aliases**:
+  - `std::Questionable`: Type alias for `$question`.
+
+---
+
+### Core Definitions and Utilities
+#### Namespace Macros
+- **Purpose**: Simplify namespace declarations and align with Helix standards.
+- **Macros**:
+  - `H_NAMESPACE_BEGIN` / `H_NAMESPACE_END`: Delimit Helix namespaces.
+  - `H_STD_NAMESPACE_BEGIN` / `H_STD_NAMESPACE_END`: Delimit Helix's standard library namespace.
+  - `H_STD_NAMESPACE`: Alias for `helix::std`.
+  - `LIBCXX_NAMESPACE`: Alias for `std`.
+  - `LIBC_NAMESPACE`: Alias for `libc`.
+
+---
+
+### Concepts
+#### `std::Interfaces::SupportsOStream`
+- **Purpose**: Ensures type `T` supports streaming to an output stream.
+- **Requirements**:
+  - `os << a` must be valid, where `os` is an `ostream`.
+
+#### `std::Interfaces::SupportsPointerCast`
+- **Purpose**: Verifies that `T` can be dynamically cast to `U`.
+- **Requirements**:
+  - `dynamic_cast<U>(T)` must be valid.
+
+#### `std::Interfaces::Castable`
+- **Purpose**: Checks if `T` can be cast to `U` via explicit or implicit operators.
+- **Requirements**:
+  - `T.operator$cast(U *)` or `T.operator U()` must be valid.
+
+#### `std::Interfaces::ConvertibleToString`
+- **Purpose**: Confirms `T` can be converted to a `string`.
+- **Requirements**:
+  - Satisfies `SupportsOStream` or `Castable<T, string>`.
+
+---
+
+### Memory Management
+#### `std::_H_RESERVED$new`
+- **Purpose**: Allocates and constructs an object of type `_Tp`.
+- **Signature**:
+  - `_Tp *std::_H_RESERVED$new(_Ty&&... t)`.
+- **Behavior**: Uses perfect forwarding to invoke the constructor.
+
+#### `std::make_aligned`
+- **Purpose**: Dynamically allocates aligned memory for a type and constructs the object.
+- **Behavior**:
+  - Throws `std::bad_alloc` on allocation failure.
+
+#### `std::destroy_aligned`
+- **Purpose**: Destroys and deallocates an object created by `make_aligned`.
+- **Behavior**:
+  - Undefined behavior if used on non-`make_aligned` pointers.
+
+#### `std::Memory::exchange`
+- **Purpose**: Atomically replaces an object’s value.
+- **Requirements**:
+  - `T` must be nothrow-move-constructible and nothrow-assignable.
+
+#### `std::Memory::forward`
+- **Purpose**: Provides perfect forwarding of arguments.
+- **Overloads**:
+  - For lvalue and rvalue references.
+
+#### `std::Memory::as_pointer`
+- **Purpose**: Converts a reference to a pointer.
+- **Constraints**:
+  - Only for non-lvalue-reference types.
+
+#### `std::Memory::as_reference`
+- **Purpose**: Converts a pointer to a reference.
+
+---
+
+### Meta Utilities
+#### Integral Constants
+- **Definitions**:
+  - `Meta::_types::integral_constant`: Base type for compile-time constants.
+  - `Meta::true_t`, `Meta::false_t`: Boolean constants.
+
+#### Type Traits
+- **Key Traits**:
+  - `Meta::remove_reference`, `Meta::remove_const`, `Meta::remove_cvref`: Strip type qualifiers.
+  - `Meta::add_const`, `Meta::add_lvalue_reference`, `Meta::add_rvalue_reference`: Add type qualifiers.
+  - `Meta::is_nothrow_move_constructible`, `Meta::is_nothrow_assignable`: Compile-time checks for move and assignment safety.
+  - `Meta::is_copy_constructible`: Checks if a type is copy-constructible.
+
+#### Concepts
+- **Key Concepts**:
+  - `Meta::convertible_to`: Validates implicit convertibility between types.
+  - `Meta::same_as`: Checks for exact type equality.
+  - `Meta::is_const`, `Meta::is_class`, `Meta::is_reference`: Type property checks.
+
+---
+
+### Primitive Types
+- **Unsigned Integers**: `u8`, `u16`, `u32`, `u64`.
+- **Signed Integers**: `i8`, `i16`, `i32`, `i64`.
+- **Floating-Point Types**: `f32`, `f64`, `f80`.
+- **Pointer-Sized Types**:
+  - `usize`, `isize` (platform-dependent).
+- **Validation**: Ensures pointer-sized types match platform bitness.
+
+---
+
+### Core Utilities
+#### `std::endl`
+- **Purpose**: Represents customizable line endings.
+- **Usage**:
+  - Streams `std::endl` to output.
+- **Constructors**:
+  - Accepts `string`, `const char*`, or `char` for line ending definition.
+
+#### `std::to_string`
+- **Purpose**: Converts any type to a `string`.
+- **Mechanisms**:
+  - Uses `to_string`, streaming, or type demangling.
+
+#### `std::stringf`
+- **Purpose**: Formats strings with placeholders (`{}`).
+- **Behavior**:
+  - Throws on mismatched arguments.
+
+#### `print`
+- **Purpose**: Prints arguments to standard output.
+- **Behavior**:
+  - Supports variadic arguments and adds a newline unless the last argument is `std::endl`.
+
+---
+
+### Platform Support
+- **Platform Detection**:
+  - Determines bitness and defines `usize`/`isize` accordingly.
+  - Supports 64-bit, 32-bit, 16-bit, and 8-bit architectures.
+- **Assertions**:
+  - Verifies `usize` and `isize` align with pointer size.
+
+---
+
+### Error Handling
+#### `std::null_t`
+- **Purpose**: Represents a null value.
+- **Usage**:
+  - Inline constant: `null`.
 
 ## Helix part - Exposed Functions
 - `std::assert`
