@@ -193,7 +193,7 @@ template <typename T>
 struct is_nothrow_move_constructible
     : meta::_types::integral_constant<bool,
                                       __is_nothrow_constructible(
-                                          T, _types::add_rvalue_reference<T>::type)> {};
+                                          T, typename _types::add_rvalue_reference<T>::type)> {};
 
 template <typename T, typename Arg>
 struct is_nothrow_assignable
@@ -207,7 +207,7 @@ struct add_const {
 template <class T>
 struct is_copy_constructible
     : public meta::_types::integral_constant<
-          bool,  __is_constructible(T, add_lvalue_reference<typename add_const<T>::type>::type)> {};
+          bool,  __is_constructible(T, typename add_lvalue_reference<typename add_const<T>::type>::type)> {};
 }  // namespace _types
 
 template <bool, class T = void>

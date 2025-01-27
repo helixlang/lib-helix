@@ -31,7 +31,7 @@
 #include "../types/errors.h"
 #include "../libc.h"
 
-/// \def $CrashWithPanic
+/// \def _HX_MC_Q7_INTERNAL_CRASH_PANIC_M
 ///
 /// A macro for triggering an immediate and unrecoverable panic within the Helix runtime.
 ///
@@ -50,7 +50,7 @@
 ///
 /// ### Example Usage
 /// ```cpp
-/// $CrashWithPanic(H_STD_NAMESPACE::errors::RuntimeError("Critical error occurred."));
+/// _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(H_STD_NAMESPACE::errors::RuntimeError("Critical error occurred."));
 /// ```
 /// This results in an immediate panic, halting execution and propagating the error.
 ///
@@ -58,8 +58,8 @@
 /// - The macro does not return to the caller. It causes the program to terminate or transfer
 /// control to a panic handler.
 /// - Should be used in critical failure paths where recovery is not possible.
-#ifndef $CrashWithPanic
-#define $CrashWithPanic(err) H_STD_NAMESPACE::Panic::Frame(err, __FILE__, __LINE__).operator$panic();
+#ifndef _HX_MC_Q7_INTERNAL_CRASH_PANIC_M
+#define _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(err) H_STD_NAMESPACE::Panic::Frame(err, __FILE__, __LINE__).operator$panic();
 #endif
 
 /// \def $panic
@@ -89,8 +89,8 @@
 /// up the call stack.
 /// - It does not invoke the panic operator directly, allowing the caller to determine the next
 /// course of action.
-#ifndef $panic
-#define $panic(err) return H_STD_NAMESPACE::Panic::Frame(err, __FILE__, __LINE__);
+#ifndef _HX_MC_Q7_PANIC_M
+#define _HX_MC_Q7_PANIC_M(err) return H_STD_NAMESPACE::Panic::Frame(err, __FILE__, __LINE__);
 #endif
 
 H_NAMESPACE_BEGIN
@@ -585,8 +585,8 @@ class Frame {
     Frame(Frame &&other) noexcept            = default;
     Frame &operator=(Frame &&other) noexcept = default;
 
-    [[noreturn]] Frame(Frame  &obj, const string &filename, usize lineno) { obj.operator$panic(); }
-    [[noreturn]] Frame(Frame &&obj, const string &filename, usize lineno) { obj.operator$panic(); }
+    [[noreturn]] Frame(Frame  &obj, const string &, usize) { obj.operator$panic(); }
+    [[noreturn]] Frame(Frame &&obj, const string &, usize) { obj.operator$panic(); }
 
     [[nodiscard]] constexpr string        file()        const { return this->_file; }
     [[nodiscard]] constexpr usize         line()        const { return this->_line; }

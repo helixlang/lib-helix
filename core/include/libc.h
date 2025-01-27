@@ -22,33 +22,29 @@
 H_NAMESPACE_BEGIN
 
 namespace libc {
-// #include <assert.h>
-// #include <ctype.h>
-// #include <errno.h>
-// #include <fenv.h>
-// #include <float.h>
-// #include <inttypes.h>
-// #include <iso646.h>
-// #include <limits.h>
-// #include <locale.h>
-// #include <math.h>
-// #include <setjmp.h>
-// #include <signal.h>
-// #include <stdarg.h>
-// #include <stdbool.h>
-// #include <stdint.h>
+#include <assert.h>
+#include <errno.h>
+#include <fenv.h>
+#include <locale.h>
+#include <time.h>
+#include <wchar.h>
 #include <stdio.h>
 #include <signal.h>
+#include <math.h>
+#include <setjmp.h>
+#include <stdarg.h>
+#include <uchar.h>
 #ifndef _MSC_VER
 #include "cxxabi.h"
+#include <unistd.h>
+#else
+#include <direct.h>
+#include <io.h>
+#include <fcntl.h>
+// #include <process.h>
+// #include <sys/stat.h>
+// #include <sys/types.h>
 #endif
-// #include <stdlib.h>
-// #include <string.h>
-// #include <time.h>
-// #include <uchar.h>
-// #include <wchar.h>
-// #include <wctype.h>
-
 template <typename T>
 using va_array = T[];
 

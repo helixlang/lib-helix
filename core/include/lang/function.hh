@@ -195,7 +195,7 @@ class $function<Rt(Tp...)> {
         constexpr Rt invoke(Tp... args) override { return callable(H_STD_NAMESPACE::memory::forward<Tp>(args)...); }
 
         constexpr $callable *clone() const override {
-            return new (LIBCXX_NAMESPACE::align_val_t(alignof(Callable<T>))) Callable(callable); // NOLINT
+            return std::make_aligned<Callable<T>>(callable);
         }
     };
 
