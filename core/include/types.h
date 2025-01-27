@@ -42,7 +42,7 @@ class tuple : public LIBCXX_NAMESPACE::tuple<T...> {
 
     template <typename... Ts>
     tuple(Ts &&...args) // NOLINT
-        : LIBCXX_NAMESPACE::tuple<T...>(H_STD_NAMESPACE::memory::forward<Ts>(args)...) {}
+        : LIBCXX_NAMESPACE::tuple<T...>(H_STD_NAMESPACE::Memory::forward<Ts>(args)...) {}
 
     inline auto operator$cast(string * /* unused */) -> string {  // cast to string op to allow for printing
         string result = "(";

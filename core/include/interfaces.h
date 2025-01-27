@@ -22,10 +22,10 @@
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
-namespace interfaces {
+namespace Interfaces {
 template <typename T>
 concept SupportsOStream = requires(LIBCXX_NAMESPACE::ostream &os, T a) {
-    { os << a } -> H_STD_NAMESPACE::meta::convertible_to<LIBCXX_NAMESPACE::ostream &>;
+    { os << a } -> H_STD_NAMESPACE::Meta::convertible_to<LIBCXX_NAMESPACE::ostream &>;
 };
 
 template <typename T, typename U>
@@ -35,14 +35,14 @@ concept SupportsPointerCast = requires(T from) {
 
 template <typename T, typename U>
 concept Castable = requires(T t, U *u) {
-    { t.operator$cast(u) } -> H_STD_NAMESPACE::meta::same_as<U>; // cast to the requested type
+    { t.operator$cast(u) } -> H_STD_NAMESPACE::Meta::same_as<U>; // cast to the requested type
 } || requires(T t, U *u) {
-    { t.operator U() } -> H_STD_NAMESPACE::meta::same_as<U>; // call the implicit cast
+    { t.operator U() } -> H_STD_NAMESPACE::Meta::same_as<U>; // call the implicit cast
 };
 
 template <typename T>
 concept ConvertibleToString = SupportsOStream<T> || Castable<T, string>;
-}  // namespace interfaces
+}  // namespace Interfaces
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
 #endif

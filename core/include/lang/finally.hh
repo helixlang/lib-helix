@@ -100,7 +100,7 @@ class $finally {
 
     template <typename Fn>
     explicit $finally(Fn &&fn)
-        : m_fn{H_STD_NAMESPACE::memory::forward<Fn>(fn)} {}
+        : m_fn{H_STD_NAMESPACE::Memory::forward<Fn>(fn)} {}
 
   private:
     $function<void()> m_fn;

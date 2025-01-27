@@ -127,22 +127,22 @@ constexpr Ty as_unsafe(Up value);
 /// \return The value reinterpret-cast to the target type.
 template <typename Ty, typename Up>
 constexpr const Ty as_unsafe(const Up value)  // NOLINT
-    requires(H_STD_NAMESPACE::meta::is_const<Up> ||
-             H_STD_NAMESPACE::meta::is_const<Ty>);
+    requires(H_STD_NAMESPACE::Meta::is_const<Up> ||
+             H_STD_NAMESPACE::Meta::is_const<Ty>);
 
 // ------------------------------------------- as_cast ------------------------------------------ //
 template <typename Ty, typename Up>
 constexpr Ty as_cast(Up &value) {
-    if constexpr (H_STD_NAMESPACE::meta::is_const<H_STD_NAMESPACE::meta::remove_reference_t<Up>> &&
-                  H_STD_NAMESPACE::meta::same_as<H_STD_NAMESPACE::meta::remove_const_t<Up>, Ty>) {
+    if constexpr (H_STD_NAMESPACE::Meta::is_const<H_STD_NAMESPACE::Meta::remove_reference_t<Up>> &&
+                  H_STD_NAMESPACE::Meta::same_as<H_STD_NAMESPACE::Meta::remove_const_t<Up>, Ty>) {
         return const_cast<Ty>(value);
     } else if constexpr (LIBCXX_NAMESPACE::is_pointer_v<Ty>) {
-        if constexpr (H_STD_NAMESPACE::interfaces::SupportsPointerCast<Up, Ty>) {
+        if constexpr (H_STD_NAMESPACE::Interfaces::SupportsPointerCast<Up, Ty>) {
             return dynamic_cast<Ty>(value);
         } else {
             return static_cast<Ty>(value);
         }
-    } else if constexpr (H_STD_NAMESPACE::interfaces::Castable<Up, Ty>) {
+    } else if constexpr (H_STD_NAMESPACE::Interfaces::Castable<Up, Ty>) {
         return value.operator$cast(static_cast<Ty *>(nullptr));
     } else {
         return static_cast<Ty>(value);
@@ -173,8 +173,8 @@ constexpr Ty as_unsafe(Up value) {
 
 template <typename Ty, typename Up>
 constexpr const Ty as_unsafe(const Up value)  // NOLINT
-    requires(H_STD_NAMESPACE::meta::is_const<Up> ||
-             H_STD_NAMESPACE::meta::is_const<Ty>) {
+    requires(H_STD_NAMESPACE::Meta::is_const<Up> ||
+             H_STD_NAMESPACE::Meta::is_const<Ty>) {
     return reinterpret_cast<const Ty>(value);  // NOLINT
 }
 

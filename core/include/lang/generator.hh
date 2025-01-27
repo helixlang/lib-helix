@@ -24,8 +24,6 @@
 #include "../memory.h"
 
 H_NAMESPACE_BEGIN
-
-
 /// \class $generator
 ///
 /// A core component of the Helix runtime, `$generator` provides support for generator semantics,
@@ -138,7 +136,7 @@ public:
         }
 
         LIBCXX_NAMESPACE::suspend_always yield_value(T value) noexcept {
-            current_value = H_STD_NAMESPACE::memory::move(value);
+            current_value = H_STD_NAMESPACE::Memory::move(value);
             return {};
         }
 
@@ -160,14 +158,14 @@ public:
     $generator &operator=(const $generator &) = delete;
 
     $generator($generator &&other) noexcept
-        : m_coroutine(H_STD_NAMESPACE::memory::exchange(other.m_coroutine, {})) {}
+        : m_coroutine(H_STD_NAMESPACE::Memory::exchange(other.m_coroutine, {})) {}
 
     $generator &operator=($generator &&other) noexcept {
         if (this != &other) {
             if (m_coroutine) {
                 m_coroutine.destroy();
             }
-            m_coroutine = H_STD_NAMESPACE::memory::exchange(other.m_coroutine, {});
+            m_coroutine = H_STD_NAMESPACE::Memory::exchange(other.m_coroutine, {});
         }
         return *this;
     }

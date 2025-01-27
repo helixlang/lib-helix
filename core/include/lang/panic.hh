@@ -209,9 +209,9 @@ class Frame;
 /// ```
 template <typename T>
 concept Panicking = requires(T obj) {
-    { obj.operator$panic() } -> H_STD_NAMESPACE::meta::convertible_to<string>;
+    { obj.operator$panic() } -> H_STD_NAMESPACE::Meta::convertible_to<string>;
 } || requires {
-    { T::operator$panic() } -> H_STD_NAMESPACE::meta::convertible_to<string>;
+    { T::operator$panic() } -> H_STD_NAMESPACE::Meta::convertible_to<string>;
 };
 
 /// \concept PanickingStatic
@@ -233,7 +233,7 @@ concept Panicking = requires(T obj) {
 /// ```
 template <typename T>
 concept PanickingStatic = requires(T obj) {
-    { T::operator$panic() } -> H_STD_NAMESPACE::meta::convertible_to<string>;
+    { T::operator$panic() } -> H_STD_NAMESPACE::Meta::convertible_to<string>;
 };
 
 /// \concept PanickingInstance
@@ -255,7 +255,7 @@ concept PanickingStatic = requires(T obj) {
 /// ```
 template <typename T>
 concept PanickingInstance = requires(T obj) {
-    { obj.operator$panic() } -> H_STD_NAMESPACE::meta::convertible_to<string>;
+    { obj.operator$panic() } -> H_STD_NAMESPACE::Meta::convertible_to<string>;
 };
 }  // namespace Panic
 
@@ -360,7 +360,7 @@ class FrameContext {
 
     constexpr FrameContext(FrameContext &&other) noexcept
         : $object(other.$object)
-        , $throw(H_STD_NAMESPACE::memory::move(other.$throw)) {
+        , $throw(H_STD_NAMESPACE::Memory::move(other.$throw)) {
         other.$object = nullptr;
     }
 
@@ -371,7 +371,7 @@ class FrameContext {
                 delete $object;
             }
             $object       = other.$object;
-            $throw        = H_STD_NAMESPACE::memory::move(other.$throw);
+            $throw        = H_STD_NAMESPACE::Memory::move(other.$throw);
             other.$object = nullptr;
         }
         return *this;
@@ -549,7 +549,7 @@ class Frame {
 
         try {
             if constexpr (LIBCXX_NAMESPACE::is_move_constructible_v<T>) {
-                object        = new T(H_STD_NAMESPACE::memory::move(obj));  // NOLINT
+                object        = new T(H_STD_NAMESPACE::Memory::move(obj));  // NOLINT
                 this->context = FrameContext(object);
             } else if constexpr (LIBCXX_NAMESPACE::is_copy_constructible_v<T>) {
                 object        = new T(obj);  // NOLINT
@@ -571,7 +571,7 @@ class Frame {
 
     template <typename T>
     constexpr Frame(T obj, string filename, usize lineno)
-        : _file(H_STD_NAMESPACE::memory::move(filename))
+        : _file(H_STD_NAMESPACE::Memory::move(filename))
         , _line(lineno) {
         initialize<T>(obj);
     }

@@ -165,10 +165,10 @@ class $question {
 
     constexpr void set_value(const T &value) { new (&data.value) T(value); }
     constexpr void set_value(T &&value) {
-        new (&data.value) T(H_STD_NAMESPACE::memory::move(value));
+        new (&data.value) T(H_STD_NAMESPACE::Memory::move(value));
     }
     constexpr void set_err(H_STD_NAMESPACE::Panic::Frame &&error) {
-        new (&data.error) H_STD_NAMESPACE::Panic::Frame(H_STD_NAMESPACE::memory::move(error));
+        new (&data.error) H_STD_NAMESPACE::Panic::Frame(H_STD_NAMESPACE::Memory::move(error));
     }
 
     constexpr void delete_error() noexcept { data.error.~Frame(); }
@@ -190,7 +190,7 @@ class $question {
     }
     constexpr $question(T &&value)
         : state($State::Value) {
-        set_value(H_STD_NAMESPACE::memory::move(value));
+        set_value(H_STD_NAMESPACE::Memory::move(value));
     }
 
     /// ------------------------------- Constructors (Error) -------------------------------
@@ -200,7 +200,7 @@ class $question {
     }
     constexpr $question(H_STD_NAMESPACE::Panic::Frame &&error)
         : state($State::Error) {
-        set_err(H_STD_NAMESPACE::memory::move(error));
+        set_err(H_STD_NAMESPACE::Memory::move(error));
     }
 
     /// ------------------------------- Move Constructor & Assignment
@@ -208,9 +208,9 @@ class $question {
     constexpr $question($question &&other) noexcept
         : state(other.state) {
         if (state == $State::Error) {
-            set_err(H_STD_NAMESPACE::memory::move(other.data.error));
+            set_err(H_STD_NAMESPACE::Memory::move(other.data.error));
         } else if (state == $State::Value) {
-            set_value(H_STD_NAMESPACE::memory::move(other.data.value));
+            set_value(H_STD_NAMESPACE::Memory::move(other.data.value));
         }
     }
 
@@ -224,9 +224,9 @@ class $question {
 
             state = other.state;
             if (state == $State::Error) {
-                set_err(H_STD_NAMESPACE::memory::move(other.data.error));
+                set_err(H_STD_NAMESPACE::Memory::move(other.data.error));
             } else if (state == $State::Value) {
-                set_value(H_STD_NAMESPACE::memory::move(other.data.value));
+                set_value(H_STD_NAMESPACE::Memory::move(other.data.value));
             }
         }
         return *this;
@@ -325,7 +325,7 @@ class $question {
         }
 
         if (state == $State::Value) {
-            if constexpr (H_STD_NAMESPACE::meta::same_as<T, E>) {
+            if constexpr (H_STD_NAMESPACE::Meta::same_as<T, E>) {
                 return data.value;
             }
 

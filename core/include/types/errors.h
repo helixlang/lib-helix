@@ -46,7 +46,7 @@ class NullValueError : public Error {
     NullValueError() = default;
 
     NullValueError(string msg)  // NOLINT(google-explicit-constructor)
-        : msg(H_STD_NAMESPACE::memory::move(msg)) {}
+        : msg(H_STD_NAMESPACE::Memory::move(msg)) {}
 
     NullValueError(const NullValueError &other)     = default;
     NullValueError(NullValueError &&other) noexcept = default;
@@ -68,7 +68,7 @@ class RuntimeError : public Error {
     RuntimeError() = default;
 
     RuntimeError(string msg)  // NOLINT(google-explicit-constructor)
-        : msg(H_STD_NAMESPACE::memory::move(msg)) {}
+        : msg(H_STD_NAMESPACE::Memory::move(msg)) {}
 
     RuntimeError(const RuntimeError &other)     = default;
     RuntimeError(RuntimeError &&other) noexcept = default;
@@ -90,7 +90,7 @@ class StateMismatchError : public Error {
     StateMismatchError() = default;
 
     StateMismatchError(string msg)  // NOLINT(google-explicit-constructor)
-        : msg(H_STD_NAMESPACE::memory::move(msg)) {}
+        : msg(H_STD_NAMESPACE::Memory::move(msg)) {}
 
     StateMismatchError(const StateMismatchError &other)     = default;
     StateMismatchError(StateMismatchError &&other) noexcept = default;
@@ -112,7 +112,7 @@ class TypeMismatchError : public Error {
     TypeMismatchError() = default;
 
     TypeMismatchError(string msg)  // NOLINT(google-explicit-constructor)
-        : msg(H_STD_NAMESPACE::memory::move(msg)) {}
+        : msg(H_STD_NAMESPACE::Memory::move(msg)) {}
 
     TypeMismatchError(const TypeMismatchError &other)     = default;
     TypeMismatchError(TypeMismatchError &&other) noexcept = default;

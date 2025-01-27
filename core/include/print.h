@@ -38,7 +38,7 @@ class endl {
     ~endl() = default;
 
     explicit endl(string end)
-        : end_l(H_STD_NAMESPACE::memory::move(end)) {}
+        : end_l(H_STD_NAMESPACE::Memory::move(end)) {}
 
     explicit endl(const char *end)
         : end_l((end != nullptr) ? end : "\n") {}
@@ -66,13 +66,13 @@ class endl {
 ///
 template <typename Ty>
 constexpr string to_string(Ty &&t) {
-    if constexpr (H_STD_NAMESPACE::interfaces::SupportsOStream<Ty>) {
+    if constexpr (H_STD_NAMESPACE::Interfaces::SupportsOStream<Ty>) {
         LIBCXX_NAMESPACE::stringstream ss;
         ss << t;
         return ss.str();
-    } else if constexpr (H_STD_NAMESPACE::interfaces::Castable<Ty, string>) {
+    } else if constexpr (H_STD_NAMESPACE::Interfaces::Castable<Ty, string>) {
         return t.operator$cast(static_cast<string *>(nullptr));
-    } else if constexpr (H_STD_NAMESPACE::meta::same_as<Ty, bool>) {
+    } else if constexpr (H_STD_NAMESPACE::Meta::same_as<Ty, bool>) {
         return t ? "true" : "false";
     } else if constexpr (LIBCXX_NAMESPACE::is_arithmetic_v<Ty>) {
         return LIBCXX_NAMESPACE::to_string(t);
@@ -107,7 +107,7 @@ constexpr string to_string(Ty &&t) {
 ///
 template <typename... Ty>
 constexpr string stringf(string s, Ty &&...t) {
-    const array<string, sizeof...(t)> EAS = {to_string(H_STD_NAMESPACE::memory::forward<Ty>(t))...};
+    const array<string, sizeof...(t)> EAS = {to_string(H_STD_NAMESPACE::Memory::forward<Ty>(t))...};
 
     usize pos = 0;
 
@@ -140,11 +140,11 @@ inline constexpr void print(Args &&...t) {
         return;
     }
 
-    ((printf("%s", H_STD_NAMESPACE::to_string(H_STD_NAMESPACE::memory::forward<Args>(t)).c_str())), ...);
+    ((printf("%s", H_STD_NAMESPACE::to_string(H_STD_NAMESPACE::Memory::forward<Args>(t)).c_str())), ...);
 
     if constexpr (sizeof...(t) > 0) {
-        if constexpr (!H_STD_NAMESPACE::meta::same_as<
-                          H_STD_NAMESPACE::meta::remove_const_volatile_t<H_STD_NAMESPACE::meta::remove_reference_t<
+        if constexpr (!H_STD_NAMESPACE::Meta::same_as<
+                          H_STD_NAMESPACE::Meta::remove_const_volatile_t<H_STD_NAMESPACE::Meta::remove_reference_t<
                               decltype(LIBCXX_NAMESPACE::get<sizeof...(t) - 1>(tuple<Args...>(t...)))>>,
                           H_STD_NAMESPACE::endl>) {
             printf("\n");

@@ -23,22 +23,22 @@
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
-namespace memory {
+namespace Memory {
 using LIBCXX_NAMESPACE::move;
 
 template <typename T>
-T &&forward(meta::remove_reference_t<T> &t) noexcept {
+T &&forward(Meta::remove_reference_t<T> &t) noexcept {
     return static_cast<T &&>(t);
 }
 
 template <typename T>
-T &&forward(meta::remove_reference_t<T> &&t) noexcept {
+T &&forward(Meta::remove_reference_t<T> &&t) noexcept {
     return static_cast<T &&>(t);
 }
 
 template <typename T>
-    requires(!meta::is_add_lvalue_reference<T>)
-constexpr meta::reference_to_pointer_t<T> as_pointer(T &&ref) noexcept {
+    requires(!Meta::is_add_lvalue_reference<T>)
+constexpr Meta::reference_to_pointer_t<T> as_pointer(T &&ref) noexcept {
     return &ref;
 }
 
@@ -49,7 +49,7 @@ constexpr T &&as_reference(T *ptr) noexcept {
 
 template <class T, class U = T>
 inline constexpr T exchange(T &obj, U &&new_value) noexcept
-  requires(meta::is_nothrow_move_constructible<T> && meta::is_nothrow_assignable<T &, U>) {
+  requires(Meta::is_nothrow_move_constructible<T> && Meta::is_nothrow_assignable<T &, U>) {
     T old_value = move(obj);
     obj         = forward<U>(new_value);
     return old_value;

@@ -38,17 +38,17 @@
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
-namespace memory {
+namespace Memory {
 template <typename T>
-T &&forward(meta::remove_reference_t<T> &t) noexcept;
+T &&forward(Meta::remove_reference_t<T> &t) noexcept;
 
 template <typename T>
-T &&forward(meta::remove_reference_t<T> &&t) noexcept;
-}  // namespace memory
+T &&forward(Meta::remove_reference_t<T> &&t) noexcept;
+}  // namespace Memory
 
 template <typename _Tp, typename... _Ty>
 constexpr _Tp *_H_RESERVED$new(_Ty &&...t) {                      // NOLINT
-    return new _Tp(H_STD_NAMESPACE::memory::forward<_Ty>(t)...);  // NOLINT
+    return new _Tp(H_STD_NAMESPACE::Memory::forward<_Ty>(t)...);  // NOLINT
 }
 
 ///

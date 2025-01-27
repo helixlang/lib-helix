@@ -186,13 +186,13 @@ class $function<Rt(Tp...)> {
     struct Callable : $callable {
         alignas(alignof(LIBCXX_NAMESPACE::max_align_t)) T callable;
 
-        constexpr Callable(typename H_STD_NAMESPACE::meta::remove_reference_t<T> &&callable)  // NOLINT(google-explicit-constructor)
-            : callable(H_STD_NAMESPACE::memory::forward<T>(callable)) {}
+        constexpr Callable(typename H_STD_NAMESPACE::Meta::remove_reference_t<T> &&callable)  // NOLINT(google-explicit-constructor)
+            : callable(H_STD_NAMESPACE::Memory::forward<T>(callable)) {}
 
         constexpr Callable(const T &callable)  // NOLINT(google-explicit-constructor)
             : callable(callable) {}
 
-        constexpr Rt invoke(Tp... args) override { return callable(H_STD_NAMESPACE::memory::forward<Tp>(args)...); }
+        constexpr Rt invoke(Tp... args) override { return callable(H_STD_NAMESPACE::Memory::forward<Tp>(args)...); }
 
         constexpr $callable *clone() const override {
             return std::make_aligned<Callable<T>>(callable);
@@ -214,17 +214,17 @@ class $function<Rt(Tp...)> {
         : callable(other.callable ? other.callable->clone() : nullptr) {}
 
     template <typename T>
-    constexpr $function(typename H_STD_NAMESPACE::meta::remove_reference_t<T> $call_o) {  // NOLINT(google-explicit-constructor)
-        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::memory::forward<T>($call_o)); // NOLINT
+    constexpr $function(typename H_STD_NAMESPACE::Meta::remove_reference_t<T> $call_o) {  // NOLINT(google-explicit-constructor)
+        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::Memory::forward<T>($call_o)); // NOLINT
     }
 
     template <typename T>
     constexpr $function(T $call_o) {  // NOLINT(google-explicit-constructor)
-        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::memory::forward<T>($call_o)); // NOLINT
+        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::Memory::forward<T>($call_o)); // NOLINT
     }
 
     constexpr $function(Rt (*func)(Tp...))  // NOLINT(google-explicit-constructor)
-        : callable(func ? new Callable<H_STD_NAMESPACE::meta::remove_const_volatile_t<Rt (*)(Tp...)>>(func) : nullptr) {}
+        : callable(func ? new Callable<H_STD_NAMESPACE::Meta::remove_const_volatile_t<Rt (*)(Tp...)>>(func) : nullptr) {}
 
     constexpr ~$function() { reset(); }
 
@@ -250,14 +250,14 @@ class $function<Rt(Tp...)> {
     template <typename T>
     constexpr $function &operator=(T $call_o) {
         delete callable;
-        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::memory::forward<T>($call_o)); // NOLINT
+        callable = new Callable<LIBCXX_NAMESPACE::decay_t<T>>(H_STD_NAMESPACE::Memory::forward<T>($call_o)); // NOLINT
         return *this;
     }
 
     // Assignment for function pointers
     constexpr $function &operator=(Rt (*func)(Tp...)) {
         delete callable;
-        callable = func ? new Callable<Rt (*)(typename H_STD_NAMESPACE::meta::remove_reference_t<Tp>...)>(func) : nullptr;
+        callable = func ? new Callable<Rt (*)(typename H_STD_NAMESPACE::Meta::remove_reference_t<Tp>...)>(func) : nullptr;
         return *this;
     }
 
@@ -269,7 +269,7 @@ class $function<Rt(Tp...)> {
             throw "called an unset function pointer";
         }
 
-        return callable->invoke(H_STD_NAMESPACE::memory::forward<Tp>(args)...);
+        return callable->invoke(H_STD_NAMESPACE::Memory::forward<Tp>(args)...);
     }
 
     constexpr void reset() noexcept {

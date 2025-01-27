@@ -42,12 +42,4 @@
 #include "print.h"
 #include "meta.h"
 
-/*
-cast.hh
-finally.hh
-function.hh
-generator.hh
-panic.hh
-*/
-
 #endif

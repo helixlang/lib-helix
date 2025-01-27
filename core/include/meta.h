@@ -21,7 +21,7 @@
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
-namespace meta {
+namespace Meta {
 namespace _types {
     template <class T, T v>
     struct integral_constant {
@@ -35,8 +35,8 @@ namespace _types {
     };
 }  // namespace _types
 
-using true_t  = meta::_types::integral_constant<bool, true>;
-using false_t = meta::_types::integral_constant<bool, false>;
+using true_t  = Meta::_types::integral_constant<bool, true>;
+using false_t = Meta::_types::integral_constant<bool, false>;
 
 namespace _internal {
     template <class>
@@ -164,7 +164,7 @@ struct is_reference<T &> : public true_t {};
 template <class T>
 struct is_reference<T &&> : public true_t {};
 
-template <typename T, bool = (!meta::_internal::same_as<decltype(_internal::is_referenceable_helper::test<T>(0)), false_t>)>
+template <typename T, bool = (!Meta::_internal::same_as<decltype(_internal::is_referenceable_helper::test<T>(0)), false_t>)>
 struct add_rvalue_reference {
     using type = T;
 };
@@ -174,7 +174,7 @@ struct add_rvalue_reference<T, true> {
     using type = T &&;
 };
 
-template <typename T, bool = (!meta::_internal::same_as<decltype(_internal::is_referenceable_helper::test<T>(0)), false_t>)>
+template <typename T, bool = (!Meta::_internal::same_as<decltype(_internal::is_referenceable_helper::test<T>(0)), false_t>)>
 struct add_lvalue_reference {
     using type = T;
 };
@@ -191,13 +191,13 @@ struct add_lvalue_reference<T, true> {
 
 template <typename T>
 struct is_nothrow_move_constructible
-    : meta::_types::integral_constant<bool,
+    : Meta::_types::integral_constant<bool,
                                       __is_nothrow_constructible(
                                           T, typename _types::add_rvalue_reference<T>::type)> {};
 
 template <typename T, typename Arg>
 struct is_nothrow_assignable
-    : meta::_types::integral_constant<bool, __is_nothrow_assignable(T, Arg)> {};
+    : Meta::_types::integral_constant<bool, __is_nothrow_assignable(T, Arg)> {};
 
 template <class T>
 struct add_const {
@@ -206,7 +206,7 @@ struct add_const {
 
 template <class T>
 struct is_copy_constructible
-    : public meta::_types::integral_constant<
+    : public Meta::_types::integral_constant<
           bool,  __is_constructible(T, typename add_lvalue_reference<typename add_const<T>::type>::type)> {};
 }  // namespace _types
 
@@ -248,7 +248,7 @@ template <class B, class D>
 concept is_derived_of = _internal::is_derived_of<B, D>;
 
 template <typename T>
-concept is_referenceable = !meta::same_as<decltype(_internal::is_referenceable_helper::test<T>(0)), false_t>;
+concept is_referenceable = !Meta::same_as<decltype(_internal::is_referenceable_helper::test<T>(0)), false_t>;
 
 template <class T>
 concept is_add_rvalue_reference = _types::is_add_rvalue_reference<T>::value;
@@ -291,7 +291,7 @@ using add_rvalue_reference_t = typename _types::add_rvalue_reference<T>::type;
 
 template <typename T>
 using add_lvalue_reference_t = typename _types::add_lvalue_reference<T>::type;
-}  // namespace meta
+}  // namespace Meta
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
