@@ -80,27 +80,27 @@ The Helix Core provides essential utilities and constructs central to the langua
 - **Usage**:
   - Constructs a `Frame` with contextual details and invokes `operator$panic`.
 
-#### `$panic`
+#### `_HX_MC_Q7_PANIC_M`
 - **Purpose**: Returns a `Panic::Frame` encapsulating an error.
 - **Usage**:
-  - `return Panic::Frame(err, __FILE__, __LINE__);`
+  - `_HX_MC_Q7_PANIC_M(err);`
 
-#### `Panic::Frame`
+#### `std::Panic::Frame`
 - **Purpose**: Represents the context of a panic event.
 - **Features**:
   - Stores file, line, and error details.
   - Manages the panic object lifecycle via `FrameContext`.
 
-#### `Panic::FrameContext`
+#### `std::Panic::FrameContext`
 - **Purpose**: Manages dynamically allocated objects for panic propagation.
 - **Features**:
   - Encapsulates objects using type erasure.
   - Supports cleanup and propagation of panic states.
 
 #### Concepts
-- `Panic::Panicking`: Validates if a type implements `operator$panic`.
-- `Panic::PanickingStatic`: Checks for static panic operators.
-- `Panic::PanickingInstance`: Checks for instance-level panic operators.
+- `std::Panic::Panicking`: Validates if a type implements `operator$panic`.
+- `std::Panic::PanickingStatic`: Checks for static panic operators.
+- `std::Panic::PanickingInstance`: Checks for instance-level panic operators.
 
 #### `_HX_FN_Vi_Q5_13_helixpanic_handler`
 - **Purpose**: Helix’s internal panic handler function.
@@ -114,12 +114,12 @@ The Helix Core provides essential utilities and constructs central to the langua
 - **Purpose**: Represents a nullable or error-prone value (`T?`).
 - **States**:
   - **Value**: Holds a valid `T`.
-  - **Null**: Represents absence.
-  - **Error**: Encapsulates a `Panic::Frame`.
+  - **Null**:  Represents absence.
+  - **Error**: Encapsulates a `std::Panic::Frame`.
 - **Features**:
-  - Safe state queries (`is_null`, `is_err`).
+  - Safe state queries (`...?`).
   - Value and error access with type safety.
-  - Error type matching (`$contains`).
+  - Error type matching (`... in ...`).
 - **Aliases**:
   - `std::Questionable`: Type alias for `$question`.
 
