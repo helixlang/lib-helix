@@ -27,15 +27,15 @@
 #ifndef __$LIBHELIX_CORE__
 #define __$LIBHELIX_CORE__
 
+#include "types.h"
+#include "libc.h"
 #include "interfaces.h"
 #include "config.h"
-#include "types.h"
 #include "lang/cast.hh"
 #include "lang/finally.hh"
 #include "lang/function.hh"
 #include "lang/generator.hh"
 #include "lang/question.hh"
-#include "libc.h"
 #include "memory.h"
 #include "libcxx.h"
 #include "primitives.h"

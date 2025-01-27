@@ -22,7 +22,7 @@
 H_NAMESPACE_BEGIN
 
 namespace libc {
-#include <assert.h>
+#include <stdio.h>
 #include <errno.h>
 #include <fenv.h>
 #include <locale.h>
@@ -30,20 +30,19 @@ namespace libc {
 #include <wchar.h>
 #include <stdio.h>
 #include <signal.h>
-#include <math.h>
 #include <setjmp.h>
 #include <stdarg.h>
 #include <uchar.h>
+#include <fcntl.h>
 #ifndef _MSC_VER
 #include "cxxabi.h"
 #include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #else
 #include <direct.h>
 #include <io.h>
-#include <fcntl.h>
-// #include <process.h>
-// #include <sys/stat.h>
-// #include <sys/types.h>
+#include <process.h>
 #endif
 template <typename T>
 using va_array = T[];

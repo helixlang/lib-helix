@@ -96,7 +96,7 @@ H_NAMESPACE_BEGIN
 ///   - `bool operator$contains(const E & /* unused */) const`: Returns `true` if the error matches
 ///   the type `E`.
 /// - **Equality**:
-///   - `bool operator==(const null_t & /*unused*/) const`: Checks for null equality.
+///   - `bool operator==(const std::null_t & /*unused*/) const`: Checks for null equality.
 ///   - `bool operator==(const E & /*unused*/) const`: Checks if the error matches a specific type.
 ///
 /// ### Guarantees
@@ -178,9 +178,9 @@ class $question {
     /// ------------------------------- Constructors (Null) -------------------------------
     constexpr $question() noexcept
         : state($State::Null) {}
-    constexpr $question(const null_t &) noexcept
+    constexpr $question(const std::null_t &) noexcept
         : state($State::Null) {}
-    constexpr $question(null_t &&) noexcept
+    constexpr $question(std::null_t &&) noexcept
         : state($State::Null) {}
 
     /// ------------------------------- Constructors (Value) -------------------------------
@@ -273,8 +273,8 @@ class $question {
     }
 
     /// ------------------------------- Operators -------------------------------
-    constexpr bool operator==(const null_t &) const noexcept { return is_null(); }
-    constexpr bool operator!=(const null_t &) const noexcept { return !is_null(); }
+    constexpr bool operator==(const std::null_t &) const noexcept { return is_null(); }
+    constexpr bool operator!=(const std::null_t &) const noexcept { return !is_null(); }
 
     template <typename E>
     constexpr bool operator==(const E &) const noexcept {

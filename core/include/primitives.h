@@ -18,8 +18,6 @@
 
 #include "config.h"
 
-H_NAMESPACE_BEGIN
-
 using byte = unsigned char;
 
 using u8  = unsigned char;
@@ -65,12 +63,10 @@ using isize = i8;
 static_assert(sizeof(usize) == sizeof(void *), "usize must match the size of a pointer.");
 static_assert(sizeof(isize) == sizeof(void *), "isize must match the size of a pointer.");
 
-H_STD_NAMESPACE_BEGIN
-
+namespace helix::std {
 class null_t {};
-inline constexpr null_t null;
+}
 
-H_STD_NAMESPACE_END
-H_NAMESPACE_END
+inline constexpr helix::std::null_t null;
 
 #endif  // __$LIBHELIX_TYPES__
