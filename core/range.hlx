@@ -145,7 +145,7 @@ module std {
       requires <T> if T has RangeIncrementable {
         let first: T;
         let last:  T;
-        let step:  T;
+        let step:  isize;
 
         fn Range(self, first: T, last: T, step: isize = 1) {
             self.first = first;
@@ -156,7 +156,7 @@ module std {
         fn Range(self, last: T) {
             self.first = T();
             self.last  = last;
-            self.step  = T(1);
+            self.step  = 1;
         }
 
         op in fn iter(self) -> yield T {
@@ -164,7 +164,16 @@ module std {
 
             while current < self.last {
                 yield current;
-                current += self.step;
+                
+                if (self.step < 0) {
+                    for (let _: isize = 0; _ > self.step; ++_) {
+                        ++current;
+                    }
+                } else {
+                    for (let _: isize = 0; _ < self.step; ++_) {
+                        ++current;
+                    }
+                }
             }
         }
 
@@ -179,7 +188,7 @@ fn range(last: T) -> std::Range::<T>
     return std::Range::<T>(last);
 }
 
-fn range(first: T, last: T, step: T = 1) -> std::Range::<T>
+fn range(first: T, last: T, step: isize = 1) -> std::Range::<T>
     requires <T> if T has std::RangeIncrementable {
     return std::Range::<T>(first, last, step);
 }

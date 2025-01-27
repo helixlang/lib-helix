@@ -14,11 +14,7 @@
 /// \note This panic handler is globally accessible to any Helix module that wildcard-imports `core.hlx`.
 
 ffi "c++" import "include/lang/panic.hh";
-
-ffi "c++" import "stdio.h";
-ffi "c++" import "stdlib.h";
-ffi "c++" import "fcntl.h";
-ffi "c++" import "unistd.h";
+ffi "c++" import "include/libc.h";
 
 /// \brief Displays runtime panic details and signals program termination.
 ///
@@ -55,9 +51,36 @@ fn _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const frame: 
     const yellow:      string = "\033[33m";
     const light_green: string = "\033[92m";
 
-    const fd: i32 = open(file_path.c_str(), O_RDONLY);
+    let open_file = fn (file_path: string) -> i32 {
+        const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
+            let fd: i32 = -1;
+            let err: errno_t = libc::_sopen_s(&fd, file_path.c_str(), O_RDONLY, _SH_DENYNO, 0);
+            
+            return -1 if err != 0 else fd;
+        } else {
+            return libc::open(file_path.c_str(), O_RDONLY);
+        }
+    };
+
+    let close_file = fn (fd: i32) {
+        const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
+            libc::_close(fd);
+        } else {
+            libc::close(fd);
+        }
+    };
+
+    let read_file = fn (fd: i32, buffer: *char, size: u32) -> isize {
+        const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
+            return libc::_read(fd, buffer, size);
+        } else {
+            return libc::read(fd, buffer, size);
+        }
+    };
+
+    const fd: i32 = open_file(file_path);
     finally:
-        if fd >= 0: close(fd);
+        if fd >= 0: close_file(fd);
 
     let get_line_from_file = fn (fd: i32, line_number: usize) -> string? {
         const BUFFER_SIZE: usize = 4096;
@@ -76,7 +99,7 @@ fn _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const frame: 
 
         if buffer == &null: return null;
 
-        while (bytes_read = read(fd, buffer, BUFFER_SIZE)) > 0 {
+        while (bytes_read = read_file(fd, buffer, BUFFER_SIZE)) > 0 {
             for let i: isize = 0; i < bytes_read; ++i {
                 let ch: char = buffer[i];
                 
@@ -141,43 +164,3 @@ fn _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const frame: 
 ///
 /// error: aborting due to previous error
 /// ```
-
-/*
-// no idea why none of this works, for some reason the function get_line_from_file only
-//    works once even if reset?
-
-let lines: array::<string?, context_lines>;
-
-// read the lines before the panic line
-for let i: usize = 0; i < context_lines; ++i {
-    let offset: isize = i - (context_lines / 2);
-    let line_index: isize = line_no + offset;
- 
-    if line_index > 0 {
-        print(f"reading line {line_index}");
-     
-        lseek(fd, 0, SEEK_SET);
-        lines[i] = get_line_from_file(fd, line_index);
-     
-        print(f"line {line_index}: {"null" if (lines[i] == null) else (lines[i] as string)}");
-    } else {
-        lines[i] = null;
-    }
-}
-
-for let i: usize = 0; i < context_lines; ++i {
-    let displayed_line_no: isize = line_no - (context_lines / 2) + i;
- 
-    if lines[i] != null {
-        let is_panic_line: bool = (i == (context_lines / 2));
-     
-        let prefix = (f"{bold}{displayed_line_no} | {red}"
-                 if      is_panic_line
-                 else f"{displayed_line_no} | ");
-     
-        print(f"   {prefix}{lines[i]}{reset}");
-    } else {
-        print(f"   {bold}{displayed_line_no} | {reset}{red}Error reading file{reset}");
-    }
-}
-*/
