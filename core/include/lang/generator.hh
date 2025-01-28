@@ -126,22 +126,20 @@ H_NAMESPACE_BEGIN
 /// - `Iter`: The iterator class for navigating generator results.
 template <LIBCXX_NAMESPACE::movable T>
 class $generator {
-public:
+  public:
     struct promise_type {
         constexpr static LIBCXX_NAMESPACE::suspend_always initial_suspend() noexcept { return {}; }
         constexpr static LIBCXX_NAMESPACE::suspend_always final_suspend() noexcept { return {}; }
 
-        $generator get_return_object() noexcept {
-            return $generator{Handle::from_promise(*this)};
-        }
+        $generator get_return_object() noexcept { return $generator{Handle::from_promise(*this)}; }
 
         LIBCXX_NAMESPACE::suspend_always yield_value(T value) noexcept {
             current_value = H_STD_NAMESPACE::Memory::move(value);
             return {};
         }
 
-        void return_void() noexcept {}
-        void await_transform() = delete;
+        void                     return_void() noexcept {}
+        void                     await_transform() = delete;
         [[noreturn]] static void unhandled_exception() { throw; }
 
         LIBCXX_NAMESPACE::optional<T> current_value;
@@ -154,7 +152,7 @@ public:
     explicit $generator(Handle coroutine) noexcept
         : m_coroutine(coroutine) {}
 
-    $generator(const $generator &) = delete;
+    $generator(const $generator &)            = delete;
     $generator &operator=(const $generator &) = delete;
 
     $generator($generator &&other) noexcept
@@ -177,21 +175,19 @@ public:
     }
 
     class Iter {
-    public:
+      public:
         explicit Iter(Handle coroutine) noexcept
             : m_coroutine(coroutine) {}
 
         void operator++() noexcept { m_coroutine.resume(); }
 
-        const T &operator*() const noexcept {
-            return *m_coroutine.promise().current_value;
-        }
+        const T &operator*() const noexcept { return *m_coroutine.promise().current_value; }
 
         constexpr bool operator==(LIBCXX_NAMESPACE::default_sentinel_t) const noexcept {
             return !m_coroutine || m_coroutine.done();
         }
 
-    private:
+      private:
         Handle m_coroutine;
     };
 
@@ -199,12 +195,21 @@ public:
         if (m_coroutine) {
             m_coroutine.resume();
         }
+
+        return Iter{m_coroutine};
+    }
+
+    const Iter cbegin() const noexcept {
+        if (m_coroutine) {
+            m_coroutine.resume();
+        }
+
         return Iter{m_coroutine};
     }
 
     constexpr LIBCXX_NAMESPACE::default_sentinel_t end() noexcept { return {}; }
-
-private:
+    constexpr LIBCXX_NAMESPACE::default_sentinel_t cend() const noexcept { return {}; }
+  private:
     Handle m_coroutine = nullptr;
 };
 

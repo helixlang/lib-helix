@@ -33,21 +33,49 @@
 #define __$LIBHELIX_STRING__
 
 #include "../config.h"
-#include "../libcxx.h"
+#include "../lang/generator.hh"
 #include "../libc.h"
+#include "../libcxx.h"
 #include "../memory.h"
+#include "../meta.h"
 #include "../primitives.h"
 
-#include <string>
-
-
 H_NAMESPACE_BEGIN
+H_STD_NAMESPACE_BEGIN
+namespace Interfaces {
+template <typename self>
+concept CharaterCompliance = requires(self inst, self other, char c, int i) {
+    { ++inst } -> std::Meta::convertible_to<self>;
+    { inst++ } -> std::Meta::convertible_to<self>;
+    { --inst } -> std::Meta::convertible_to<self>;
+    { inst-- } -> std::Meta::convertible_to<self>;
 
-template <typename CharT>
-class char_traits {
+    { inst == other } -> std::Meta::convertible_to<bool>;
+    { inst != other } -> std::Meta::convertible_to<bool>;
+    { inst < other } -> std::Meta::convertible_to<bool>;
+    { inst > other } -> std::Meta::convertible_to<bool>;
+    { inst <= other } -> std::Meta::convertible_to<bool>;
+    { inst >= other } -> std::Meta::convertible_to<bool>;
 
+    { inst = other } -> std::Meta::same_as<self &>;
+
+    { static_cast<char>(inst) } -> std::Meta::same_as<char>;
+    { static_cast<int>(inst) } -> std::Meta::same_as<int>;
+
+    { inst + i } -> std::Meta::convertible_to<self>;
+    { inst - i } -> std::Meta::convertible_to<self>;
+    { i + inst } -> std::Meta::convertible_to<self>;
+
+    // eval if needed for char
+    { inst - other } -> std::Meta::convertible_to<int>;
+
+    { inst += i } -> std::Meta::same_as<self &>;
+    { inst -= i } -> std::Meta::same_as<self &>;
 };
+}  // end namespace Interfaces
+H_STD_NAMESPACE_END
 
+namespace String {
 /// \class string_slice
 /// \brief A string slice is a view into a string, it does not own the data, this can also be set
 ///        to read-only char pointers
@@ -55,15 +83,100 @@ class char_traits {
 /// \tparam _Size The size of the string slice (this is not the size of the string but the size of
 ///         the slice itself like a substring)
 template <typename CharT>
-class slice { // string::slice
-    const CharT *m_data;
-    usize        m_size;
+class slice {
+  private:
+    mutable helix::$generator<CharT> $gen_state = operator$generator();
+
+  public:
+    using value_type      = CharT;
+    using size_type       = usize;
+    using difference_type = isize;
+
+    using reference       = const CharT &;
+    using const_reference = const CharT &;
+
+    using pointer       = const CharT *;
+    using const_pointer = const CharT *;
+
+    constexpr slice() noexcept;
+    constexpr slice(const CharT *data, size_type size) noexcept;
+    constexpr slice(const slice &) noexcept = default;
+    constexpr slice(slice &&) noexcept      = default;
+
+    constexpr slice &operator=(const slice &) noexcept = default;
+    constexpr slice &operator=(slice &&) noexcept      = default;
+
+    constexpr reference operator[](size_type pos) const noexcept;
+    constexpr reference at(size_type pos) const;
+    constexpr reference front() const noexcept;
+    constexpr reference back() const noexcept;
+    constexpr pointer   data() const noexcept;
+
+    [[nodiscard]] constexpr bool      empty() const noexcept;
+    [[nodiscard]] constexpr size_type size() const noexcept;
+    [[nodiscard]] constexpr size_type length() const noexcept;
+
+    // constexpr const_iterator begin() const noexcept;
+    // constexpr const_iterator cbegin() const noexcept;
+    // constexpr const_iterator end() const noexcept;
+    // constexpr const_iterator cend() const noexcept;
+    // constexpr const_reverse_iterator rbegin() const noexcept;
+    // constexpr const_reverse_iterator crbegin() const noexcept;
+    // constexpr const_reverse_iterator rend() const noexcept;
+    // constexpr const_reverse_iterator crend() const noexcept;
+    inline auto operator$generator() -> helix::$generator<CharT> {}
+
+    auto iter() -> helix::$generator<CharT> { return operator$generator(); }
+
+    auto begin() { return $gen_state.begin(); }
+    auto cbegin() { return $gen_state.cbegin(); }
+    auto end() { return $gen_state.end(); }
+
+    constexpr slice split(size_type pos, size_type count) const;
+    constexpr int   compare(const slice &other) const noexcept;
+
+    constexpr void left_strip(size_type n) noexcept;
+    constexpr void right_strip(size_type n) noexcept;
+
+    friend constexpr bool operator==(const slice &lhs, const slice &rhs) noexcept {
+        return lhs.size() == rhs.size() && LIBCXX_NAMESPACE::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
+    friend constexpr bool operator!=(const slice &lhs, const slice &rhs) noexcept {
+        return !(lhs == rhs);
+    }
+    friend constexpr bool operator<(const slice &lhs, const slice &rhs) noexcept {
+        return LIBCXX_NAMESPACE::lexicographical_compare(
+            lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+    friend constexpr bool operator<=(const slice &lhs, const slice &rhs) noexcept {
+        return !(rhs < lhs);
+    }
+    friend constexpr bool operator>(const slice &lhs, const slice &rhs) noexcept {
+        return rhs < lhs;
+    }
+    friend constexpr bool operator>=(const slice &lhs, const slice &rhs) noexcept {
+        return !(lhs < rhs);
+    }
+
+  private:
+    const_pointer m_data;
+    size_type     m_size;
 };
 
 template <typename CharT, const usize _SlabSize = 16>  // NOLINT
+    requires(std::Interfaces::CharaterCompliance<CharT>)
 class basic {
-    
+  private:
+    enum StorageLocation { Stack, ROM, Heap };
+
+    basic(const CharT *rom_ptr);
+    basic(CharT *rom_ptr);
+    basic(basic<CharT> rom_ptr);
 };
+
+}  // namespace String
+
+using string = String::basic<wchar_t>;
 
 H_NAMESPACE_END
 #endif

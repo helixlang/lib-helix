@@ -19,6 +19,7 @@
 #include <any>
 #include <array>
 #include <cassert>
+#include <algorithm>
 #include <coroutine>
 #include <cstddef>
 #include <iterator>
@@ -66,18 +67,18 @@ T *make_aligned(Args &&...args) {
     static_assert(alignof(T) <= __STDCPP_DEFAULT_NEW_ALIGNMENT__ || __cpp_aligned_new,
                   "Your compiler does not support over-aligned allocations.");
 
-    void *rawMem = nullptr;
+    void *raw_mem = nullptr;
 #ifdef _MSC_VER
-    rawMem = _aligned_malloc(sizeof(T), alignof(T));
+    raw_mem = _aligned_malloc(sizeof(T), alignof(T));
     
-    if (!rawMem) {
+    if (!raw_mem) {
         throw LIBCXX_NAMESPACE::bad_alloc();
     }
 #else
-    rawMem = ::operator new(sizeof(T), LIBCXX_NAMESPACE::align_val_t(alignof(T)));
+    raw_mem = ::operator new(sizeof(T), LIBCXX_NAMESPACE::align_val_t(alignof(T)));
 #endif
 
-    return ::new (rawMem) T(LIBCXX_NAMESPACE::forward<Args>(args)...);
+    return ::new (raw_mem) T(LIBCXX_NAMESPACE::forward<Args>(args)...);
 }
 
 ///

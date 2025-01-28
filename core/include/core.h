@@ -41,5 +41,6 @@
 #include "primitives.h"
 #include "print.h"
 #include "meta.h"
+#include "undef.h"
 
 #endif

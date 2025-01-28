@@ -59,7 +59,7 @@
 /// control to a panic handler.
 /// - Should be used in critical failure paths where recovery is not possible.
 #ifndef _HX_MC_Q7_INTERNAL_CRASH_PANIC_M
-#define _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(err) H_STD_NAMESPACE::Panic::Frame(err, __FILE__, __LINE__).operator$panic();
+#define _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(err) ::helix::std::Panic::Frame(err, __FILE__, __LINE__).operator$panic();
 #endif
 
 /// \def $panic
@@ -90,7 +90,7 @@
 /// - It does not invoke the panic operator directly, allowing the caller to determine the next
 /// course of action.
 #ifndef _HX_MC_Q7_PANIC_M
-#define _HX_MC_Q7_PANIC_M(err) return H_STD_NAMESPACE::Panic::Frame(err, __FILE__, __LINE__);
+#define _HX_MC_Q7_PANIC_M(err) return ::helix::std::Panic::Frame(err, __FILE__, __LINE__);
 #endif
 
 H_NAMESPACE_BEGIN
