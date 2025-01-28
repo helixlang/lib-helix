@@ -23,13 +23,13 @@
 
 #include "../config.h"
 #include "../lang/function.hh"
-#include "../primitives.h"
+#include "../libc.h"
 #include "../memory.h"
 #include "../meta.h"
+#include "../primitives.h"
 #include "../types.h"
 #include "../types/erase.h"
 #include "../types/errors.h"
-#include "../libc.h"
 
 /// \def _HX_MC_Q7_INTERNAL_CRASH_PANIC_M
 ///
@@ -50,7 +50,8 @@
 ///
 /// ### Example Usage
 /// ```cpp
-/// _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(H_STD_NAMESPACE::errors::RuntimeError("Critical error occurred."));
+/// _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(H_STD_NAMESPACE::errors::RuntimeError("Critical error
+/// occurred."));
 /// ```
 /// This results in an immediate panic, halting execution and propagating the error.
 ///
@@ -59,7 +60,8 @@
 /// control to a panic handler.
 /// - Should be used in critical failure paths where recovery is not possible.
 #ifndef _HX_MC_Q7_INTERNAL_CRASH_PANIC_M
-#define _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(err) ::helix::std::Panic::Frame(err, __FILE__, __LINE__).operator$panic();
+#define _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(err) \
+    ::helix::std::Panic::Frame(err, __FILE__, __LINE__).operator$panic();
 #endif
 
 /// \def $panic
@@ -146,10 +148,10 @@ H_STD_NAMESPACE_END
 /// //     fn (*H_STD_NAMESPACE::Panic::Frame) -> void
 /// #[panic(&_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv)]
 /// \endcode
-extern "C" [[noreturn]]
-void _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const H_STD_NAMESPACE::Panic::Frame * /* f */); // NOLINT(bugprone-reserved-identifier)
+extern "C" [[noreturn]] void _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(
+    const H_STD_NAMESPACE::Panic::Frame * /* f */);  // NOLINT(bugprone-reserved-identifier)
 
-H_STD_NAMESPACE_BEGIN 
+H_STD_NAMESPACE_BEGIN
 
 /// \namespace Panic
 ///
@@ -161,8 +163,8 @@ H_STD_NAMESPACE_BEGIN
 /// - `Panic::Frame`: Represents a context for managing and propagating panic errors.
 /// - Concepts for identifying and validating panic-capable types (`Panicking`, `PanickingStatic`,
 /// `PanickingInstance`).
-/// - `_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv`: A function to manage panic events
-/// triggered during runtime.
+/// - `_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv`: A function to manage panic
+/// events triggered during runtime.
 ///
 /// ### Overview
 /// The `Panic` namespace is foundational to Helix's error-handling architecture. It ensures that
@@ -259,6 +261,12 @@ concept PanickingInstance = requires(T obj) {
 };
 }  // namespace Panic
 
+// std::crash - taks anything throw would and throws it as an exception
+template <typename T>
+[[noreturn]] static constexpr void crash(T error) {
+    throw error;
+}
+
 namespace Panic {
 /// \class FrameContext
 ///
@@ -313,73 +321,62 @@ namespace Panic {
 /// \endcode
 class FrameContext {
   private:
-    H_STD_NAMESPACE::TypeErasure                   *$object;
-    $function<void(H_STD_NAMESPACE::TypeErasure *)> $throw;
+    H_STD_NAMESPACE::TypeErasure                   *error;    ///< The error object.
+    $function<void(H_STD_NAMESPACE::TypeErasure *)> handler;  ///< The panic handler.
 
     template <typename T>
-    [[noreturn]] constexpr static void throw_object(H_STD_NAMESPACE::TypeErasure *$object) {
-        if ($object == nullptr) {
-            throw errors::RuntimeError("Tried to crash with a null object.");
-        }
-
-        if ($object->type_info() != &typeid(T)) {
-            throw errors::TypeMismatchError("Type mismatch when crashing.");
-        }
-
-        T *object = static_cast<T *>(**$object);
-        throw *object;
-    }
+    [[noreturn]] constexpr static void throw_object(H_STD_NAMESPACE::TypeErasure *);
 
   public:
     constexpr ~FrameContext() {
-        if ($object != nullptr) {
-            $object->destroy();
-            delete $object;
-            $object = nullptr;
+        if (error != nullptr) {
+            error->destroy();
+            delete error;
+            error = nullptr;
         }
     }
 
     constexpr FrameContext()
-        : $object(nullptr) {}
+        : error(nullptr) {}
 
     constexpr FrameContext(const FrameContext &other)
-        : $object((other.$object != nullptr) ? other.$object->clone() : nullptr)
-        , $throw(other.$throw) {}
+        : error((other.error != nullptr) ? other.error->clone() : nullptr)
+        , handler(other.handler) {}
 
     constexpr FrameContext &operator=(const FrameContext &other) {
         if (this != &other) {
-            if ($object != nullptr) {
-                $object->destroy();
-                delete $object;
+            if (error != nullptr) {
+                error->destroy();
+                delete error;
             }
-            $object = (other.$object != nullptr) ? other.$object->clone() : nullptr;
-            $throw  = other.$throw;
+            error   = (other.error != nullptr) ? other.error->clone() : nullptr;
+            handler = other.handler;
         }
         return *this;
     }
 
     constexpr FrameContext(FrameContext &&other) noexcept
-        : $object(other.$object)
-        , $throw(H_STD_NAMESPACE::Memory::move(other.$throw)) {
-        other.$object = nullptr;
+        : error(other.error)
+        , handler(H_STD_NAMESPACE::Memory::move(other.handler)) {
+        other.error = nullptr;
     }
 
     constexpr FrameContext &operator=(FrameContext &&other) noexcept {
         if (this != &other) {
-            if ($object != nullptr) {
-                $object->destroy();
-                delete $object;
+            if (error != nullptr) {
+                error->destroy();
+                delete error;
             }
-            $object       = other.$object;
-            $throw        = H_STD_NAMESPACE::Memory::move(other.$throw);
-            other.$object = nullptr;
+            error       = other.error;
+            handler     = H_STD_NAMESPACE::Memory::move(other.handler);
+            other.error = nullptr;
         }
         return *this;
     }
 
     template <typename T>
     constexpr explicit FrameContext(T *obj)
-        : $object(H_STD_NAMESPACE::erase_type(obj)) {
+        : error(H_STD_NAMESPACE::erase_type(obj)) {
         if constexpr (!Panic::Panicking<T>) {
             static_assert(Panic::Panicking<T>,
                           "Frame invoked with an object that does not have a panic method, add "
@@ -388,53 +385,23 @@ class FrameContext {
                           "static variant.");
         }
 
-        $throw = &FrameContext::throw_object<T>;
+        handler = &FrameContext::throw_object<T>;
     }
 
-    [[nodiscard]] constexpr void *object() const { return ($object != nullptr) ? **$object : nullptr; }
+    [[noreturn]]  void   crash();
+    [[nodiscard]] void  *object()    const;
+    [[nodiscard]] string type_name() const;
 
-    [[noreturn]] void crash() {
-        $throw($object);
-        throw errors::RuntimeError("Object '" + string($object->type_info()->name()) +
-                                   "' failed to panic.");
+    constexpr bool operator!=(const LIBCXX_NAMESPACE::type_info *rhs) const {
+        return !(*this == rhs);
     }
 
-    constexpr bool operator!=(const LIBCXX_NAMESPACE::type_info *rhs) const { return !(*this == rhs); }
     constexpr bool operator==(const LIBCXX_NAMESPACE::type_info *rhs) const {
-        if (this->$object != nullptr) {
-            return this->$object->type_info() == rhs;
+        if (this->error != nullptr) {
+            return this->error->type_info() == rhs;
         }
 
         return false;
-    }
-
-    [[nodiscard]] constexpr string type_name() const {
-        if ($object != nullptr) {
-        #if defined(_MSC_VER)
-            return $object->type_info()->name();
-        #else
-            const char* mangled_name = $object->type_info()->name();
-
-            if ((mangled_name == nullptr) || (*mangled_name == 0)) {
-                return {};
-            }
-
-            int status = 0;
-
-            // __cxa_demangle returns a malloc-allocated string
-            char* demangle = LIBC_NAMESPACE::abi::__cxa_demangle(mangled_name, nullptr, nullptr, &status);
-            if (status == 0 && (demangle != nullptr)) {
-                string result(demangle);
-            
-                free(demangle); // NOLINT
-                return result;
-            }
-            
-            return mangled_name;
-        #endif
-        }
-
-        return "null";
     }
 };
 
@@ -585,15 +552,17 @@ class Frame {
     Frame(Frame &&other) noexcept            = default;
     Frame &operator=(Frame &&other) noexcept = default;
 
-    [[noreturn]] Frame(Frame  &obj, const string &, usize) { obj.operator$panic(); }
+    [[noreturn]] Frame(Frame &obj, const string &, usize) { obj.operator$panic(); }
     [[noreturn]] Frame(Frame &&obj, const string &, usize) { obj.operator$panic(); }
 
-    [[nodiscard]] constexpr string        file()        const { return this->_file; }
-    [[nodiscard]] constexpr usize         line()        const { return this->_line; }
-    [[nodiscard]] constexpr string        reason()      const { return this->_reason; }
+    [[nodiscard]] constexpr string        file() const { return this->_file; }
+    [[nodiscard]] constexpr usize         line() const { return this->_line; }
+    [[nodiscard]] constexpr string        reason() const { return this->_reason; }
     [[nodiscard]] constexpr FrameContext &get_context() const { return context; }
 
-    [[noreturn]] void operator$panic() const { _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(this); }
+    [[noreturn]] void operator$panic() const {
+        _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(this);
+    }
 };
 }  // namespace Panic
 

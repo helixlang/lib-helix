@@ -265,7 +265,7 @@ class $function<Rt(Tp...)> {
     [[nodiscard]] constexpr bool operator$question() const noexcept { return callable != nullptr; }
 
     constexpr Rt operator()(Tp... args) {
-        if (!callable) {
+        if (callable == nullptr) {
             throw "called an unset function pointer";
         }
 

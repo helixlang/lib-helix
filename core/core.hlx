@@ -35,8 +35,9 @@
 ///                                                                                              ///
 ///==============================================================================================///
 
-import unwind::*;
 import range::*;
+import __panic::frame_context::*;
+import __panic::handler::*;
 
 fn _HX_FN23helix_runtime_initialize() -> void {
     // this is the first function call in main always.
