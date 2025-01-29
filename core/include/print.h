@@ -66,11 +66,11 @@ class endl {
 ///
 template <typename Ty>
 constexpr string to_string(Ty &&t) {
-    if constexpr (H_STD_NAMESPACE::Interfaces::SupportsOStream<Ty>) {
+    if constexpr (H_STD_NAMESPACE::Interface::SupportsOStream<Ty>) {
         LIBCXX_NAMESPACE::stringstream ss;
         ss << t;
         return ss.str();
-    } else if constexpr (H_STD_NAMESPACE::Interfaces::Castable<Ty, string>) {
+    } else if constexpr (H_STD_NAMESPACE::Interface::Castable<Ty, string>) {
         return t.operator$cast(static_cast<string *>(nullptr));
     } else if constexpr (H_STD_NAMESPACE::Meta::same_as<Ty, bool>) {
         return t ? "true" : "false";

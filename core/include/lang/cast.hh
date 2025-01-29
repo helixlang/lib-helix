@@ -137,12 +137,12 @@ constexpr Ty as_cast(Up &value) {
                   H_STD_NAMESPACE::Meta::same_as<H_STD_NAMESPACE::Meta::remove_const_t<Up>, Ty>) {
         return const_cast<Ty>(value);
     } else if constexpr (LIBCXX_NAMESPACE::is_pointer_v<Ty>) {
-        if constexpr (H_STD_NAMESPACE::Interfaces::SupportsPointerCast<Up, Ty>) {
+        if constexpr (H_STD_NAMESPACE::Interface::SupportsPointerCast<Up, Ty>) {
             return dynamic_cast<Ty>(value);
         } else {
             return static_cast<Ty>(value);
         }
-    } else if constexpr (H_STD_NAMESPACE::Interfaces::Castable<Up, Ty>) {
+    } else if constexpr (H_STD_NAMESPACE::Interface::Castable<Up, Ty>) {
         return value.operator$cast(static_cast<Ty *>(nullptr));
     } else {
         return static_cast<Ty>(value);

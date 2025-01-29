@@ -138,22 +138,22 @@ The Helix Core provides essential utilities and constructs central to the langua
 ---
 
 ### Concepts
-#### `std::Interfaces::SupportsOStream`
+#### `std::Interface::SupportsOStream`
 - **Purpose**: Ensures type `T` supports streaming to an output stream.
 - **Requirements**:
   - `os << a` must be valid, where `os` is an `ostream`.
 
-#### `std::Interfaces::SupportsPointerCast`
+#### `std::Interface::SupportsPointerCast`
 - **Purpose**: Verifies that `T` can be dynamically cast to `U`.
 - **Requirements**:
   - `dynamic_cast<U>(T)` must be valid.
 
-#### `std::Interfaces::Castable`
+#### `std::Interface::Castable`
 - **Purpose**: Checks if `T` can be cast to `U` via explicit or implicit operators.
 - **Requirements**:
   - `T.operator$cast(U *)` or `T.operator U()` must be valid.
 
-#### `std::Interfaces::ConvertibleToString`
+#### `std::Interface::ConvertibleToString`
 - **Purpose**: Confirms `T` can be converted to a `string`.
 - **Requirements**:
   - Satisfies `SupportsOStream` or `Castable<T, string>`.
@@ -364,7 +364,7 @@ Z:\devolopment\helix\helix-lang\build\debug\x64-msvc-windows\bin\helix.exe
   - `std::json::parse`
   - `std::json::stringify`
 
-### Interfaces
+### Interface
 - `interfaces::Compare`
 - `interfaces::EqualityCompare`
 - `interfaces::Additive`
@@ -386,4 +386,4 @@ Z:\devolopment\helix\helix-lang\build\debug\x64-msvc-windows\bin\helix.exe
 - `interfaces::Transform`
 - `interfaces::PredicateFilter`
 - `interfaces::ConditionEvaluate`
-- `Interfaces::ErrorHandle`
+- `Interface::ErrorHandle`

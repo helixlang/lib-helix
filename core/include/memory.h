@@ -37,7 +37,7 @@ T &&forward(Meta::remove_reference_t<T> &&t) noexcept {
 }
 
 template <typename T>
-    requires(!Meta::is_add_lvalue_reference<T>)
+    requires(!Meta::is_lvalue_reference<T>)
 constexpr Meta::reference_to_pointer_t<T> as_pointer(T &&ref) noexcept {
     return &ref;
 }

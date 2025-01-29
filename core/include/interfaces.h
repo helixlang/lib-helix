@@ -22,7 +22,7 @@
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
-namespace Interfaces {
+namespace Interface {
 template <typename T>
 concept SupportsOStream = requires(LIBCXX_NAMESPACE::ostream &os, T a) {
     { os << a } -> H_STD_NAMESPACE::Meta::convertible_to<LIBCXX_NAMESPACE::ostream &>;
@@ -42,7 +42,35 @@ concept Castable = requires(T t, U *u) {
 
 template <typename T>
 concept ConvertibleToString = SupportsOStream<T> || Castable<T, string>;
-}  // namespace Interfaces
+
+template <typename T>
+concept ClassType = Meta::is_class<T>;
+
+template <class T>
+concept ConstType = std::Meta::is_const<T>;
+
+template <typename T>
+concept ReferenceableType = Meta::is_referenceable<T>;
+
+template <class T>
+concept RValueReference = Meta::is_rvalue_reference<T>;
+
+template <class T>
+concept LValueReference = Meta::is_rvalue_reference<T>;
+
+template <class T>
+concept ReferenceType = Meta::is_reference<T>;
+
+template <typename T>
+concept MoveConstructible = Meta::is_nothrow_move_constructible<T>;
+
+template <typename T, typename Arg>
+concept NothrowAssignable = Meta::is_nothrow_assignable<T, Arg>;
+
+template <class T>
+concept CopyConstructible = Meta::is_copy_constructible<T>;
+
+}  // namespace Interface
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
 #endif

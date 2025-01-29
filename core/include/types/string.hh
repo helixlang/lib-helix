@@ -42,7 +42,7 @@
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
-namespace Interfaces {
+namespace Interface {
 template <typename self>
 concept CharaterCompliance = requires(self inst, self other, char c, int i) {
     { ++inst } -> std::Meta::convertible_to<self>;
@@ -72,7 +72,7 @@ concept CharaterCompliance = requires(self inst, self other, char c, int i) {
     { inst += i } -> std::Meta::same_as<self &>;
     { inst -= i } -> std::Meta::same_as<self &>;
 };
-}  // end namespace Interfaces
+}  // end namespace Interface
 H_STD_NAMESPACE_END
 
 namespace String {
@@ -124,13 +124,16 @@ class slice {
     // constexpr const_reverse_iterator crbegin() const noexcept;
     // constexpr const_reverse_iterator rend() const noexcept;
     // constexpr const_reverse_iterator crend() const noexcept;
-    inline auto operator$generator() -> helix::$generator<CharT> {}
 
+    inline auto operator$generator() -> helix::$generator<CharT> {
+
+    }
+    
     auto iter() -> helix::$generator<CharT> { return operator$generator(); }
-
     auto begin() { return $gen_state.begin(); }
     auto cbegin() { return $gen_state.cbegin(); }
     auto end() { return $gen_state.end(); }
+    auto cend() { return $gen_state.cend(); }
 
     constexpr slice split(size_type pos, size_type count) const;
     constexpr int   compare(const slice &other) const noexcept;
@@ -141,19 +144,24 @@ class slice {
     friend constexpr bool operator==(const slice &lhs, const slice &rhs) noexcept {
         return lhs.size() == rhs.size() && LIBCXX_NAMESPACE::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
+
     friend constexpr bool operator!=(const slice &lhs, const slice &rhs) noexcept {
         return !(lhs == rhs);
     }
+
     friend constexpr bool operator<(const slice &lhs, const slice &rhs) noexcept {
         return LIBCXX_NAMESPACE::lexicographical_compare(
             lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
+
     friend constexpr bool operator<=(const slice &lhs, const slice &rhs) noexcept {
         return !(rhs < lhs);
     }
+
     friend constexpr bool operator>(const slice &lhs, const slice &rhs) noexcept {
         return rhs < lhs;
     }
+
     friend constexpr bool operator>=(const slice &lhs, const slice &rhs) noexcept {
         return !(lhs < rhs);
     }
@@ -164,7 +172,7 @@ class slice {
 };
 
 template <typename CharT, const usize _SlabSize = 16>  // NOLINT
-    requires(std::Interfaces::CharaterCompliance<CharT>)
+    requires(std::Interface::CharaterCompliance<CharT>)
 class basic {
   private:
     enum StorageLocation { Stack, ROM, Heap };

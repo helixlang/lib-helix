@@ -24,6 +24,7 @@
 #include "../config.h"
 #include "../lang/function.hh"
 #include "../libc.h"
+#include "../interfaces.h"
 #include "../memory.h"
 #include "../meta.h"
 #include "../primitives.h"
@@ -190,6 +191,7 @@ namespace Panic {
 /// `_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv`.
 class Frame;
 
+namespace Interface {
 /// \concept Panicking
 ///
 /// A concept to determine whether a type `T` can invoke the panic operator.
@@ -207,7 +209,7 @@ class Frame;
 ///     string operator$panic() { return "Error occurred"; }
 /// };
 ///
-/// static_assert(Panic::Panicking<Error>);
+/// static_assert(Panic::Interface::Panicking<Error>);
 /// ```
 template <typename T>
 concept Panicking = requires(T obj) {
@@ -231,7 +233,7 @@ concept Panicking = requires(T obj) {
 ///     static string operator$panic() { return "Static error occurred"; }
 /// };
 ///
-/// static_assert(Panic::PanickingStatic<Error>);
+/// static_assert(Panic::Interface::PanickingStatic<Error>);
 /// ```
 template <typename T>
 concept PanickingStatic = requires(T obj) {
@@ -253,12 +255,13 @@ concept PanickingStatic = requires(T obj) {
 ///     string operator$panic() { return "Instance error occurred"; }
 /// };
 ///
-/// static_assert(Panic::PanickingInstance<Error>);
+/// static_assert(Panic::Interface::PanickingInstance<Error>);
 /// ```
 template <typename T>
 concept PanickingInstance = requires(T obj) {
     { obj.operator$panic() } -> H_STD_NAMESPACE::Meta::convertible_to<string>;
 };
+}  // namespace Interface
 }  // namespace Panic
 
 // std::crash - taks anything throw would and throws it as an exception
@@ -377,10 +380,10 @@ class FrameContext {
     template <typename T>
     constexpr explicit FrameContext(T *obj)
         : error(H_STD_NAMESPACE::erase_type(obj)) {
-        if constexpr (!Panic::Panicking<T>) {
-            static_assert(Panic::Panicking<T>,
+        if constexpr (!Panic::Interface::Panicking<T>) {
+            static_assert(Panic::Interface::Panicking<T>,
                           "Frame invoked with an object that does not have a panic method, add "
-                          "`class ... with Panic::Panicking` "
+                          "`class ... with Panic::Interface::Panicking` "
                           "to the definition, and implement 'op panic fn(self) -> string' or the "
                           "static variant.");
         }
@@ -484,7 +487,7 @@ class FrameContext {
 ///   - `file()`: Returns the file name associated with the panic.
 ///   - `line()`: Returns the line number associated with the panic.
 ///   - `reason()`: Returns the panic reason.
-///   - `get_context()`: Returns the underlying `FrameContext`.
+///   - `get_context()`: Returns a pointer to the underlying `FrameContext`.
 /// - Methods:
 ///   - `operator$panic()`: Propagates the panic.
 class Frame {
@@ -494,53 +497,22 @@ class Frame {
     string               _file;
     usize                _line = 0;
 
-    template <typename T>
-        requires __is_class
-    (T) constexpr inline void initialize(const T &obj) {
-        if constexpr (PanickingStatic<T>) {
-            _reason = T::operator$panic();
-        } else if constexpr (PanickingInstance<T>) {
-            _reason = obj.operator$panic();
-        } else {
-            static_assert(Panic::Panicking<T>,
-                          "Frame invoked with a type that lacks a panic operator. Ensure the type "
-                          "declares `class ... with Panic::Panicking` and implements either "
-                          "`op panic fn(self) -> string` or the static equivalent.");
-        }
-
-        T *object = nullptr;
-
-        static_assert(LIBCXX_NAMESPACE::is_copy_constructible_v<T> ||
-                          LIBCXX_NAMESPACE::is_move_constructible_v<T>,
-                      "Frame invoked with a type that is not copy or move constructible.");
-
-        try {
-            if constexpr (LIBCXX_NAMESPACE::is_move_constructible_v<T>) {
-                object        = new T(H_STD_NAMESPACE::Memory::move(obj));  // NOLINT
-                this->context = FrameContext(object);
-            } else if constexpr (LIBCXX_NAMESPACE::is_copy_constructible_v<T>) {
-                object        = new T(obj);  // NOLINT
-                this->context = FrameContext(object);
-            }
-        } catch (...) {
-            delete object;  // NOLINT
-            throw errors::RuntimeError("Failed to initialize panic frame.");
-        }
-    }
+    template <typename T> requires std ::Interface ::ClassType<T>
+    constexpr void initialize(const T *obj);
 
   public:
     template <typename T>
     constexpr Frame(T obj, const char *filename, usize lineno)
         : _file(filename)
         , _line(lineno) {
-        initialize<T>(obj);
+        initialize<T>(&obj);
     }
 
     template <typename T>
     constexpr Frame(T obj, string filename, usize lineno)
         : _file(H_STD_NAMESPACE::Memory::move(filename))
         , _line(lineno) {
-        initialize<T>(obj);
+        initialize<T>(&obj);
     }
 
     constexpr Frame()  = delete;
@@ -555,10 +527,10 @@ class Frame {
     [[noreturn]] Frame(Frame &obj, const string &, usize) { obj.operator$panic(); }
     [[noreturn]] Frame(Frame &&obj, const string &, usize) { obj.operator$panic(); }
 
-    [[nodiscard]] constexpr string        file() const { return this->_file; }
-    [[nodiscard]] constexpr usize         line() const { return this->_line; }
-    [[nodiscard]] constexpr string        reason() const { return this->_reason; }
-    [[nodiscard]] constexpr FrameContext &get_context() const { return context; }
+    [[nodiscard]] constexpr string        file() const;
+    [[nodiscard]] constexpr usize         line() const;
+    [[nodiscard]] constexpr string        reason() const;
+    [[nodiscard]] constexpr FrameContext *get_context() const;
 
     [[noreturn]] void operator$panic() const {
         _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(this);

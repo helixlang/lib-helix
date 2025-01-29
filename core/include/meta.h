@@ -144,16 +144,16 @@ struct reference_to_pointer<T &&> {
 };
 
 template <class T>
-struct is_add_lvalue_reference : public false_t {};
+struct is_lvalue_reference : public false_t {};
 
 template <class T>
-struct is_add_lvalue_reference<T &> : public true_t {};
+struct is_lvalue_reference<T &> : public true_t {};
 
 template <class T>
-struct is_add_rvalue_reference : public false_t {};
+struct is_rvalue_reference : public false_t {};
 
 template <class T>
-struct is_add_rvalue_reference<T &&> : public true_t {};
+struct is_rvalue_reference<T &&> : public true_t {};
 
 template <class T>
 struct is_reference : public false_t {};
@@ -251,10 +251,10 @@ template <typename T>
 concept is_referenceable = !Meta::same_as<decltype(_internal::is_referenceable_helper::test<T>(0)), false_t>;
 
 template <class T>
-concept is_add_rvalue_reference = _types::is_add_rvalue_reference<T>::value;
+concept is_rvalue_reference = _types::is_rvalue_reference<T>::value;
 
 template <class T>
-concept is_add_lvalue_reference = _types::is_add_lvalue_reference<T>::value;
+concept is_lvalue_reference = _types::is_lvalue_reference<T>::value;
 
 template <class T>
 concept is_reference = _types::is_reference<T>::value;

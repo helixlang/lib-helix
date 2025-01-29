@@ -38,8 +38,10 @@
 import range::*;
 import __panic::frame_context::*;
 import __panic::handler::*;
+import __panic::frame::*;
 
-fn _HX_FN23helix_runtime_initialize() -> void {
+fn _HX_FN_Vi_Q5_7_helixrt_init_Rv() -> void {
     // this is the first function call in main always.
     // anything here runs first.
+
 }

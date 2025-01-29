@@ -107,11 +107,11 @@ H_NAMESPACE_BEGIN
 ///
 /// ### Related
 /// - `H_STD_NAMESPACE::Panic::Frame`: Represents the error state.
-/// - `H_STD_NAMESPACE::Panic::Panicking`: Concept for types supporting the `operator$panic()`
+/// - `H_STD_NAMESPACE::Panic::Interface::Panicking`: Concept for types supporting the `operator$panic()`
 /// function.
-/// - `H_STD_NAMESPACE::Panic::PanickingInstance`: Concept for instances supporting
+/// - `H_STD_NAMESPACE::Panic::Interface::PanickingInstance`: Concept for instances supporting
 /// `operator$panic()`.
-/// - `H_STD_NAMESPACE::Panic::PanickingStatic`: Concept for types supporting static
+/// - `H_STD_NAMESPACE::Panic::Interface::PanickingStatic`: Concept for types supporting static
 /// `operator$panic()`.
 ///
 /// ### Example Usage
@@ -160,7 +160,7 @@ class $question {
     [[nodiscard]] constexpr bool is_null() const noexcept { return state == $State::Null; }
     [[nodiscard]] constexpr bool is_err() const noexcept { return state == $State::Error; }
     [[nodiscard]] constexpr bool is_err(const LIBCXX_NAMESPACE::type_info *type) const noexcept {
-        return state == $State::Error && data.error.get_context() == type;
+        return state == $State::Error && (*data.error.get_context()) == type;
     }
 
     constexpr void set_value(const T &value) { new (&data.value) T(value); }
@@ -278,7 +278,7 @@ class $question {
 
     template <typename E>
     constexpr bool operator==(const E &) const noexcept {
-        if constexpr (H_STD_NAMESPACE::Panic::Panicking<E>) {
+        if constexpr (H_STD_NAMESPACE::Panic::Interface::Panicking<E>) {
             return is_err(&typeid(E));
         }
 
@@ -310,11 +310,11 @@ class $question {
 
     /// ------------------------------- Casting -------------------------------
     template <typename E>
-        requires H_STD_NAMESPACE::Panic::Panicking<E>
+        requires H_STD_NAMESPACE::Panic::Interface::Panicking<E>
     constexpr E operator$cast(E * /*unused*/) const {
         if (state == $State::Error) {
             if (is_err(&typeid(E))) {
-                auto *obj = data.error.get_context().object();
+                auto *obj = (*data.error.get_context()).object();
                 if (obj) {
                     return *reinterpret_cast<E *>(obj);
                 }

@@ -1,0 +1,54 @@
+#[trivially_import(true)]
+
+ffi "c++" import "../include/lang/panic.hh";
+
+eval fn std::Panic::Frame::initialize(const obj: unsafe *T)
+  requires <T> if T has std::Interface::ClassType {
+    eval if __inline_cpp("Panic::Interface::PanickingStatic<T>") {
+        _reason = __inline_cpp("T::operator$panic()");
+    } else if __inline_cpp("Panic::Interface::PanickingInstance<T>") {
+        _reason = __inline_cpp("(*obj).operator$panic()");
+    } else {
+        static_assert(
+            __inline_cpp("Panic::Interface::Panicking<T>"),
+            r"Frame invoked with a type that lacks a panic operator. Ensure the type "
+             "declares `class ... with Panic::Panicking` and implements either `op "
+             "panic fn(self) -> string` or the static equivalent."
+        );
+    }
+
+    let object: unsafe *T = &null;
+
+    static_assert(
+        __inline_cpp("libcxx::is_copy_constructible_v<T>") || __inline_cpp("libcxx::is_move_constructible_v<T>"),
+         r"Frame invoked with a type that is not copy or move constructible.");
+
+    try {
+        eval if (__inline_cpp("libcxx::is_move_constructible_v<T>")) {
+            object        = _NEW(T(std::Memory::move(*obj)));
+            this->context = Panic::FrameContext(object);
+        } else if (__inline_cpp("libcxx::is_copy_constructible_v<T>")) {
+            object        = _NEW(T(*obj));
+            this->context = Panic::FrameContext(object);
+        }
+    } catch {
+        delete object;
+        std::crash(errors::RuntimeError("Failed to initialize panic frame."));
+    }
+}
+
+eval const fn std::Panic::Frame::file() -> string {
+    return this->_file;
+}
+
+eval const fn std::Panic::Frame::line() -> usize {
+    return this->_line;
+}
+
+eval const fn std::Panic::Frame::reason() -> string {
+    return this->_reason;
+}
+
+eval const fn std::Panic::Frame::get_context() -> *std::Panic::FrameContext {
+    return &context;
+}

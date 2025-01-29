@@ -13,8 +13,8 @@
 ///
 /// \note This panic handler is globally accessible to any Helix module that wildcard-imports `core.hlx`.
 
-ffi "c++" import "include/lang/panic.hh";
-ffi "c++" import "include/libc.h";
+ffi "c++" import "../include/lang/panic.hh";
+ffi "c++" import "../include/libc.h";
 
 /// \brief Displays runtime panic details and signals program termination.
 ///
@@ -39,7 +39,7 @@ ffi "c++" import "include/libc.h";
 fn _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const frame: *std::Panic::Frame) {
     const file_path: string = (*frame).file();
     const message:   string = (*frame).reason();
-    const error_t:   string = (*frame).get_context().type_name();
+    const error_t:   string = (*((*frame).get_context())).type_name();
     const line_no:   usize  = (*frame).line();
     
     const bold:        string = "\033[1m";
@@ -124,7 +124,7 @@ fn _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const frame: 
     if fd < 0 {
         print(f"{bold}{red}{error_t}:{reset}{white} file descriptor lost for {light_green}'{file_path}'{reset}. Maybe the file was moved or deleted?");
         print(f"    {bold}{red}panic reason:{reset}{white} {message}");
-        (*frame).get_context().crash();
+        (*((*frame).get_context())).crash();
     }
 
     print(f"{bold}{red}{error_t}:{reset}{white} {message}");
@@ -137,7 +137,7 @@ fn _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const frame: 
         print(f"   {bold}{line_no} | {reset}{red}Error reading file{reset}");
 
     // signal process termination
-    (*frame).get_context().crash();
+    (*((*frame).get_context())).crash();
 }
 
 /// \section CommentedErrorReporting Example Error Reporting (Commented Section)
