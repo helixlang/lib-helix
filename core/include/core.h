@@ -27,20 +27,30 @@
 #ifndef __$LIBHELIX_CORE__
 #define __$LIBHELIX_CORE__
 
-#include "types.h"
+#include "libcxx.h"
 #include "libc.h"
 #include "interfaces.h"
 #include "config.h"
-#include "lang/cast.hh"
-#include "lang/finally.hh"
-#include "lang/function.hh"
-#include "lang/generator.hh"
-#include "lang/question.hh"
 #include "memory.h"
 #include "libcxx.h"
 #include "primitives.h"
 #include "print.h"
 #include "meta.h"
+
+#include "lang/cast.hh"
+#include "lang/finally.hh"
+#include "lang/function.hh"
+#include "lang/generator.hh"
+#include "lang/question.hh"
+
+#include "types/slice.hh"
+#include "types/string.hh"
+#include "types/tuple.hh"
+#include "types/array.hh"
+#include "types/map.hh"
+#include "types/set.hh"
+#include "types/vec.hh"
+
 #include "undef.h"
 
 #endif

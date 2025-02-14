@@ -17,8 +17,11 @@
 #define __$LIBHELIX_INTERFACES__
 
 #include "config.h"
-#include "types.h"
+#include "libcxx.h"
+#include "memory.h"
 #include "meta.h"
+#include "primitives.h"
+#include "types/forward.hh"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -35,9 +38,9 @@ concept SupportsPointerCast = requires(T from) {
 
 template <typename T, typename U>
 concept Castable = requires(T t, U *u) {
-    { t.operator$cast(u) } -> H_STD_NAMESPACE::Meta::same_as<U>; // cast to the requested type
+    { t.operator$cast(u) } -> H_STD_NAMESPACE::Meta::same_as<U>;  // cast to the requested type
 } || requires(T t, U *u) {
-    { t.operator U() } -> H_STD_NAMESPACE::Meta::same_as<U>; // call the implicit cast
+    { t.operator U() } -> H_STD_NAMESPACE::Meta::same_as<U>;  // call the implicit cast
 };
 
 template <typename T>
@@ -70,6 +73,11 @@ concept NothrowAssignable = Meta::is_nothrow_assignable<T, Arg>;
 template <class T>
 concept CopyConstructible = Meta::is_copy_constructible<T>;
 
+template <typename self>
+concept RangeCompliant = requires(self $_1738523894814_8910, self $_1738523894814_7822) {
+    { ++$_1738523894814_8910 } -> std ::Meta ::convertible_to<self>;
+    { $_1738523894814_8910 < $_1738523894814_7822 } -> std ::Meta ::convertible_to<bool>;
+};
 }  // namespace Interface
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
