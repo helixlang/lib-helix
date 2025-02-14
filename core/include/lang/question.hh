@@ -32,9 +32,7 @@
 #include "../memory.h"
 #include "../meta.h"
 #include "../primitives.h"
-#include "../types.h"
-#include "../types/errors.h"
-
+#include "../types/errors.hh"
 
 H_NAMESPACE_BEGIN
 

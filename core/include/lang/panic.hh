@@ -28,9 +28,8 @@
 #include "../memory.h"
 #include "../meta.h"
 #include "../primitives.h"
-#include "../types.h"
-#include "../types/erase.h"
-#include "../types/errors.h"
+#include "../types/erase.hh"
+#include "../types/errors.hh"
 
 /// \def _HX_MC_Q7_INTERNAL_CRASH_PANIC_M
 ///

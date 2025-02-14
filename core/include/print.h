@@ -18,11 +18,14 @@
 
 #include "interfaces.h"
 #include "config.h"
-#include "types.h"
 #include "libc.h"
 #include "memory.h"
 #include "meta.h"
 #include "primitives.h"
+
+#include "types/forward.hh"
+#include "types/array.hh"
+#include "types/tuple.hh"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
