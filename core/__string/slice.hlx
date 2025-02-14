@@ -1,0 +1,81 @@
+#[trivially_import(true)]
+
+ffi "c++" import "../include/types/slice.hh";
+
+fn std::String::slice::<T>::slice(other: const slice_ptr)
+  requires <T> {
+    self.m_data = (*other).m_data;
+    self.m_size = (*other).m_size;
+    self.m_address = (*other).m_address;
+}
+
+fn std::String::slice::<T>::slice(str: const char_ptr, size: const size_type)
+  requires <T> {
+    let has_null_b = fn (word: uintptr_t) -> bool {
+        eval let high_bits = uintptr_t(0x8080808080808080);
+        eval let low_bits  = uintptr_t(0x0101010101010101);
+        return ((word - low_bits) & ~word & high_bits) != 0;
+    };
+
+    let index_first_null_b = fn (word: uintptr_t) -> usize {
+        const byte_ptr: unsafe *char = (&word) as unsafe const *char;
+        for i in 0 .. sizeof(uintptr_t) {
+            if (byte_ptr[i] == 0) {
+                return i;
+            }
+        }
+
+        return sizeof(uintptr_t);
+    };
+
+    let raw_string_length = fn (str: unsafe const *char) -> usize {
+        const s: unsafe *char = str;
+
+        while (s as unsafe uintptr_t) % sizeof(uintptr_t) != 0 {
+            if (*s == '\0') {
+                return s - str;
+            }
+
+            ++s;
+        }
+
+        const word_ptr: unsafe *uintptr_t = s as unsafe const *uintptr_t;
+
+        while !has_null_b(*word_ptr) {
+            ++word_ptr;
+        }
+
+        // Find exact location of the null byte
+        s = word_ptr as unsafe const *char;
+        return s + index_first_null_b(*word_ptr) - str;
+    };
+    
+    if size == 0 {
+        self.m_size = str_length(str);
+    } else {
+        self.m_size = size;
+    }
+
+    self.m_data = str;
+    self.m_address = std::Memory::address_type(str);
+
+    // std::crash(std::errors::RuntimeError("Object \'" + string(self.error->type_info()->name()) + "\' failed to panic."));
+}
+
+/*
+if (other == nullptr) {
+    // FIXME: panic
+}
+
+if (size == 0) {
+    
+
+    this->m_size = raw_string_length(other);
+} else {
+    this->m_size = size;
+}
+
+this->m_address = std::Memory::address_type(other);
+this->m_data    = other;
+
+*/

@@ -41,7 +41,7 @@ const fn std::Panic::FrameContext::type_name() -> string {
         let status: i32 = 0;
 
         // __cxa_demangle returns a malloc-allocated string
-        let demangle: unsafe *char = LIBC_NAMESPACE::abi::__cxa_demangle(mangled_name, (&null), (&null), (&status));
+        let demangle: unsafe *char = libc::abi::__cxa_demangle(mangled_name, (&null), (&null), (&status));
         if status == 0 && (demangle != (&null)) {
             let result: string = demangle;
         
