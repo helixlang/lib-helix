@@ -33,158 +33,326 @@
 #define __$LIBHELIX_STRING__
 
 #include "../config.h"
+#include "../interfaces.h"
 #include "../lang/generator.hh"
 #include "../libc.h"
 #include "../libcxx.h"
 #include "../memory.h"
 #include "../meta.h"
 #include "../primitives.h"
+#include "forward.hh"
+#include "slice.hh"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
-namespace Interface {
-template <typename self>
-concept CharaterCompliance = requires(self inst, self other, char c, int i) {
-    { ++inst } -> std::Meta::convertible_to<self>;
-    { inst++ } -> std::Meta::convertible_to<self>;
-    { --inst } -> std::Meta::convertible_to<self>;
-    { inst-- } -> std::Meta::convertible_to<self>;
-
-    { inst == other } -> std::Meta::convertible_to<bool>;
-    { inst != other } -> std::Meta::convertible_to<bool>;
-    { inst < other } -> std::Meta::convertible_to<bool>;
-    { inst > other } -> std::Meta::convertible_to<bool>;
-    { inst <= other } -> std::Meta::convertible_to<bool>;
-    { inst >= other } -> std::Meta::convertible_to<bool>;
-
-    { inst = other } -> std::Meta::same_as<self &>;
-
-    { static_cast<char>(inst) } -> std::Meta::same_as<char>;
-    { static_cast<int>(inst) } -> std::Meta::same_as<int>;
-
-    { inst + i } -> std::Meta::convertible_to<self>;
-    { inst - i } -> std::Meta::convertible_to<self>;
-    { i + inst } -> std::Meta::convertible_to<self>;
-
-    // eval if needed for char
-    { inst - other } -> std::Meta::convertible_to<int>;
-
-    { inst += i } -> std::Meta::same_as<self &>;
-    { inst -= i } -> std::Meta::same_as<self &>;
-};
-}  // end namespace Interface
-H_STD_NAMESPACE_END
-
 namespace String {
-/// \class string_slice
-/// \brief A string slice is a view into a string, it does not own the data, this can also be set
-///        to read-only char pointers
-/// \tparam _ElemT The element type of the string
-/// \tparam _Size The size of the string slice (this is not the size of the string but the size of
-///         the slice itself like a substring)
-template <typename CharT>
-class slice {
-  private:
-    mutable helix::$generator<CharT> $gen_state = operator$generator();
-
-  public:
-    using value_type      = CharT;
-    using size_type       = usize;
-    using difference_type = isize;
-
-    using reference       = const CharT &;
-    using const_reference = const CharT &;
-
-    using pointer       = const CharT *;
-    using const_pointer = const CharT *;
-
-    constexpr slice() noexcept;
-    constexpr slice(const CharT *data, size_type size) noexcept;
-    constexpr slice(const slice &) noexcept = default;
-    constexpr slice(slice &&) noexcept      = default;
-
-    constexpr slice &operator=(const slice &) noexcept = default;
-    constexpr slice &operator=(slice &&) noexcept      = default;
-
-    constexpr reference operator[](size_type pos) const noexcept;
-    constexpr reference at(size_type pos) const;
-    constexpr reference front() const noexcept;
-    constexpr reference back() const noexcept;
-    constexpr pointer   data() const noexcept;
-
-    [[nodiscard]] constexpr bool      empty() const noexcept;
-    [[nodiscard]] constexpr size_type size() const noexcept;
-    [[nodiscard]] constexpr size_type length() const noexcept;
-
-    // constexpr const_iterator begin() const noexcept;
-    // constexpr const_iterator cbegin() const noexcept;
-    // constexpr const_iterator end() const noexcept;
-    // constexpr const_iterator cend() const noexcept;
-    // constexpr const_reverse_iterator rbegin() const noexcept;
-    // constexpr const_reverse_iterator crbegin() const noexcept;
-    // constexpr const_reverse_iterator rend() const noexcept;
-    // constexpr const_reverse_iterator crend() const noexcept;
-
-    inline auto operator$generator() -> helix::$generator<CharT> {
-
-    }
-    
-    auto iter() -> helix::$generator<CharT> { return operator$generator(); }
-    auto begin() { return $gen_state.begin(); }
-    auto cbegin() { return $gen_state.cbegin(); }
-    auto end() { return $gen_state.end(); }
-    auto cend() { return $gen_state.cend(); }
-
-    constexpr slice split(size_type pos, size_type count) const;
-    constexpr int   compare(const slice &other) const noexcept;
-
-    constexpr void left_strip(size_type n) noexcept;
-    constexpr void right_strip(size_type n) noexcept;
-
-    friend constexpr bool operator==(const slice &lhs, const slice &rhs) noexcept {
-        return lhs.size() == rhs.size() && LIBCXX_NAMESPACE::equal(lhs.begin(), lhs.end(), rhs.begin());
-    }
-
-    friend constexpr bool operator!=(const slice &lhs, const slice &rhs) noexcept {
-        return !(lhs == rhs);
-    }
-
-    friend constexpr bool operator<(const slice &lhs, const slice &rhs) noexcept {
-        return LIBCXX_NAMESPACE::lexicographical_compare(
-            lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-    }
-
-    friend constexpr bool operator<=(const slice &lhs, const slice &rhs) noexcept {
-        return !(rhs < lhs);
-    }
-
-    friend constexpr bool operator>(const slice &lhs, const slice &rhs) noexcept {
-        return rhs < lhs;
-    }
-
-    friend constexpr bool operator>=(const slice &lhs, const slice &rhs) noexcept {
-        return !(lhs < rhs);
-    }
-
-  private:
-    const_pointer m_data;
-    size_type     m_size;
-};
-
-template <typename CharT, const usize _SlabSize = 16>  // NOLINT
-    requires(std::Interface::CharaterCompliance<CharT>)
+template <typename T = wchar_t>
 class basic {
   private:
-    enum StorageLocation { Stack, ROM, Heap };
+    static constexpr size_t SBO_SIZE = 24;
+    using str_t                      = LIBCXX_NAMESPACE::basic_string<T>;
 
-    basic(const CharT *rom_ptr);
-    basic(CharT *rom_ptr);
-    basic(basic<CharT> rom_ptr);
+    union {
+        struct {
+            T sbo_buffer[SBO_SIZE];  // Small Buffer Optimization
+        };
+        struct {
+            T     *heap_buffer;
+            size_t capacity;
+        };
+    };
+
+    size_t size;
+    u8     flags;
+
+  public:
+    // --- Constructors ---
+    constexpr basic() noexcept
+        : size(0)
+        , flags(0) {
+        sbo_buffer[0] = '\0';
+    }
+
+    constexpr basic(const basic &other) noexcept { assign(other); }
+
+    constexpr basic(basic &&other) noexcept { move_assign(std::Memory::move(other)); }
+
+    constexpr explicit basic(const T *str) noexcept { assign(str); }
+
+    constexpr explicit basic(const T *str, size_t len) noexcept { assign(str, len); }
+
+    constexpr explicit basic(const str_t &str) noexcept { assign(str.c_str(), str.size()); }
+
+    constexpr ~basic() {
+        if (!is_sbo()) {
+            delete[] heap_buffer;
+        }
+    }
+
+    constexpr basic &operator=(const basic &other) noexcept {
+        if (this != &other) {
+            assign(other);
+        }
+        return *this;
+    }
+
+    constexpr basic &operator=(basic &&other) noexcept {
+        if (this != &other) {
+            move_assign(std::Memory::move(other));
+        }
+        return *this;
+    }
+
+    // --- Internal Helpers ---
+  private:
+    [[nodiscard]] constexpr bool is_sbo() const noexcept { return (flags & 1) == 0; }
+
+    constexpr void assign(const T *str, size_t len = 0) noexcept {
+        if (len == 0) {
+            len = std::String::length(str);
+        }
+        this->size = len;
+
+        if (len < SBO_SIZE) {
+            std::Memory::copy(sbo_buffer, str, (len + 1) * sizeof(T));
+            flags &= ~1;  // Mark as SBO
+        } else {
+            heap_buffer = new T[len + 1];
+            std::Memory::copy(heap_buffer, str, (len + 1) * sizeof(T));
+            capacity = len;
+            flags |= 1;  // Mark as Heap
+        }
+    }
+
+    constexpr void assign(const basic &other) noexcept { assign(other.data(), other.size); }
+
+    constexpr void move_assign(basic &&other) noexcept {
+        std::Memory::copy(this, &other, sizeof(basic));
+        other.flags = 0;
+        other.size  = 0;
+    }
+
+    constexpr void ensure_mutable() {
+        if ((flags & 2) == 0) {
+            return;  // Not ROM
+        }
+        assign(data(), size);  // Copy to mutable storage
+    }
+
+  public:
+    // --- Data Access ---
+    [[nodiscard]] constexpr size_t   length() const noexcept { return size; }
+    [[nodiscard]] constexpr bool     empty() const noexcept { return size == 0; }
+    [[nodiscard]] constexpr const T *data() const noexcept {
+        return is_sbo() ? sbo_buffer : heap_buffer;
+    }
+
+    // --- Mutation ---
+    constexpr void append(const T *str) {
+        ensure_mutable();
+        size_t len = std::String::length(str);
+        if (size + len < SBO_SIZE) {
+            std::Memory::copy(sbo_buffer + size, str, (len + 1) * sizeof(T));
+        } else {
+            size_t new_size   = size + len;
+            T     *new_buffer = new T[new_size + 1];
+            std::Memory::copy(new_buffer, data(), size * sizeof(T));
+            std::Memory::copy(new_buffer + size, str, (len + 1) * sizeof(T));
+            if (!is_sbo())
+                delete[] heap_buffer;
+            heap_buffer = new_buffer;
+            capacity    = new_size;
+            flags |= 1;  // Heap flag
+        }
+        size += len;
+    }
+
+    constexpr void clear() {
+        size          = 0;
+        sbo_buffer[0] = '\0';
+        flags &= ~1;
+    }
+
+    // --- String Operations ---
+    [[nodiscard]] constexpr basic upper() const {
+        basic result(*this);
+        for (size_t i = 0; i < result.size; ++i) {
+            result.sbo_buffer[i] = LIBCXX_NAMESPACE::towupper(result.sbo_buffer[i]);
+        }
+        return result;
+    }
+
+    [[nodiscard]] constexpr basic lower() const {
+        basic result(*this);
+        for (size_t i = 0; i < result.size; ++i) {
+            result.sbo_buffer[i] = LIBCXX_NAMESPACE::towlower(result.sbo_buffer[i]);
+        }
+        return result;
+    }
+
+    [[nodiscard]] constexpr basic strip() const {
+        size_t start = 0;
+        size_t end   = size;
+        while (start < end && LIBCXX_NAMESPACE::iswspace(data()[start])) {
+            ++start;
+        }
+        while (end > start && LIBCXX_NAMESPACE::iswspace(data()[end - 1])) {
+            --end;
+        }
+        return basic(data() + start, end - start);
+    }
+
+    [[nodiscard]] constexpr basic replace(T old_c, T new_c) const {
+        basic result(*this);
+        for (size_t i = 0; i < result.size; ++i) {
+            if (result.sbo_buffer[i] == old_c) {
+                result.sbo_buffer[i] = new_c;
+            }
+        }
+        return result;
+    }
+
+    [[nodiscard]] constexpr std::Questionable<size_t> find(T c) const noexcept {
+        for (size_t i = 0; i < size; ++i) {
+            if (data()[i] == c) {
+                return i;
+            }
+        }
+        return null;
+    }
+
+    // --- Operators ---
+    [[nodiscard]] constexpr std::Questionable<T> operator[](size_t i) const noexcept {
+        if (i >= size) {
+            return null;
+        }
+        return data()[i];
+    }
+
+    [[nodiscard]] constexpr bool operator==(const basic &other) const noexcept {
+        return size == other.size && std::Memory::copy(data(), other.data(), size * sizeof(T)) == 0;
+    }
+
+    [[nodiscard]] constexpr bool operator!=(const basic &other) const noexcept {
+        return !(*this == other);
+    }
+
+    [[nodiscard]] constexpr bool operator<(const basic &other) const noexcept {
+        return std::String::compare(data(), other.data(), LIBCXX_NAMESPACE::min(size, other.size)) <
+               0;
+    }
+
+    [[nodiscard]] constexpr bool operator>(const basic &other) const noexcept {
+        return std::String::compare(data(), other.data(), LIBCXX_NAMESPACE::min(size, other.size)) >
+               0;
+    }
 };
 
+// template <typename T, const usize _SlabSize /* = 16 */>  // NOLINT
+//     requires(std::Interface::CharaterType<T>)
+// class basic {
+//   private:
+//     enum StorageLocation { Stack, ROM, Heap };
+
+//   public:
+//     using char_type       = T;
+//     using size_type       = usize;
+//     using difference_type = isize;
+//     using char_ref        = T &;
+//     using char_ptr        = T *;
+//     using reference       = basic<T> &;
+//     using basicT          = basic<T>;
+
+//     basic();
+//     basic(char_ptr rom_ptr);
+//     basic(char_type c, size_type size = 0);
+//     basic(basic<T> rom_ptr);
+
+//     basic operator=(reference);
+//     basic operator+(reference);
+//     basic operator+=(reference);
+
+//     basic operator=(char_ptr);
+//     basic operator+(char_ptr);
+//     basic operator+=(char_ptr);
+
+//     basic operator-(reference);
+//     basic operator-(char_ptr);
+
+//     basic operator-=(reference);
+//     basic operator-=(char_ptr);
+
+//     char_type operator[](usize);
+//     basic<T> operator[](std::Range<usize>);
+
+//     bool operator$contains(char_type c);
+//     bool operator$contains(reference);
+//     bool operator$contains(difference_type);
+
+//     bool operator==(reference);
+//     bool operator==(char_ptr);
+
+//     bool operator!=(reference);
+//     bool operator!=(char_ptr);
+
+//     bool operator<(reference);
+//     bool operator<(char_ptr);
+
+//     bool operator<=(reference);
+//     bool operator<=(char_ptr);
+
+//     bool operator>(reference);
+//     bool operator>(char_ptr);
+
+//     bool operator>=(reference);
+//     bool operator>=(char_ptr);
+
+//     usize          capacity();
+//     usize          length();
+//     bool           empty();
+//     const char_ptr data() const;
+//     char_ptr       raw_data() const;  // FIXME: once unsafe overloads are implemented to unsafe
+//     data
+
+//     void remove_suffix(usize = 1);
+//     void remove_prefix(usize = 1);
+//     void reserve(usize);   // adds additional space to the string
+//     void shrink_to_fit();  // shrinks the string to the size of the string
+
+//     void append(reference);
+//     void insert(isize i, reference);
+
+//     std::Questionable<char_type> remove(isize);
+//     std::Questionable<char_type> remove(reference);
+
+//     void clear();
+// };
 }  // namespace String
 
-using string = String::basic<wchar_t>;
+template <>
+class String::basic<wchar_t> {
+  public:
+    basic(const char *rom_ptr);
+    basic(char *rom_ptr);
+    basic(basic<char> rom_ptr);
+
+    basic operator=(const char *);
+    basic operator+(const char *);
+    basic operator+=(const char *);
+
+    basic operator=(char *);
+    basic operator+(char *);
+    basic operator+=(char *);
+
+    basic operator=(basic<char>);
+    basic operator+(basic<char>);
+    basic operator+=(basic<char>);
+};
+
+H_STD_NAMESPACE_END
+
+// using string = String::basic<wchar_t>;
+using string = LIBCXX_NAMESPACE::string;
 
 H_NAMESPACE_END
 #endif
