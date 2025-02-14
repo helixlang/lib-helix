@@ -35,13 +35,13 @@
 ///                                                                                              ///
 ///==============================================================================================///
 
-import range::*;
+import __utils::range::*;
 import __panic::frame_context::*;
 import __panic::handler::*;
 import __panic::frame::*;
+// import __string::slice::*; // at this point all the basic primitives types are warpers of the c++ version
 
 fn _HX_FN_Vi_Q5_7_helixrt_init_Rv() -> void {
     // this is the first function call in main always.
     // anything here runs first.
-
 }
