@@ -24,16 +24,16 @@
 #include "primitives.h"
 
 #if defined(__linux__) || defined(__APPLE__)
-#include <pthread.h>
-#include <signal.h>
-#include <sys/mman.h>
-#include <sys/resource.h>
-#include <unistd.h>
+////////
 #elif defined(_WIN32)
-#include <processthreadsapi.h>
-#include <tlhelp32.h>
-#include <windows.h>
+///////
 #endif
+
+using u64 = unsigned long long;
+
+using i16 = signed short;
+using i32 = signed int;
+using i64 = signed long long;
 
 #include "meta.h"
 
@@ -183,7 +183,7 @@ inline void *heap_start(void **start = nullptr) {
 #pragma warning(push)
 #pragma warning(disable : 4996)
 #endif
-    hp_start = libc::sbrk(0);
+    hp_start = sbrk(0);
 #if defined(__clang__) || defined(__GNUC__)
 #pragma GCC diagnostic pop
 #elif defined(_MSC_VER)

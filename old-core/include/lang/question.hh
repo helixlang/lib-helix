@@ -285,7 +285,7 @@ class $question {
 #endif
 
             _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(H_STD_NAMESPACE::errors::TypeMismatchError(
-                "Invalid: error type does not match any panic state."));
+                L"Invalid: error type does not match any panic state."));
 
 #if defined(_MSC_VER)
         }
@@ -316,8 +316,7 @@ class $question {
                 if (obj) {
                     return *reinterpret_cast<E *>(obj);
                 }
-                _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(H_STD_NAMESPACE::errors::NullValueError(
-                    "Invalid Decay: error context object is null."));
+                _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(H_STD_NAMESPACE::errors::NullValueError(L"Invalid Decay: error context object is null."));
             }
             data.error.operator$panic();
         }
@@ -328,11 +327,11 @@ class $question {
             }
 
             _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(H_STD_NAMESPACE::errors::TypeMismatchError(
-                "Invalid cast: value type does not match requested type."));
+                L"Invalid cast: value type does not match requested type."));
         }
 
         _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(
-            H_STD_NAMESPACE::errors::NullValueError("Invalid Decay: value is null."));
+            H_STD_NAMESPACE::errors::NullValueError(L"Invalid Decay: value is null."));
     }
 
     constexpr T operator$cast(T * /*unused*/) const {
@@ -345,7 +344,7 @@ class $question {
         }
 
         _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(
-            H_STD_NAMESPACE::errors::NullValueError("Invalid Decay: value is null."));
+            H_STD_NAMESPACE::errors::NullValueError(L"Invalid Decay: value is null."));
     }
 
     [[nodiscard]] constexpr T &operator*() { return operator$cast(static_cast<T *>(nullptr)); }

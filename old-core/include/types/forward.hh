@@ -16,8 +16,6 @@
 #ifndef __$LIBHELIX_FORWARD__
 #define __$LIBHELIX_FORWARD__
 
-#include <string>
-
 #include "../config.h"
 #include "../meta.h"
 #include "../primitives.h"
@@ -68,12 +66,12 @@ concept CharaterType = requires(self inst, self other, char c, int i) {
 
 namespace String {
 template <typename T>
-class basic;
+class basic_string;
 }
 
 H_STD_NAMESPACE_END
 
-using string = LIBCXX_NAMESPACE::string;
+using string = std::String::basic_string<wchar_t>;
 
 H_STD_NAMESPACE_BEGIN
 

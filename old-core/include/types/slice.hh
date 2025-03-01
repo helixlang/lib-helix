@@ -51,63 +51,46 @@ class Range;
 
 namespace String {
 /// \class string_slice
-/// \brief A string slice is a view into a string, it does not own the data, this can also be set
+/// \brief A string basic_slice is a view into a string, it does not own the data, this can also be set
 ///        to read-only char pointers
 /// \tparam _ElemT The element type of the string
-/// \tparam _Size The size of the string slice (this is not the size of the string but the size of
-///         the slice itself like a substring)
+/// \tparam _Size The size of the string basic_slice (this is not the size of the string but the size of
+///         the basic_slice itself like a substring)
 template <typename T>
-class slice {
+class basic_slice {
   private:
     using view_t = LIBCXX_NAMESPACE::basic_string_view<T>;
 
   public:
     // --- Type Definitions ---
     using char_t  = T;
-    using slice_v = LIBCXX_NAMESPACE::vector<slice>;
+    using slice_v = LIBCXX_NAMESPACE::vector<basic_slice>;
 
     // --- Constructors ---
-    constexpr slice() noexcept                   = default;
-    constexpr slice(const slice &other) noexcept = default;
-    constexpr slice(slice &&other) noexcept      = default;
+    constexpr basic_slice() noexcept                   = default;
+    constexpr basic_slice(const basic_slice &other) noexcept = default;
+    constexpr basic_slice(basic_slice &&other) noexcept      = default;
 
-    constexpr explicit slice(const char_t *str) noexcept
+    constexpr explicit basic_slice(const char_t *str) noexcept
         : data(str, LIBCXX_NAMESPACE::char_traits<char_t>::length(str)) {}
 
-    constexpr explicit slice(const char_t *str, size_t size) noexcept
+    constexpr explicit basic_slice(const char_t *str, size_t size) noexcept
         : data(str, size) {}
 
-    constexpr explicit slice(view_t view) noexcept
+    constexpr explicit basic_slice(view_t view) noexcept
         : data(view) {}
 
-    constexpr slice &operator=(const slice &) noexcept = default;
-    constexpr slice &operator=(slice &&) noexcept      = default;
-    constexpr ~slice()                                 = default;
+    constexpr basic_slice &operator=(const basic_slice &) noexcept = default;
+    constexpr basic_slice &operator=(basic_slice &&) noexcept      = default;
+    constexpr ~basic_slice()                                 = default;
 
     // --- Data Access & Utility ---
     [[nodiscard]] constexpr size_t        length() const noexcept { return data.size(); }
     [[nodiscard]] constexpr bool          empty() const noexcept { return data.empty(); }
     [[nodiscard]] constexpr const char_t *raw() const noexcept { return data.data(); }
-    [[nodiscard]] constexpr LIBCXX_NAMESPACE::wstring str() const {
-        return LIBCXX_NAMESPACE::wstring(data);
-    }
 
     // --- Python-like Methods ---
-    [[nodiscard]] constexpr slice to_upper() const noexcept {
-        LIBCXX_NAMESPACE::wstring result(data.begin(), data.end());
-        for (auto &c : result)
-            c = LIBCXX_NAMESPACE::towupper(c);
-        return slice(result);
-    }
-
-    [[nodiscard]] constexpr slice to_lower() const noexcept {
-        LIBCXX_NAMESPACE::wstring result(data.begin(), data.end());
-        for (auto &c : result)
-            c = LIBCXX_NAMESPACE::towlower(c);
-        return slice(result);
-    }
-
-    [[nodiscard]] constexpr slice to_strip() const noexcept {
+    [[nodiscard]] constexpr basic_slice to_strip() const noexcept {
         size_t start = 0;
         size_t end   = data.size();
         while (start < end && LIBCXX_NAMESPACE::iswspace(data[start])) {
@@ -116,33 +99,23 @@ class slice {
         while (end > start && LIBCXX_NAMESPACE::iswspace(data[end - 1])) {
             --end;
         }
-        return slice(data.substr(start, end - start));
+        return basic_slice(data.substr(start, end - start));
     }
 
-    [[nodiscard]] constexpr slice l_strip() const noexcept {
+    [[nodiscard]] constexpr basic_slice l_strip() const noexcept {
         size_t start = 0;
         while (start < data.size() && LIBCXX_NAMESPACE::iswspace(data[start])) {
             ++start;
         }
-        return slice(data.substr(start));
+        return basic_slice(data.substr(start));
     }
 
-    [[nodiscard]] constexpr slice r_strip() const noexcept {
+    [[nodiscard]] constexpr basic_slice r_strip() const noexcept {
         size_t end = data.size();
         while (end > 0 && LIBCXX_NAMESPACE::iswspace(data[end - 1])) {
             --end;
         }
-        return slice(data.substr(0, end));
-    }
-
-    [[nodiscard]] constexpr slice replace(char_t old_c, char_t new_c) const noexcept {
-        LIBCXX_NAMESPACE::wstring result(data.begin(), data.end());
-        for (auto &c : result) {
-            if (c == old_c) {
-                c = new_c;
-            }
-        }
-        return slice(result);
+        return basic_slice(data.substr(0, end));
     }
 
     [[nodiscard]] constexpr slice_v split(char_t delim) const noexcept {
@@ -165,11 +138,11 @@ class slice {
         return pos == view_t::npos ? null : pos;
     }
 
-    [[nodiscard]] constexpr bool starts_with(slice prefix) const noexcept {
+    [[nodiscard]] constexpr bool starts_with(basic_slice prefix) const noexcept {
         return data.starts_with(prefix.data);
     }
 
-    [[nodiscard]] constexpr bool ends_with(slice suffix) const noexcept {
+    [[nodiscard]] constexpr bool ends_with(basic_slice suffix) const noexcept {
         return data.ends_with(suffix.data);
     }
 
@@ -186,81 +159,79 @@ class slice {
         return data[i];
     }
 
-    [[nodiscard]] constexpr int compare(slice other) const noexcept {
+    [[nodiscard]] constexpr int compare(basic_slice other) const noexcept {
         return data.compare(other.data);
     }
 
-    friend constexpr bool operator==(const slice &lhs, const slice &rhs) noexcept {
+    friend constexpr bool operator==(const basic_slice &lhs, const basic_slice &rhs) noexcept {
         return lhs.data == rhs.data;
     }
 
-    friend constexpr bool operator!=(const slice &lhs, const slice &rhs) noexcept {
+    friend constexpr bool operator!=(const basic_slice &lhs, const basic_slice &rhs) noexcept {
         return lhs.data != rhs.data;
     }
 
-    friend constexpr bool operator<(const slice &lhs, const slice &rhs) noexcept {
+    friend constexpr bool operator<(const basic_slice &lhs, const basic_slice &rhs) noexcept {
         return lhs.data < rhs.data;
     }
 
-    friend constexpr bool operator>(const slice &lhs, const slice &rhs) noexcept {
+    friend constexpr bool operator>(const basic_slice &lhs, const basic_slice &rhs) noexcept {
         return lhs.data > rhs.data;
     }
 
-    friend constexpr bool operator<=(const slice &lhs, const slice &rhs) noexcept {
+    friend constexpr bool operator<=(const basic_slice &lhs, const basic_slice &rhs) noexcept {
         return lhs.data <= rhs.data;
     }
 
-    friend constexpr bool operator>=(const slice &lhs, const slice &rhs) noexcept {
+    friend constexpr bool operator>=(const basic_slice &lhs, const basic_slice &rhs) noexcept {
         return lhs.data >= rhs.data;
     }
 
   private:
     view_t data{};
 };
+
+using wide_slice = basic_slice<wchar_t>;
 }  // end namespace String
 
 H_STD_NAMESPACE_END
-
-// using string = String::basic<wchar_t>;
-using string = LIBCXX_NAMESPACE::string;
-
 H_NAMESPACE_END
 #endif
 
 /*
-slice_v split(isize p, slice::Operation op = slice::Operation::Remove) const;
-    slice_v split(char_t c, slice::Operation op = slice::Operation::Remove) const;
-    slice_v split(slice s, slice::Operation op = slice::Operation::Remove) const;
-    slice_v split(char_t *c, slice::Operation op = slice::Operation::Remove) const;
+slice_v split(isize p, basic_slice::Operation op = basic_slice::Operation::Remove) const;
+    slice_v split(char_t c, basic_slice::Operation op = basic_slice::Operation::Remove) const;
+    slice_v split(basic_slice s, basic_slice::Operation op = basic_slice::Operation::Remove) const;
+    slice_v split(char_t *c, basic_slice::Operation op = basic_slice::Operation::Remove) const;
 
     // char at p and n after
-    slice sub_slice(isize p, usize n) const;
+    basic_slice sub_slice(isize p, usize n) const;
     // char at p till size - p
-    slice sub_slice(isize p) const;
+    basic_slice sub_slice(isize p) const;
     // r.start to r.end
-    slice sub_slice(std::Range<isize> r) const;
+    basic_slice sub_slice(std::Range<isize> r) const;
 
     // char at i
     std::Questionable<char_t> get(isize i) const;
 
     // pos of char after n occurrences, if neg n, find in reverse, null returned if not found at n
 occurrence
-    // example: slice("foo bar is bad").index_of('b') == 4
-    // example: slice("foo bar is bad").index_of('b', 1) == 4
-    // example: slice("foo bar is bad").index_of('b', -1) == 11
-    // example: slice("foo bar is bad").index_of('b', -2) == 4
-    // example: slice("foo bar is bad").index_of('b', 2) == 11
-    // example: slice("foo bar is bad").index_of('b', -3) == null
-    // example: slice("foo bar is bad").index_of('b', 3) == null
+    // example: basic_slice("foo bar is bad").index_of('b') == 4
+    // example: basic_slice("foo bar is bad").index_of('b', 1) == 4
+    // example: basic_slice("foo bar is bad").index_of('b', -1) == 11
+    // example: basic_slice("foo bar is bad").index_of('b', -2) == 4
+    // example: basic_slice("foo bar is bad").index_of('b', 2) == 11
+    // example: basic_slice("foo bar is bad").index_of('b', -3) == null
+    // example: basic_slice("foo bar is bad").index_of('b', 3) == null
     std::Questionable<usize> index_of(char_t c, isize n = 1) const;
 
     void remove_suffix();
     void remove_prefix();
 
     // --- String-like Operations ---
-    bool  starts_with(slice &) const;
-    bool  ends_with(slice &) const;
-    slice strip() const;
-    slice r_strip() const;
-    slice l_strip() const;
+    bool  starts_with(basic_slice &) const;
+    bool  ends_with(basic_slice &) const;
+    basic_slice strip() const;
+    basic_slice r_strip() const;
+    basic_slice l_strip() const;
 */

@@ -12,7 +12,7 @@
 ///   Copyright (c) 2024 The Helix Project (CC BY 4.0)                                           ///
 ///                                                                                              ///
 ///------------------------------------------------------------------------------------ Helix ---///
-/// Ideology: make sure this is highly optimized, a basic string must have the following grantees:
+/// Ideology: make sure this is highly optimized, a basic_string string must have the following grantees:
 /// 1. const char*'s that point to the ROM of the file must not be moved to the heap unless modifed
 ///    even then to optimize the performance of strings, the allocation model should follow that of
 ///    a slab allocator, unless the string is truncated. In the case of trunaction the whole ROM
@@ -32,6 +32,7 @@
 #ifndef __$LIBHELIX_STRING__
 #define __$LIBHELIX_STRING__
 
+#include <csetjmp>
 #include "../config.h"
 #include "../interfaces.h"
 #include "../lang/generator.hh"
@@ -47,10 +48,10 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 namespace String {
 template <typename T = wchar_t>
-class basic {
+class basic_string {
   private:
     static constexpr size_t SBO_SIZE = 24;
-    using str_t                      = LIBCXX_NAMESPACE::basic_string<T>;
+    using str_t = LIBCXX_NAMESPACE::basic_string<T>;
 
     union {
         struct {
@@ -66,37 +67,40 @@ class basic {
     u8     flags;
 
   public:
+    using slice = basic_slice<T>;
+
     // --- Constructors ---
-    constexpr basic() noexcept
+    constexpr basic_string() noexcept
         : size(0)
         , flags(0) {
         sbo_buffer[0] = '\0';
     }
 
-    constexpr basic(const basic &other) noexcept { assign(other); }
+    constexpr basic_string(const basic_string &other) noexcept { assign(other); }
 
-    constexpr basic(basic &&other) noexcept { move_assign(std::Memory::move(other)); }
+    constexpr basic_string(basic_string &&other) noexcept { move_assign(std::Memory::move(other)); }
 
-    constexpr explicit basic(const T *str) noexcept { assign(str); }
+    constexpr explicit basic_string(const T *str) noexcept { assign(str); }
 
-    constexpr explicit basic(const T *str, size_t len) noexcept { assign(str, len); }
+    constexpr explicit basic_string(const T *str, size_t len) noexcept { assign(str, len); }
 
-    constexpr explicit basic(const str_t &str) noexcept { assign(str.c_str(), str.size()); }
+    constexpr explicit basic_string(const str_t &str) noexcept { assign(str.c_str(), str.size()); }
+    constexpr explicit basic_string(const slice &str) noexcept { assign(str.raw(), str.size()); }
 
-    constexpr ~basic() {
+    constexpr ~basic_string() {
         if (!is_sbo()) {
             delete[] heap_buffer;
         }
     }
 
-    constexpr basic &operator=(const basic &other) noexcept {
+    constexpr basic_string &operator=(const basic_string &other) noexcept {
         if (this != &other) {
             assign(other);
         }
         return *this;
     }
 
-    constexpr basic &operator=(basic &&other) noexcept {
+    constexpr basic_string &operator=(basic_string &&other) noexcept {
         if (this != &other) {
             move_assign(std::Memory::move(other));
         }
@@ -124,10 +128,10 @@ class basic {
         }
     }
 
-    constexpr void assign(const basic &other) noexcept { assign(other.data(), other.size); }
+    constexpr void assign(const basic_string &other) noexcept { assign(other.raw(), other.size); }
 
-    constexpr void move_assign(basic &&other) noexcept {
-        std::Memory::copy(this, &other, sizeof(basic));
+    constexpr void move_assign(basic_string &&other) noexcept {
+        std::Memory::copy(this, &other, sizeof(basic_string));
         other.flags = 0;
         other.size  = 0;
     }
@@ -136,14 +140,14 @@ class basic {
         if ((flags & 2) == 0) {
             return;  // Not ROM
         }
-        assign(data(), size);  // Copy to mutable storage
+        assign(raw(), size);  // Copy to mutable storage
     }
 
   public:
     // --- Data Access ---
     [[nodiscard]] constexpr size_t   length() const noexcept { return size; }
     [[nodiscard]] constexpr bool     empty() const noexcept { return size == 0; }
-    [[nodiscard]] constexpr const T *data() const noexcept {
+    [[nodiscard]] constexpr const T *raw() const noexcept {
         return is_sbo() ? sbo_buffer : heap_buffer;
     }
 
@@ -156,7 +160,7 @@ class basic {
         } else {
             size_t new_size   = size + len;
             T     *new_buffer = new T[new_size + 1];
-            std::Memory::copy(new_buffer, data(), size * sizeof(T));
+            std::Memory::copy(new_buffer, raw(), size * sizeof(T));
             std::Memory::copy(new_buffer + size, str, (len + 1) * sizeof(T));
             if (!is_sbo())
                 delete[] heap_buffer;
@@ -174,6 +178,22 @@ class basic {
     }
 
     // --- String Operations ---
+    [[nodiscard]] constexpr basic_string<T> to_upper() const noexcept {
+        basic_string<T> result(*this);
+        for (auto &c : result) {
+            c =
+            #ifndef _MSC_VER
+                LIBCXX_NAMESPACE::towupper(c)
+            #else
+                towupper(c)
+            #endif
+            ;
+        }
+
+        return result;
+    }
+
+    /*
     [[nodiscard]] constexpr basic upper() const {
         basic result(*this);
         for (size_t i = 0; i < result.size; ++i) {
@@ -189,32 +209,49 @@ class basic {
         }
         return result;
     }
+    */
 
-    [[nodiscard]] constexpr basic strip() const {
-        size_t start = 0;
-        size_t end   = size;
-        while (start < end && LIBCXX_NAMESPACE::iswspace(data()[start])) {
-            ++start;
+    [[nodiscard]] constexpr basic_string<T> to_lower() const noexcept {
+        basic_string<T> result(*this);
+        for (auto &c : result) {
+            c =
+            #ifndef _MSC_VER
+                LIBCXX_NAMESPACE::towlower(c)
+            #else
+                towupper(c)
+            #endif
+            ;
         }
-        while (end > start && LIBCXX_NAMESPACE::iswspace(data()[end - 1])) {
-            --end;
-        }
-        return basic(data() + start, end - start);
+
+        return result;
     }
 
-    [[nodiscard]] constexpr basic replace(T old_c, T new_c) const {
-        basic result(*this);
-        for (size_t i = 0; i < result.size; ++i) {
-            if (result.sbo_buffer[i] == old_c) {
-                result.sbo_buffer[i] = new_c;
+    [[nodiscard]] constexpr basic_string strip() const {
+        size_t start = 0;
+        size_t end   = size;
+        while (start < end && LIBCXX_NAMESPACE::iswspace(raw()[start])) {
+            ++start;
+        }
+        while (end > start && LIBCXX_NAMESPACE::iswspace(raw()[end - 1])) {
+            --end;
+        }
+        return basic_string(raw() + start, end - start);
+    }
+
+    [[nodiscard]] constexpr basic_string<T> replace(T old_c, T new_c) const noexcept {
+        LIBCXX_NAMESPACE::wstring result(raw().begin(), raw().end());
+        for (auto &c : result) {
+            if (c == old_c) {
+                c = new_c;
             }
         }
-        return result;
+
+        return basic_string<T>(result);
     }
 
     [[nodiscard]] constexpr std::Questionable<size_t> find(T c) const noexcept {
         for (size_t i = 0; i < size; ++i) {
-            if (data()[i] == c) {
+            if (raw()[i] == c) {
                 return i;
             }
         }
@@ -226,133 +263,53 @@ class basic {
         if (i >= size) {
             return null;
         }
-        return data()[i];
+        return raw()[i];
     }
 
-    [[nodiscard]] constexpr bool operator==(const basic &other) const noexcept {
-        return size == other.size && std::Memory::copy(data(), other.data(), size * sizeof(T)) == 0;
+    [[nodiscard]] constexpr bool operator==(const basic_string &other) const noexcept {
+        return size == other.size && std::Memory::copy(raw(), other.raw(), size * sizeof(T)) == 0;
     }
 
-    [[nodiscard]] constexpr bool operator!=(const basic &other) const noexcept {
+    [[nodiscard]] constexpr bool operator!=(const basic_string &other) const noexcept {
         return !(*this == other);
     }
 
-    [[nodiscard]] constexpr bool operator<(const basic &other) const noexcept {
-        return std::String::compare(data(), other.data(), LIBCXX_NAMESPACE::min(size, other.size)) <
+    [[nodiscard]] constexpr bool operator<(const basic_string &other) const noexcept {
+        return std::String::compare(raw(), other.raw(), LIBCXX_NAMESPACE::min(size, other.size)) <
                0;
     }
 
-    [[nodiscard]] constexpr bool operator>(const basic &other) const noexcept {
-        return std::String::compare(data(), other.data(), LIBCXX_NAMESPACE::min(size, other.size)) >
+    [[nodiscard]] constexpr bool operator>(const basic_string &other) const noexcept {
+        return std::String::compare(raw(), other.raw(), LIBCXX_NAMESPACE::min(size, other.size)) >
                0;
     }
 };
-
-// template <typename T, const usize _SlabSize /* = 16 */>  // NOLINT
-//     requires(std::Interface::CharaterType<T>)
-// class basic {
-//   private:
-//     enum StorageLocation { Stack, ROM, Heap };
-
-//   public:
-//     using char_type       = T;
-//     using size_type       = usize;
-//     using difference_type = isize;
-//     using char_ref        = T &;
-//     using char_ptr        = T *;
-//     using reference       = basic<T> &;
-//     using basicT          = basic<T>;
-
-//     basic();
-//     basic(char_ptr rom_ptr);
-//     basic(char_type c, size_type size = 0);
-//     basic(basic<T> rom_ptr);
-
-//     basic operator=(reference);
-//     basic operator+(reference);
-//     basic operator+=(reference);
-
-//     basic operator=(char_ptr);
-//     basic operator+(char_ptr);
-//     basic operator+=(char_ptr);
-
-//     basic operator-(reference);
-//     basic operator-(char_ptr);
-
-//     basic operator-=(reference);
-//     basic operator-=(char_ptr);
-
-//     char_type operator[](usize);
-//     basic<T> operator[](std::Range<usize>);
-
-//     bool operator$contains(char_type c);
-//     bool operator$contains(reference);
-//     bool operator$contains(difference_type);
-
-//     bool operator==(reference);
-//     bool operator==(char_ptr);
-
-//     bool operator!=(reference);
-//     bool operator!=(char_ptr);
-
-//     bool operator<(reference);
-//     bool operator<(char_ptr);
-
-//     bool operator<=(reference);
-//     bool operator<=(char_ptr);
-
-//     bool operator>(reference);
-//     bool operator>(char_ptr);
-
-//     bool operator>=(reference);
-//     bool operator>=(char_ptr);
-
-//     usize          capacity();
-//     usize          length();
-//     bool           empty();
-//     const char_ptr data() const;
-//     char_ptr       raw_data() const;  // FIXME: once unsafe overloads are implemented to unsafe
-//     data
-
-//     void remove_suffix(usize = 1);
-//     void remove_prefix(usize = 1);
-//     void reserve(usize);   // adds additional space to the string
-//     void shrink_to_fit();  // shrinks the string to the size of the string
-
-//     void append(reference);
-//     void insert(isize i, reference);
-
-//     std::Questionable<char_type> remove(isize);
-//     std::Questionable<char_type> remove(reference);
-
-//     void clear();
-// };
 }  // namespace String
 
+
 template <>
-class String::basic<wchar_t> {
+class String::basic_string<wchar_t> {
   public:
-    basic(const char *rom_ptr);
-    basic(char *rom_ptr);
-    basic(basic<char> rom_ptr);
+    basic_string(const char *rom_ptr);
+    basic_string(char *rom_ptr);
+    basic_string(basic_string<char> rom_ptr);
 
-    basic operator=(const char *);
-    basic operator+(const char *);
-    basic operator+=(const char *);
+    basic_string operator=(const char *);
+    basic_string operator+(const char *);
+    basic_string operator+=(const char *);
 
-    basic operator=(char *);
-    basic operator+(char *);
-    basic operator+=(char *);
+    basic_string operator=(char *);
+    basic_string operator+(char *);
+    basic_string operator+=(char *);
 
-    basic operator=(basic<char>);
-    basic operator+(basic<char>);
-    basic operator+=(basic<char>);
+    basic_string operator=(basic_string<char>);
+    basic_string operator+(basic_string<char>);
+    basic_string operator+=(basic_string<char>);
 };
 
 H_STD_NAMESPACE_END
 
-// using string = String::basic<wchar_t>;
-using string = LIBCXX_NAMESPACE::string;
+using string = std::String::basic_string<wchar_t>;
 
 H_NAMESPACE_END
 #endif
