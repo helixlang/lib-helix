@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M8LITERALS
 #define _$_HX_CORE_M8LITERALS
 
-#include "../../config/config.h"
+#include <include/config/config.h>
 #include "num_data.hh"
 #include "primitives.hh"
 
@@ -115,6 +115,21 @@ constexpr f32 operator"" _f32(long double v) noexcept { return {static_cast<floa
 constexpr f64 operator"" _f64(long double v) noexcept { return {static_cast<double>(v)}; }
 
 constexpr f80 operator"" _f80(long double v) noexcept { return {v}; }
+
+constexpr usize operator"" _usize(unsigned long long v) noexcept
+    DIAGNOSE_IF(((__builtin_constant_p(v)) &&
+                     ((v > __NumData<usize::c_type>::max) || (v < __NumData<usize::c_type>::min)),
+                 "Literal value too large for usize",
+                 "warning")) {
+    return {static_cast<usize::c_type>(v)};
+}
+
+constexpr isize operator"" _isize(unsigned long long v) noexcept
+    DIAGNOSE_IF(((__builtin_constant_p(v)) && ((v < 0) || (v > __NumData<isize::c_type>::max)),
+                 "Literal value too large for u32",
+                 "warning")) {
+    return {static_cast<isize::c_type>(v)};
+}
 
 // FIXME: add llvm level support for this
 // constexpr f128 operator"" _f128(unsigned long long v) noexcept {

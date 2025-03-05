@@ -22,6 +22,7 @@
 #include "primitives.hh"
 #include "size_t.hh"
 #include "variant.hh"
+#include "bitset.hh"
 
 // ensure that the sizes are correct and match the platform
 static_assert(sizeof(helix::usize) == sizeof(void *), "usize must match the size of a pointer.");
