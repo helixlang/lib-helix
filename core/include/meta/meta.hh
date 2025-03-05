@@ -25,5 +25,6 @@
 #include "remove_reference.hh"
 #include "traits.hh"
 #include "type_properties.hh"
+#include "__interfaces/interfaces.hh"
 
 #endif  // _$_HX_CORE_M4META

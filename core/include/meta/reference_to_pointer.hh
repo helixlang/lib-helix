@@ -16,17 +16,7 @@
 #ifndef _$_HX_CORE_M20REFERENCE_TO_POINTER
 #define _$_HX_CORE_M20REFERENCE_TO_POINTER
 
-#include "../config/config.h"
-
-H_NAMESPACE_BEGIN
-H_STD_NAMESPACE_BEGIN
-
-namespace Meta {
-    
-}
-
-H_STD_NAMESPACE_END
-H_NAMESPACE_END
+#include <include/config/config.h>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

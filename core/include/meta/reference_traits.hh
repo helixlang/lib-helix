@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M16REFERENCE_TRAITS
 #define _$_HX_CORE_M16REFERENCE_TRAITS
 
-#include "../config/config.h"
+#include <include/config/config.h>
 #include "integral_constant.hh"
 #include "traits.hh"
 
@@ -80,6 +80,15 @@ namespace _types {
     template <class T>
     struct is_reference<T &&> : public true_t {};
 
+    template <class T>
+    struct is_pointer : public false_t {};
+
+    template <class T>
+    struct is_pointer<T*> : public true_t {};
+
+    template <class T>
+    struct is_pointer<T**> : public true_t {};
+
 }  // namespace _types
 
 template <typename T>
@@ -89,13 +98,16 @@ template <typename T>
 using as_lvalue_reference = typename _types::add_lvalue_reference<T>::type;
 
 template <typename T> // FIXME( add typename is msvc requires it )
-using is_lval_reference = _types::is_lvalue_reference<T>::value;
+concept is_lval_reference = _types::is_lvalue_reference<T>::value;
 
 template <typename T>
-using is_rval_reference = _types::is_rvalue_reference<T>::value;
+concept is_rval_reference = _types::is_rvalue_reference<T>::value;
 
 template <typename T>
-using is_reference = _types::is_reference<T>::value;
+concept is_reference = _types::is_reference<T>::value;
+
+template <typename T>
+concept is_pointer = _types::is_pointer<T>::value;
 
 template <typename T>
 concept is_referenceable = !Meta::same_as<decltype(_types::is_referenceable_helper::test<T>(0)), false_t>;
