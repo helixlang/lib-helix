@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M7VARIANT
 #define _$_HX_CORE_M7VARIANT
 
-#include "../../config/config.h"
+#include <include/config/config.h>
 
 H_NAMESPACE_BEGIN
 
