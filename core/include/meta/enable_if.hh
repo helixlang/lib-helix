@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M9ENABLE_IF
 #define _$_HX_CORE_M9ENABLE_IF
 
-#include "../config/config.h"
+#include <include/config/config.h>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

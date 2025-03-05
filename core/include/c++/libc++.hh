@@ -16,11 +16,7 @@
 #ifndef _$_HX_CORE_M6LIBCPP
 #define _$_HX_CORE_M6LIBCPP
 
-#include "../config/config.h"
-
-#include "windows.hh"
-#include "darwin.hh"
-#include "posix.hh"
+#include <include/config/config.h>
 
 #include <algorithm>
 #include <array>
@@ -29,6 +25,7 @@
 #include <chrono>
 #include <complex>
 #include <condition_variable>
+#include <coroutine>
 #include <deque>
 #include <exception>
 #include <fstream>
@@ -75,5 +72,9 @@
 #include <valarray>
 #include <variant>
 #include <vector>
+
+#include "darwin.hh"
+#include "posix.hh"
+#include "windows.hh"
 
 #endif  // _$_HX_CORE_M6LIBCPP
