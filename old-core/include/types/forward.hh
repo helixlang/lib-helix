@@ -17,7 +17,7 @@
 #define __$LIBHELIX_FORWARD__
 
 #include "../config.h"
-#include "../meta.h"
+#include "include/meta.h"
 #include "../primitives.h"
 
 H_NAMESPACE_BEGIN

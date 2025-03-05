@@ -39,7 +39,7 @@
 #include "../libc.h"
 #include "../libcxx.h"
 #include "../memory.h"
-#include "../meta.h"
+#include "include/meta.h"
 #include "../primitives.h"
 #include "forward.hh"
 #include "slice.hh"
