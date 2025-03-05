@@ -13,57 +13,14 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M6TRAITS
-#define _$_HX_CORE_M6TRAITS
+#ifndef _$_HX_CORE_M7RUNTIME
+#define _$_HX_CORE_M7RUNTIME
 
-#include <include/config/config.h>
-#include "integral_constant.hh"
+#include <include/runtime/__casting/as_cast.hh>
+#include <include/runtime/__panic/panic.hh>
+#include <include/runtime/__memory/memory.hh>
+#include <include/runtime/__io/io.hh>
+#include <include/runtime/__generator/generator.hh>
+#include <include/runtime/__finally/finally.hh>
 
-H_NAMESPACE_BEGIN
-H_STD_NAMESPACE_BEGIN
-
-namespace Meta {
-namespace _types {
-    template <class>
-    constexpr bool is_const_impl = false;
-
-    template <class T>
-    constexpr bool is_const_impl<const T> = true;
-}  // namespace _types
-
-template <class Up, class T>
-constexpr bool is_convertible = __is_convertible_to(Up, T);
-
-#ifdef __clang__  // clang has an intrinsic for this
-template <class T, class Up>
-constexpr bool same_as = __is_same(T, Up) && __is_same(Up, T);
-
-#else  // use a custom implementation
-template <class, class>
-constexpr bool same_as = false;
-
-template <class T>
-constexpr bool same_as<T, T> = true;
-#endif
-
-template <class Up, class T>
-concept convertible_to = is_convertible<Up, T> && requires { static_cast<T>(declval<Up>()); };
-
-template <class Up, class T>
-concept is_same_as = same_as<Up, T>;
-
-template <class T>
-concept is_const = _types::is_const_impl<T>;
-
-template <class B, class D>
-concept is_derived_of = __is_base_of(B, D);
-
-template <class T>
-concept is_class = __is_class(T);
-
-}  // namespace Meta
-
-H_STD_NAMESPACE_END
-H_NAMESPACE_END
-
-#endif  // _$_HX_CORE_M6TRAITS
+#endif  // _$_HX_CORE_M7RUNTIME
