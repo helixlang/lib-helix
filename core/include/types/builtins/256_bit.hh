@@ -16,8 +16,8 @@
 #ifndef _$_HX_CORE_M7256_BIT
 #define _$_HX_CORE_M7256_BIT
 
-#include "../../config/config.h"
-#include "bit_set.hh"
+#include <include/config/config.h>
+#include "bitset.hh"
 
 H_NAMESPACE_BEGIN
 

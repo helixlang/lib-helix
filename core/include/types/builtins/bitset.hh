@@ -13,20 +13,18 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M7BIT_SET
-#define _$_HX_CORE_M7BIT_SET
+#ifndef _$_HX_CORE_M6BITSET
+#define _$_HX_CORE_M6BITSET
 
-#include "../../c++/libc++.hh"
-#include "../../config/config.h"
-#include "../../meta/meta.hh"
+#include <include/c++/libc++.hh>
+#include <include/config/config.h>
+#include <include/runtime/__panic/panic_fwd.hh>
+#include <include/meta/meta.hh>
+
 #include "num_data.hh"
 #include "size_t.hh"
 
 H_NAMESPACE_BEGIN
-
-// Declaration of rt_panic (you must provide its implementation).
-extern void rt_panic(const char *message, const char *file, int line);
-
 // -----------------------------------------------------------------------------
 // Helper: Character-to-Integer Conversion
 // -----------------------------------------------------------------------------
@@ -71,6 +69,29 @@ struct __BitSet<T> {
     HELIX_FORCE_INLINE constexpr __BitSet(T val)
         : value(val) {}
 
+    template <typename U, typename = std::Meta::enable_if<libcxx::is_arithmetic_v<U>>>
+    HELIX_FORCE_INLINE constexpr __BitSet(const U val) noexcept
+        : value(static_cast<T>(val)) {
+        #if defined(__clang__) || defined(__GNUC__) || defined(__MINGW32__)
+            #pragma GCC diagnostic push
+            #pragma GCC diagnostic warning "-Woverflow"
+        #elif defined(_MSC_VER)
+            #pragma warning(push)
+            #pragma warning(1 : 4307) // Warning C4307: integral constant overflow
+        #endif
+
+        if (val > static_cast<U>(__NumData<T>::max) ||
+            val < static_cast<U>(__NumData<T>::min)) {
+            value = static_cast<T>(val);
+        }
+
+        #if defined(__clang__) || defined(__GNUC__) || defined(__MINGW32__)
+            #pragma GCC diagnostic pop
+        #elif defined(_MSC_VER)
+            #pragma warning(pop)
+        #endif
+    }
+
     // Total digits/bits (as defined in __NumData)
     HELIX_FORCE_INLINE static constexpr unsigned bits() noexcept { return __NumData<T>::digits; }
 
@@ -81,10 +102,11 @@ struct __BitSet<T> {
 
     // Set a specific bit.
     HELIX_FORCE_INLINE constexpr void set_bit(unsigned idx, bool b) noexcept {
-        if (b)
+        if (b) {
             value |= (T(1) << idx);
-        else
+        } else {
             value &= ~(T(1) << idx);
+        }
     }
 
     // Explicit conversion to underlying type.
@@ -98,34 +120,19 @@ struct __BitSet<T> {
     // ── Arithmetic Operators ──
     // Addition operator with compile-time diagnostic and runtime check in debug.
     HELIX_FORCE_INLINE constexpr __BitSet operator+(const __BitSet &other) const noexcept
-        DIAGNOSE_IF(((__builtin_constant_p(value) && __builtin_constant_p(other.value)) &&
-                         (__NumData<T>::is_signed
-                              ? ((other.value > 0 && value > __NumData<T>::max - other.value) ||
-                                 (other.value < 0 && value < __NumData<T>::min - other.value))
-                              : (value > __NumData<T>::max - other.value)),
-                     "Addition out of bounds",
-                     "warning")) {
+        // DIAGNOSE_IF(((__builtin_constant_p(value) && __builtin_constant_p(other.value)) &&
+        //                  (__NumData<T>::is_signed
+        //                       ? ((other.value > 0 && value > __NumData<T>::max - other.value) ||
+        //                          (other.value < 0 && value < __NumData<T>::min - other.value))
+        //                       : (value > __NumData<T>::max - other.value)),
+        //              "Addition out of bounds",
+        //              "warning"))
+        {
         T res = value + other.value;
-#if defined(H_DEBUG_M)
-        if constexpr (__NumData<T>::is_signed) {
-            if ((other.value > 0 && value > __NumData<T>::max - other.value) ||
-                (other.value < 0 && value < __NumData<T>::min - other.value)) {
-                rt_panic("panic (file: " __FILE__
-                         ", line: " /*__LINE__*/ "): Addition out of bounds",
-                         __FILE__,
-                         __LINE__);
-            }
-        } else {
-            if (value > __NumData<T>::max - other.value) {
-                rt_panic("panic (file: " __FILE__
-                         ", line: " /*__LINE__*/ "): Addition out of bounds",
-                         __FILE__,
-                         __LINE__);
-            }
-        }
-#endif
         return __BitSet(res);
     }
+
+    int some_func(const int* oj);
 
     HELIX_FORCE_INLINE constexpr __BitSet &operator+=(const __BitSet &other) noexcept {
         *this = *this + other;
@@ -160,7 +167,7 @@ struct __BitSet<T> {
         __BitSet quotient(0);
         __BitSet remainder(0);
         for (int i = bits() - 1; i >= 0; i--) {
-            remainder = remainder << 1;
+            remainder = remainder.operator<<(__BitSet(1));
             remainder.set_bit(0, get_bit(i));
             if (remainder >= other) {
                 remainder -= other;
@@ -286,7 +293,7 @@ struct __BitSet<T> {
     HELIX_FORCE_INLINE static constexpr __BitSet max_value() noexcept { return max; }
     HELIX_FORCE_INLINE static constexpr __BitSet min_value() noexcept { return min; }
     HELIX_FORCE_INLINE constexpr T               abs() const noexcept {
-        return (is_signed && (*this < __BitSet(0))) ? -(*this) : *this;
+        return is_signed ? (value < 0 ? -value : value) : value;
     }
 
     // Conversion to a narrow C-string.
@@ -415,6 +422,8 @@ struct __BitSet<T> {
     }
 };
 
+
+
 // -----------------------------------------------------------------------------
 // Composite __BitSet for Multiple Numeric Types
 // -----------------------------------------------------------------------------
@@ -426,9 +435,112 @@ struct __BitSet<__BitSet<Head>, __BitSet<Tail>...> {
     HELIX_FORCE_INLINE constexpr __BitSet()
         : head(0)
         , tail() {}
+
+    HELIX_FORCE_INLINE constexpr __BitSet(Head h)
+        : head(h)
+        , tail() {}
+
     HELIX_FORCE_INLINE constexpr __BitSet(Head h, Tail... t)
         : head(h)
         , tail(t...) {}
+
+    #define NARROWING_WARNING_PUSH \
+        _Pragma("GCC diagnostic push") \
+        _Pragma("GCC diagnostic warning \"-Wnarrowing\"") \
+        _Pragma("clang diagnostic push") \
+        _Pragma("clang diagnostic warning \"-Wnarrowing\"") \
+        _Pragma("warning(push)") \
+        _Pragma("warning(1 : 4244)") // MSVC: possible loss of data
+
+    #define NARROWING_WARNING_POP \
+        _Pragma("GCC diagnostic pop") \
+        _Pragma("clang diagnostic pop") \
+        _Pragma("warning(pop)")
+
+    // Signed conversions
+    HELIX_FORCE_INLINE constexpr explicit operator signed char() const noexcept {
+        NARROWING_WARNING_PUSH
+        signed char result = static_cast<signed char>(tail) + 
+                            (static_cast<signed char>(head) << __BitSet<Tail...>::bits());
+        NARROWING_WARNING_POP
+        return result;
+    }
+
+    HELIX_FORCE_INLINE constexpr explicit operator signed short() const noexcept {
+        NARROWING_WARNING_PUSH
+        signed short result = static_cast<signed short>(tail) + 
+                             (static_cast<signed short>(head) << __BitSet<Tail...>::bits());
+        NARROWING_WARNING_POP
+        return result;
+    }
+
+    HELIX_FORCE_INLINE constexpr explicit operator signed int() const noexcept {
+        NARROWING_WARNING_PUSH
+        signed int result = static_cast<signed int>(tail) + 
+                           (static_cast<signed int>(head) << __BitSet<Tail...>::bits());
+        NARROWING_WARNING_POP
+        return result;
+    }
+
+    HELIX_FORCE_INLINE constexpr explicit operator signed long() const noexcept {
+        NARROWING_WARNING_PUSH
+        signed long result = static_cast<signed long>(tail) + 
+                            (static_cast<signed long>(head) << __BitSet<Tail...>::bits());
+        NARROWING_WARNING_POP
+        return result;
+    }
+
+    HELIX_FORCE_INLINE constexpr explicit operator signed long long() const noexcept {
+        NARROWING_WARNING_PUSH
+        signed long long result = static_cast<signed long long>(tail) + 
+                                 (static_cast<signed long long>(head) << __BitSet<Tail...>::bits());
+        NARROWING_WARNING_POP
+        return result;
+    }
+
+    // Unsigned conversions
+    HELIX_FORCE_INLINE constexpr explicit operator unsigned char() const noexcept {
+        NARROWING_WARNING_PUSH
+        unsigned char result = static_cast<unsigned char>(tail) + 
+                              (static_cast<unsigned char>(head) << __BitSet<Tail...>::bits());
+        NARROWING_WARNING_POP
+        return result;
+    }
+
+    HELIX_FORCE_INLINE constexpr explicit operator unsigned short() const noexcept {
+        NARROWING_WARNING_PUSH
+        unsigned short result = static_cast<unsigned short>(tail) + 
+                               (static_cast<unsigned short>(head) << __BitSet<Tail...>::bits());
+        NARROWING_WARNING_POP
+        return result;
+    }
+
+    HELIX_FORCE_INLINE constexpr explicit operator unsigned int() const noexcept {
+        NARROWING_WARNING_PUSH
+        unsigned int result = static_cast<unsigned int>(tail) + 
+                             (static_cast<unsigned int>(head) << __BitSet<Tail...>::bits());
+        NARROWING_WARNING_POP
+        return result;
+    }
+
+    HELIX_FORCE_INLINE constexpr explicit operator unsigned long() const noexcept {
+        NARROWING_WARNING_PUSH
+        unsigned long result = static_cast<unsigned long>(tail) + 
+                              (static_cast<unsigned long>(head) << __BitSet<Tail...>::bits());
+        NARROWING_WARNING_POP
+        return result;
+    }
+
+    HELIX_FORCE_INLINE constexpr explicit operator unsigned long long() const noexcept {
+        NARROWING_WARNING_PUSH
+        unsigned long long result = static_cast<unsigned long long>(tail) + 
+                                   (static_cast<unsigned long long>(head) << __BitSet<Tail...>::bits());
+        NARROWING_WARNING_POP
+        return result;
+    }
+
+    #undef NARROWING_WARNING_PUSH
+    #undef NARROWING_WARNING_POP
 
     // Total bits = bits in head + bits in tail.
     HELIX_FORCE_INLINE static constexpr unsigned bits() noexcept {
@@ -441,7 +553,7 @@ struct __BitSet<__BitSet<Head>, __BitSet<Tail>...> {
         if (idx < tail_bits) {
             return tail.get_bit(idx);
         }
-        return ((head >> (idx - tail_bits)) & 1);
+        return ((head >> (idx - tail_bits)) & __BitSet(1));
     }
     HELIX_FORCE_INLINE constexpr void set_bit(unsigned idx, bool b) noexcept {
         constexpr unsigned tail_bits = __BitSet<Tail...>::bits();
@@ -462,7 +574,7 @@ struct __BitSet<__BitSet<Head>, __BitSet<Tail>...> {
         __BitSet result;
         result.tail = tail + other.tail;
         bool carry  = (result.tail < tail);
-        result.head = head + other.head + (carry ? 1 : 0);
+        result.head = head + other.head + __BitSet(carry ? 1 : 0);
         return result;
     }
     HELIX_FORCE_INLINE constexpr __BitSet &operator+=(const __BitSet &other) noexcept {
@@ -640,8 +752,8 @@ struct __BitSet<__BitSet<Head>, __BitSet<Tail>...> {
     static constexpr bool is_signed = __BitSet<Head>::is_signed;
     static constexpr bool is_radix  = __BitSet<Head>::is_radix;
 
-    HELIX_FORCE_INLINE constexpr __BitSet<Head, Tail...> abs() const noexcept {
-        return (is_signed && (*this < __BitSet(0))) ? -(*this) : *this;
+    HELIX_FORCE_INLINE constexpr __BitSet abs() const noexcept {
+        return __BitSet(head.abs(), tail.abs());
     }
 
     HELIX_FORCE_INLINE constexpr explicit operator bool() const noexcept {
@@ -768,6 +880,20 @@ struct __BitSet<__BitSet<Head>, __BitSet<Tail>...> {
         return result;
     }
 };
+
+template class __BitSet<signed char>;
+template class __BitSet<signed short>;
+template class __BitSet<signed int>;
+template class __BitSet<signed long>;
+template class __BitSet<signed long long>;
+template class __BitSet<__BitSet<signed long long>, __BitSet<signed long long>>;
+
+template class __BitSet<unsigned char>;
+template class __BitSet<unsigned short>;
+template class __BitSet<unsigned int>;
+template class __BitSet<unsigned long>;
+template class __BitSet<unsigned long long>;
+template class __BitSet<__BitSet<unsigned long long>, __BitSet<unsigned long long>>;
 
 // -----------------------------------------------------------------------------
 // Non-Member Overloads to Allow Arithmetic with Built-in Types
@@ -953,4 +1079,4 @@ HELIX_FORCE_INLINE constexpr usize cstr_length(const char *str) {
 
 H_NAMESPACE_END
 
-#endif  // _$_HX_CORE_M7BIT_SET
+#endif  // _$_HX_CORE_M6BITSET

@@ -13,15 +13,13 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M8F128_BIT
-#define _$_HX_CORE_M8F128_BIT
+#ifndef _$_HX_CORE_M5ARRAY
+#define _$_HX_CORE_M5ARRAY
 
 #include <include/config/config.h>
 
 H_NAMESPACE_BEGIN
 
-
-
 H_NAMESPACE_END
 
-#endif  // _$_HX_CORE_M8F128_BIT
+#endif  // _$_HX_CORE_M5ARRAY
