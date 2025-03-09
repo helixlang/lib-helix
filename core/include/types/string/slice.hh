@@ -28,10 +28,10 @@ H_STD_NAMESPACE_BEGIN
 
 namespace String {
 
-template <typename CharT, typename Traits = LIBCXX_NAMESPACE::char_traits<CharT>>
+template <typename CharT, typename Traits = libcxx::char_traits<CharT>>
     requires CharTraits<Traits, CharT>
 class slice {
-    using view_t = LIBCXX_NAMESPACE::basic_string_view<CharT>;
+    using view_t = libcxx::basic_string_view<CharT>;
 
     usize  length;
     view_t data{};
@@ -58,12 +58,15 @@ class slice {
     constexpr slice(view_t view) noexcept;
     constexpr slice(char_vec &vec) noexcept;
     constexpr slice(char_vec &&vec) noexcept;
-    
-    template <typename U = CharT>
-    constexpr slice(const char* str, typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>>* = nullptr) noexcept;
 
     template <typename U = CharT>
-    constexpr slice(const char* str, usize size, typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>>* = nullptr) noexcept;
+    constexpr slice(const char *str,
+                    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
+
+    template <typename U = CharT>
+    constexpr slice(const char *str,
+                    usize       size,
+                    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
     constexpr operator view_t() const noexcept { return data; }
 
