@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M8C_STRING
 
 #include <include/config/config.h>
+
 #include <include/types/builtins/builtins.hh>
 #include <include/types/question/question.hh>
 

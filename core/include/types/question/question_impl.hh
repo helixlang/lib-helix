@@ -17,7 +17,8 @@
 #define _$_HX_CORE_M13QUESTION_IMPL
 
 #include <include/config/config.h>
-#include <include/runtime/__panic/frame.hh> // THIS is the issue
+
+#include <include/runtime/__panic/frame.hh>  // THIS is the issue
 #include <include/types/builtins/primitives.hh>
 
 H_NAMESPACE_BEGIN
@@ -131,7 +132,7 @@ class $question {
 
     union $StorageT {
         mutable std::Panic::Frame error;
-        mutable T                             value;
+        mutable T                 value;
 
         constexpr $StorageT() noexcept
             : value() {}
@@ -166,19 +167,17 @@ class $question {
     constexpr $question(const std::Panic::Frame &error);
     constexpr $question(std::Panic::Frame &&error);
 
-    /// ------------------------------- Move Constructor & Assignment
-    /// -------------------------------
+    /// --------------------------- Move Constructor & Assignment ---------------------------
     constexpr $question($question &&other) noexcept;
 
     constexpr $question &operator=($question &&other) noexcept;
 
-    /// ------------------------------- Copy Constructor & Assignment
-    /// -------------------------------
+    /// -------------------------- Copy Constructor & Assignment ----------------------------
     constexpr $question(const $question &other);
     constexpr $question &operator=(const $question &other);
 
     /// ------------------------------- Destructor -------------------------------
-    constexpr ~$question() ;
+    constexpr ~$question();
 
     /// ------------------------------- Operators -------------------------------
     constexpr bool operator==(const std::null_t &) const noexcept;
