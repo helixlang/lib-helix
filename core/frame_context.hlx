@@ -1,0 +1,55 @@
+#[trivially_import(true)] // prevents wrapping IR in a `unwind` module, keeping the handler globally accessible
+
+ffi "c++" import "include/runtime/__panic/panic.hh";
+
+eval fn std::Panic::FrameContext::throw_object(error: unsafe *std::TypeErasure) requires <T> {
+    if error == (&null) {
+        std::crash(std::errors::RuntimeError("Tried to crash with a null object."));
+    }
+
+    if error->type_info() != (&typeid(T)) {
+        std::crash(std::errors::TypeMismatchError("Type mismatch when crashing."));
+    }
+
+    let object: unsafe *T = (**error) as *T;
+    std::crash(*object);
+}
+
+const fn std::Panic::FrameContext::object() -> unsafe *void {
+    return (**self.error) if (self.error != (&null)) else (&null);
+}
+
+fn std::Panic::FrameContext::crash() {
+    self.handler(self.error);
+    std::crash(std::errors::RuntimeError("Object \'" + string(self.error->type_info()->name()) + "\' failed to panic."));
+}
+
+
+const fn std::Panic::FrameContext::type_name() -> string {
+    if (self.error == (&null)) {
+        return "null";
+    }
+
+    const eval if defined(_MSC_VER) {
+        return self.error->type_info()->name();
+    } else {
+        const mangled_name: unsafe *char = self.error->type_info()->name();
+
+        if (mangled_name == (&null)) || ((*mangled_name) == 0) {
+            return string();
+        }
+
+        let status: i32 = 0;
+
+        // __cxa_demangle returns a malloc-allocated string
+        let demangle: unsafe *char = libc::abi::__cxa_demangle(mangled_name, (&null), (&null), (&status));
+        if status == 0 && (demangle != (&null)) {
+            let result: string = demangle;
+        
+            free(demangle);
+            return result;
+        }
+        
+        return mangled_name;
+    }
+}
