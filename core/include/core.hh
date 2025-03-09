@@ -22,5 +22,4 @@
 #include <include/runtime/runtime.hh>
 #include <include/types/types.hh>
 
-
 #endif  // _$_HX_CORE_M4CORE
