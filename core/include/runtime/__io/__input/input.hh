@@ -13,15 +13,19 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M4UNIX
-#define _$_HX_CORE_M4UNIX
+#ifndef _$_HX_CORE_M5INPUT
+#define _$_HX_CORE_M5INPUT
 
-#if defined(__linux__) || defined(__APPLE__)
-#   include <pthread.h>
-#   include <sys/mman.h>
-#   include <sys/resource.h>
-#   include <unistd.h>
-#   include <cxxabi.h>
-#endif
+#include <include/config/config.h>
+#include <include/runtime/__memory/memory.hh>
+#include <include/meta/meta.hh>
 
-#endif  // _$_HX_CORE_M4UNIX
+H_NAMESPACE_BEGIN
+H_STD_NAMESPACE_BEGIN
+
+
+
+H_STD_NAMESPACE_END
+H_NAMESPACE_END
+
+#endif  // _$_HX_CORE_M5INPUT

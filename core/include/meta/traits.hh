@@ -17,7 +17,6 @@
 #define _$_HX_CORE_M6TRAITS
 
 #include <include/config/config.h>
-#include "integral_constant.hh"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

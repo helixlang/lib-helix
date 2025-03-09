@@ -18,11 +18,8 @@
 
 #include <include/config/config.h>
 
-H_NAMESPACE_BEGIN
-H_STD_NAMESPACE_BEGIN
-
-
-H_STD_NAMESPACE_END
-H_NAMESPACE_END
+#include <include/runtime/__io/__print/print.hh>
+#include <include/runtime/__io/__print/endl.hh>
+#include <include/runtime/__io/__print/stringf.hh>
 
 #endif  // _$_HX_CORE_M2IO
