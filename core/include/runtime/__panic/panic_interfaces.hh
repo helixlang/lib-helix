@@ -40,7 +40,7 @@ namespace Panic {
 /// ### Related
 /// - See the full definition of `Panic::Frame` for detailed documentation.
 /// - Used in conjunction with `Panicking` interfaces and
-/// `_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv`.
+/// `HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv`.
 class Frame;
 
 namespace Interface {

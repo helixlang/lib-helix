@@ -27,11 +27,11 @@ namespace Panic {
 
 H_STD_NAMESPACE_END
 
-/// \fn _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv
+/// \fn HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv
 ///
 /// \brief Handles panic events triggered during runtime.
 ///
-/// \details The `_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv` function is
+/// \details The `HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv` function is
 ///          invoked when a panic is triggered. It performs necessary operations, such as invoking
 ///          registered panic hooks or logging the error context.
 ///
@@ -69,11 +69,9 @@ H_STD_NAMESPACE_END
 /// // Add the following directive to the main file of your Helix program:
 /// //     the passed parameter can be any function pointer that satisfies the signature:
 /// //     fn (*std::Panic::Frame) -> void
-/// #[panic(&_HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv)]
+/// #[panic(&HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv)]
 /// \endcode
-extern "C" [[noreturn]] void _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv // NOLINT(bugprone-reserved-identifier)
-                      ( const std::Panic::Frame * /* f */ );
-
+void (*HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv) ( const std::Panic::Frame * /* f */ );
 H_NAMESPACE_END
 
 #endif  // _$_HX_CORE_M9PANIC_FWD
