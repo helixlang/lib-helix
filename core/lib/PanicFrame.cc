@@ -40,7 +40,7 @@ constexpr Frame::Frame(T obj, string filename, usize lineno)
 [[noreturn]] Frame::Frame(Frame &&obj, const string &, usize) { obj.operator$panic(); }
 
 void Frame::operator$panic() const {
-    _HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(this);
+    HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(this);
 }
 
 }  // namespace Panic
