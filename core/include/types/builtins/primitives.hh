@@ -17,7 +17,7 @@
 #define _$_HX_CORE_M10PRIMITIVES
 
 #include <include/config/config.h>
-#include "bitset.hh"
+#include <include/types/builtins/bitset.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

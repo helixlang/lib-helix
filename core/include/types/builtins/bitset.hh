@@ -19,7 +19,8 @@
 #include <include/c++/libc++.hh>
 #include <include/config/config.h>
 #include <include/runtime/__panic/panic_fwd.hh>
-#include <include/meta/meta.hh>
+#include <include/meta/traits.hh>
+#include <include/meta/enable_if.hh>
 
 #include "num_data.hh"
 #include "size_t.hh"
