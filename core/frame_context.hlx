@@ -1,14 +1,29 @@
-#[trivially_import(true)] // prevents wrapping IR in a `unwind` module, keeping the handler globally accessible
+///--- The Helix Project ------------------------------------------------------------------------///
+///                                                                                              ///
+///   Part of the Helix Project, under the Attribution 4.0 International license (CC BY 4.0).    ///
+///   You are allowed to use, modify, redistribute, and create derivative works, even for        ///
+///   commercial purposes, provided that you give appropriate credit, and indicate if changes    ///
+///   were made.                                                                                 ///
+///                                                                                              ///
+///   For more information on the license terms and requirements, please visit:                  ///
+///     https://creativecommons.org/licenses/by/4.0/                                             ///
+///                                                                                              ///
+///   SPDX-License-Identifier: CC-BY-4.0                                                         ///
+///   Copyright (c) 2024 The Helix Project (CC BY 4.0)                                           ///
+///                                                                                              ///
+///-------------------------------------------------------------------------------- Lib-Helix ---///
+
+#[trivially_import(true)]
 
 ffi "c++" import "include/runtime/__panic/panic.hh";
 
 eval fn std::Panic::FrameContext::throw_object(error: unsafe *std::TypeErasure) requires <T> {
     if error == (&null) {
-        std::crash(std::errors::RuntimeError("Tried to crash with a null object."));
+        std::crash(std::Error::RuntimeError("Tried to crash with a null object."));
     }
 
     if error->type_info() != (&typeid(T)) {
-        std::crash(std::errors::TypeMismatchError("Type mismatch when crashing."));
+        std::crash(std::Error::TypeMismatchError("Type mismatch when crashing."));
     }
 
     let object: unsafe *T = (**error) as *T;
@@ -21,7 +36,7 @@ const fn std::Panic::FrameContext::object() -> unsafe *void {
 
 fn std::Panic::FrameContext::crash() {
     self.handler(self.error);
-    std::crash(std::errors::RuntimeError("Object \'" + string(self.error->type_info()->name()) + "\' failed to panic."));
+    std::crash(std::Error::RuntimeError("Object \'" + string(self.error->type_info()->name()) + "\' failed to panic."));
 }
 
 
@@ -33,7 +48,7 @@ const fn std::Panic::FrameContext::type_name() -> string {
     const eval if defined(_MSC_VER) {
         return self.error->type_info()->name();
     } else {
-        const mangled_name: unsafe *char = self.error->type_info()->name();
+        const mangled_name: unsafe *std::Legacy::char = self.error->type_info()->name();
 
         if (mangled_name == (&null)) || ((*mangled_name) == 0) {
             return string();
@@ -42,14 +57,14 @@ const fn std::Panic::FrameContext::type_name() -> string {
         let status: i32 = 0;
 
         // __cxa_demangle returns a malloc-allocated string
-        let demangle: unsafe *char = libc::abi::__cxa_demangle(mangled_name, (&null), (&null), (&status));
+        let demangle: unsafe *std::Legacy::char = __cxxabiv1::__cxa_demangle(mangled_name, (&null), (&null), (&status));
         if status == 0 && (demangle != (&null)) {
-            let result: string = demangle;
+            let result: string = sstring_to_string(demangle);
         
             free(demangle);
             return result;
         }
         
-        return mangled_name;
+        return sstring_to_string(mangled_name);
     }
 }

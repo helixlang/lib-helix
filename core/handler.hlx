@@ -1,3 +1,18 @@
+///--- The Helix Project ------------------------------------------------------------------------///
+///                                                                                              ///
+///   Part of the Helix Project, under the Attribution 4.0 International license (CC BY 4.0).    ///
+///   You are allowed to use, modify, redistribute, and create derivative works, even for        ///
+///   commercial purposes, provided that you give appropriate credit, and indicate if changes    ///
+///   were made.                                                                                 ///
+///                                                                                              ///
+///   For more information on the license terms and requirements, please visit:                  ///
+///     https://creativecommons.org/licenses/by/4.0/                                             ///
+///                                                                                              ///
+///   SPDX-License-Identifier: CC-BY-4.0                                                         ///
+///   Copyright (c) 2024 The Helix Project (CC BY 4.0)                                           ///
+///                                                                                              ///
+///-------------------------------------------------------------------------------- Lib-Helix ---///
+
 #[trivially_import(true)] // prevents wrapping IR in a `handler` module, keeping the handler globally accessible
 
 /// \file
@@ -53,27 +68,27 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     let open_file = fn (file_path: string) -> i32 {
         const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
             let fd: i32 = -1;
-            let err: errno_t = libcxx::_sopen_s(&fd, file_path.c_str(), O_RDONLY, _SH_DENYNO, 0);
+            let err: errno_t = _sopen_s(&fd, std::string_to_sstring(file_path).raw(), O_RDONLY, _SH_DENYNO, 0);
             
             return -1 if err != 0 else fd;
         } else {
-            return libcxx::open(file_path.c_str(), O_RDONLY);
+            return open(std::string_to_sstring(file_path).raw(), O_RDONLY);
         }
     };
 
     let close_file = fn (fd: i32) {
         const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
-            libcxx::_close(fd);
+            _close(fd);
         } else {
-            libcxx::close(fd);
+            close(fd);
         }
     };
 
     let read_file = fn (fd: i32, buffer: *char, size: u32) -> isize {
         const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
-            return libcxx::_read(fd, buffer, size);
+            return _read(fd, buffer, size);
         } else {
-            return libcxx::read(fd, buffer, size);
+            return read(fd, buffer, size);
         }
     };
 

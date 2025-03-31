@@ -1,19 +1,17 @@
-#[trivially_import(true)] // prevents wrapping IR in a `panic_handler` module, keeping the handler globally accessible
-
-///=== The Helix Project ========================================================================///
+///--- The Helix Project ------------------------------------------------------------------------///
 ///                                                                                              ///
-///   Part of the Helix Project, licensed under the Attribution 4.0 International License (CC    ///
-///   BY 4.0). This license allows you to use, modify, redistribute, and create derivative       ///
-///   works, even for commercial purposes, as long as proper credit is given, and modifications  ///
-///   are clearly indicated.                                                                     ///
+///   Part of the Helix Project, under the Attribution 4.0 International license (CC BY 4.0).    ///
+///   You are allowed to use, modify, redistribute, and create derivative works, even for        ///
+///   commercial purposes, provided that you give appropriate credit, and indicate if changes    ///
+///   were made.                                                                                 ///
 ///                                                                                              ///
-///   License details:                                                                           ///
-///   https://creativecommons.org/licenses/by/4.0/                                               ///
+///   For more information on the license terms and requirements, please visit:                  ///
+///     https://creativecommons.org/licenses/by/4.0/                                             ///
 ///                                                                                              ///
 ///   SPDX-License-Identifier: CC-BY-4.0                                                         ///
-///   Copyright (c) 2024 The Helix Project                                                       ///
+///   Copyright (c) 2024 The Helix Project (CC BY 4.0)                                           ///
 ///                                                                                              ///
-///==================================================================================== Helix ===///
+///-------------------------------------------------------------------------------- Lib-Helix ---///
 ///                                                                                              ///
 ///   This file (`core.hlx`) serves as the primary entry point for globally exported definitions ///
 ///   in the Helix runtime. All functions and symbols defined here exist in the global scope,    ///
@@ -34,6 +32,8 @@
 ///       the compilation process.                                                               ///
 ///                                                                                              ///
 ///==============================================================================================///
+
+#[trivially_import(true)]
 
 import range::*;
 import frame_context::*;
