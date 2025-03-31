@@ -53,26 +53,26 @@ class slice {
     constexpr slice() noexcept                   = default;
     constexpr slice(const slice &other) noexcept = default;
     constexpr slice(slice &&other) noexcept      = default;
-    constexpr slice(const CharT *str) noexcept;
-    constexpr slice(const CharT *str, size_t size) noexcept;
-    constexpr slice(view_t view) noexcept;
-    constexpr slice(char_vec &vec) noexcept;
-    constexpr slice(char_vec &&vec) noexcept;
+    slice(const CharT *str) noexcept;
+    slice(const CharT *str, size_t size) noexcept;
+    slice(view_t view) noexcept;
+    slice(char_vec &vec) noexcept;
+    slice(char_vec &&vec) noexcept;
 
     template <typename U = CharT>
-    constexpr slice(const char *str,
+    slice(const char *str,
                     typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
     template <typename U = CharT>
-    constexpr slice(const char *str,
+    slice(const char *str,
                     usize       size,
                     typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
     constexpr operator view_t() const noexcept { return data; }
 
-    constexpr void exchange(slice &other) noexcept;
-    constexpr void replace(slice &other) noexcept;
-    constexpr void replace(CharT *str, usize size) noexcept;
+    void exchange(slice &other) noexcept;
+    void replace(slice &other) noexcept;
+    void replace(CharT *str, usize size) noexcept;
 
     [[nodiscard("raw() returns a pointer to the slice's underlying data, essential for direct "
                 "access; ignoring it may discard critical information")]]
@@ -86,17 +86,17 @@ class slice {
     }
     [[nodiscard("subslice() creates a view into a portion of the slice, vital for safe substring "
                 "operations; ignoring it wastes the result")]]
-    constexpr slice subslice(usize pos, usize len) const noexcept;
+    slice subslice(usize pos, usize len) const noexcept;
 
-    constexpr slice l_strip(char_vec &delim = {' ', '\t', '\n', '\r'}) const;
-    constexpr slice r_strip(char_vec &delim = {' ', '\t', '\n', '\r'}) const;
-    constexpr slice strip(char_vec &delim = {' ', '\t', '\n', '\r'}) const;
+    slice l_strip(char_vec &delim = {' ', '\t', '\n', '\r'}) const;
+    slice r_strip(char_vec &delim = {' ', '\t', '\n', '\r'}) const;
+    slice strip(char_vec &delim = {' ', '\t', '\n', '\r'}) const;
 
-    constexpr bool starts_with(slice &needle) const;
-    constexpr bool ends_with(slice &needle) const;
+    bool starts_with(slice &needle) const;
+    bool ends_with(slice &needle) const;
 
-    constexpr bool contains(slice &needle) const;
-    constexpr bool contains(wchar_t &chr) const;
+    bool contains(slice &needle) const;
+    bool contains(wchar_t &chr) const;
 
     bool operator==(const slice &other) const noexcept { return data == other.data; }
     bool operator!=(const slice &other) const noexcept { return data != other.data; }
@@ -108,7 +108,7 @@ class slice {
     constexpr bool operator$contains(slice &needle) const { return contains(needle); }
     constexpr bool operator$contains(wchar_t &chr) const { return contains(chr); }
 
-    constexpr isize compare(slice &other) const noexcept;
+    isize compare(slice &other) const noexcept;
 
     [[nodiscard("split_lines() returns a vector of line views, necessary for line-based "
                 "processing; discarding it neglects the parsed structure")]]

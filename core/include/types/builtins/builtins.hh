@@ -16,16 +16,13 @@
 #ifndef _$_HX_CORE_M8BUILTINS
 #define _$_HX_CORE_M8BUILTINS
 
-#include "256_bit.hh"
-#include "f128_bit.hh"
 #include "literals.hh"
 #include "primitives.hh"
 #include "size_t.hh"
 #include "variant.hh"
-#include "bitset.hh"
 
 // ensure that the sizes are correct and match the platform
-static_assert(sizeof(helix::usize) == sizeof(void *), "usize must match the size of a pointer.");
-static_assert(sizeof(helix::isize) == sizeof(void *), "isize must match the size of a pointer.");
+static_assert(sizeof(usize) == sizeof(void *), "usize must match the size of a pointer.");
+static_assert(sizeof(isize) == sizeof(void *), "isize must match the size of a pointer.");
 
 #endif  // _$_HX_CORE_M8BUILTINS
