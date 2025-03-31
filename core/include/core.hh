@@ -22,4 +22,15 @@
 #include <include/runtime/runtime.hh>
 #include <include/types/types.hh>
 
+// ----- implementation of the core library ----- //
+#include <include/source/Casting.tpp>
+#include <include/source/Finally.tpp>
+#include <include/source/i128.tpp>
+#include <include/source/PanicFrame.tpp>
+#include <include/source/PanicFrameContext.tpp>
+#include <include/source/Questionable.tpp>
+#include <include/source/Slice.tpp>
+#include <include/source/String.tpp>
+#include <include/source/u128.tpp>
+
 #endif  // _$_HX_CORE_M4CORE

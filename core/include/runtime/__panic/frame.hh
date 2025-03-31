@@ -119,17 +119,17 @@ class Frame {
 
     template <typename T>
         requires std ::Interface ::ClassType<T>
-    constexpr void initialize(const T *obj);
+    void initialize(const T *obj);
 
   public:
     template <typename T>
-    constexpr Frame(T obj, const char *filename, usize lineno);
+    Frame(T obj, const char *filename, usize lineno);
 
     template <typename T>
-    constexpr Frame(T obj, string filename, usize lineno);
+    Frame(T obj, string filename, usize lineno);
 
     constexpr Frame()  = delete;
-    constexpr ~Frame() = default;
+    ~Frame() = default;
 
     constexpr Frame(const Frame &)            = delete;
     constexpr Frame &operator=(const Frame &) = delete;
@@ -140,10 +140,10 @@ class Frame {
     [[noreturn]] Frame(Frame &obj, const string &, usize);
     [[noreturn]] Frame(Frame &&obj, const string &, usize);
 
-    [[nodiscard]] constexpr string        file() const;
-    [[nodiscard]] constexpr usize         line() const;
-    [[nodiscard]] constexpr string        reason() const;
-    [[nodiscard]] constexpr FrameContext *get_context() const;
+    [[nodiscard]] string        file() const;
+    [[nodiscard]] usize         line() const;
+    [[nodiscard]] string        reason() const;
+    [[nodiscard]] FrameContext *get_context() const;
 
     [[noreturn]] void operator$panic() const;
 };

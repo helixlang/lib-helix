@@ -21,9 +21,9 @@
 #include <include/runtime/__panic/panic_fwd.hh>
 #include <include/meta/traits.hh>
 #include <include/meta/enable_if.hh>
-
-#include "num_data.hh"
-#include "size_t.hh"
+#include <include/types/builtins/size_t.hh>
+#include <include/types/builtins/primitives.hh>
+#include <include/types/builtins/num_data.hh>
 
 H_NAMESPACE_BEGIN
 // -----------------------------------------------------------------------------
@@ -907,8 +907,8 @@ HELIX_FORCE_INLINE constexpr __BitSet<T> operator+(const __BitSet<T> &lhs, U rhs
                      (__NumData<T>::is_signed ? ((lhs > 0 && rhs > __NumData<T>::max - lhs) ||
                                                  (lhs < 0 && rhs < __NumData<T>::min - lhs))
                                               : (rhs > __NumData<T>::max - lhs)),
-                 "Addition out of bounds",
-                 "warning")) {
+                 L"Addition out of bounds",
+                 L"warning")) {
     return lhs + __BitSet<T>(static_cast<T>(rhs));
 }
 

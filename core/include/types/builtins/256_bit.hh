@@ -21,9 +21,6 @@
 
 H_NAMESPACE_BEGIN
 
-using u256 = __BitSet<u64, u64, u64, u64>;
-using i256 = __BitSet<i64, i64, i64, i64>;
-
 // constexpr u256 operator"" _u256(const char* str, unsigned long len) noexcept {
 //     return u256::from_cstr(str, len);
 // }
