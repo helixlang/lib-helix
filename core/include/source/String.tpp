@@ -13,16 +13,25 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#include <include/config/config.h>
+#ifndef _$_HX_CORE_M6STRING
+#define _$_HX_CORE_M6STRING
 
-#include <include/core.hh>
+#include <include/config/config.h>
+#include <include/c++/libc++.hh>
+#include <include/meta/meta.hh>
+#include <include/runtime/runtime.hh>
+#include <include/types/types.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
-constexpr usize log2_sizeof_wchar_t = static_cast<usize::c_type>(sizeof(wchar_t) > 1) +
-                                      static_cast<usize::c_type>(sizeof(wchar_t) > 2) +
-                                      static_cast<usize::c_type>(sizeof(wchar_t) > 4);
+namespace String::__internal {
+    namespace {
+        constexpr static usize log2_sizeof_wchar_t = static_cast<usize>(sizeof(wchar_t) > 1) +
+                                                     static_cast<usize>(sizeof(wchar_t) > 2) +
+                                                     static_cast<usize>(sizeof(wchar_t) > 4);
+    }
+}  // namespace String::__internal
 
 namespace String {
 template <typename CharT, typename Traits>
@@ -63,6 +72,13 @@ inline basic<CharT, Traits> &basic<CharT, Traits>::operator+=(const CharT *str) 
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
+inline basic<CharT, Traits> &basic<CharT, Traits>::operator+=(const CharT chr) noexcept {
+    data += chr;
+    return *this;
+}
+
+template <typename CharT, typename Traits>
+    requires CharTraits<Traits, CharT>
 inline basic<CharT, Traits> &basic<CharT, Traits>::operator+=(const slice_t &s) noexcept {
     data.append(s.raw(), s.size());
     return *this;
@@ -86,6 +102,14 @@ inline basic<CharT, Traits> basic<CharT, Traits>::operator+(const CharT *str) co
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
+inline basic<CharT, Traits> basic<CharT, Traits>::operator+(const CharT chr) const {
+    basic result = *this;
+    result += chr;
+    return result;
+}
+
+template <typename CharT, typename Traits>
+    requires CharTraits<Traits, CharT>
 inline basic<CharT, Traits> basic<CharT, Traits>::operator+(const slice_t &s) const {
     basic result = *this;
     result += s;
@@ -95,14 +119,14 @@ inline basic<CharT, Traits> basic<CharT, Traits>::operator+(const slice_t &s) co
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 template <typename U>
-constexpr basic<CharT, Traits>::basic(
+basic<CharT, Traits>::basic(
     const char *str,
-    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> *) noexcept {
+    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept {
     usize    size = LIBCXX_NAMESPACE::char_traits<char>::length(str);
-    wchar_t *buff = static_cast<wchar_t *>(alloca((size + 1) << log2_sizeof_wchar_t));
+    auto *buff = static_cast<wchar_t *>(alloca((size + 1) << String::__internal::log2_sizeof_wchar_t));
 
     try {
-        for (usize::c_type i = 0; i < size; ++i) {
+        for (usize i = 0; i < size; ++i) {
             buff[i] = static_cast<wchar_t>(static_cast<unsigned char>(str[i]));
         }
         data = buff;
@@ -112,14 +136,14 @@ constexpr basic<CharT, Traits>::basic(
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 template <typename U>
-constexpr basic<CharT, Traits>::basic(
+basic<CharT, Traits>::basic(
     const char *str,
     usize       size,
     typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> *) noexcept {
-    wchar_t *buff = static_cast<wchar_t *>(alloca((size) << log2_sizeof_wchar_t));
+    auto *buff = static_cast<wchar_t *>(alloca((size) << String::__internal::log2_sizeof_wchar_t));
 
     try {
-        for (usize::c_type i = 0; i < size; ++i) {
+        for (usize i = 0; i < size; ++i) {
             buff[i] = static_cast<wchar_t>(static_cast<unsigned char>(str[i]));
         }
         data = buff;
@@ -130,7 +154,7 @@ template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline basic<CharT, Traits> basic<CharT, Traits>::subslice(size_t pos, size_t len) const noexcept {
     return basic(
-        data.substr(static_cast<size_t::c_type>(pos), static_cast<size_t::c_type>(len)).c_str());
+        data.substr(static_cast<size_t>(pos), static_cast<size_t>(len)).c_str());
 }
 
 template <typename CharT, typename Traits>
@@ -311,3 +335,5 @@ template class basic<wchar_t>;
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
+
+#endif  // _$_HX_CORE_M6STRING
