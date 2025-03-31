@@ -26,13 +26,13 @@
 H_NAMESPACE_BEGIN
 
 template <typename... Args>
-inline constexpr void print(Args &&...t) {
+constexpr void print(Args &&...t) {
     if constexpr (sizeof...(t) == 0) {
-        printf("\n");
+        wprintf(L"\n");
         return;
     }
 
-    ((printf("%s", std::to_string(std::Memory::forward<Args>(t)).c_str())), ...);
+    ((wprintf(L"%s", std::to_string(std::Memory::forward<Args>(t)).raw())), ...);
 
     if constexpr (sizeof...(t) > 0) {
         if constexpr (!std::Meta::same_as<
@@ -40,7 +40,7 @@ inline constexpr void print(Args &&...t) {
                               decltype(LIBCXX_NAMESPACE::get<sizeof...(t) - 1>(
                                   tuple<Args...>(t...)))>>,
                           std::endl>) {
-            printf("\n");
+            wprintf(L"\n");
         }
     }
 }

@@ -36,14 +36,14 @@ class endl {
     explicit endl(string end)
         : end_l(std::Memory::move(end)) {}
 
-    explicit endl(const char *end)
-        : end_l((end != nullptr) ? end : "\n") {}
+    explicit endl(const wchar_t *end)
+        : end_l((end != nullptr) ? end : L"\n") {}
 
-    explicit endl(char end)
+    explicit endl(wchar_t end)
         : end_l(end, 1) {}
 
   private:
-    string end_l = "\n";
+    string end_l = L"\n";
 };
 
 H_STD_NAMESPACE_END

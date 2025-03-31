@@ -27,7 +27,7 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 namespace Memory {
-enum class AddressType : u8::c_type {
+enum class AddressType : u8 {
     ROTData,  // (.rodata)
     Stack,    // (stack)
     Heap,     // (heap)

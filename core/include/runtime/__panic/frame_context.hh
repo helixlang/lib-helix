@@ -82,25 +82,25 @@ class FrameContext {
     $function<void(std::TypeErasure *)> handler;  ///< The panic handler.
 
     template <typename T>
-    [[noreturn]] constexpr static void throw_object(std::TypeErasure *);
+    [[noreturn]] static constexpr void throw_object(std::TypeErasure *);
 
   public:
-    constexpr FrameContext();
-    constexpr FrameContext(const FrameContext &other);
-    constexpr FrameContext &operator=(const FrameContext &other);
-    constexpr FrameContext(FrameContext &&other) noexcept;
-    constexpr FrameContext &operator=(FrameContext &&other) noexcept;
-    constexpr ~FrameContext();
+    FrameContext();
+    FrameContext(const FrameContext &other);
+    FrameContext &operator=(const FrameContext &other);
+    FrameContext(FrameContext &&other) noexcept;
+    FrameContext &operator=(FrameContext &&other) noexcept;
+    ~FrameContext();
 
     template <typename T>
-    constexpr explicit FrameContext(T *obj);
+    explicit FrameContext(T *obj);
 
-    [[noreturn]] void    crash();
-    [[nodiscard]] void  *object() const;
-    [[nodiscard]] string type_name() const;
+    [[noreturn]]  void    crash();
+    [[nodiscard]] void   *object() const;
+    [[nodiscard]] string  type_name() const;
 
-    constexpr bool operator!=(const libcxx::type_info *rhs) const;
-    constexpr bool operator==(const libcxx::type_info *rhs) const;
+    bool operator!=(const libcxx::type_info *rhs) const;
+    bool operator==(const libcxx::type_info *rhs) const;
 };
 };  // namespace Panic
 
