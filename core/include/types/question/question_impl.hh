@@ -136,73 +136,73 @@ class $question {
 
         constexpr $StorageT() noexcept
             : value() {}
-        constexpr ~$StorageT() noexcept {}
+        ~$StorageT() noexcept {}
     };
 
     mutable $State state = $State::Null;
     $StorageT      data;
 
-    [[nodiscard]] constexpr bool is_null() const noexcept;
-    [[nodiscard]] constexpr bool is_err() const noexcept;
-    [[nodiscard]] constexpr bool is_err(const libcxx::type_info *type) const noexcept;
+    [[nodiscard]] bool is_null() const noexcept;
+    [[nodiscard]] bool is_err() const noexcept;
+    [[nodiscard]] bool is_err(const libcxx::type_info *type) const noexcept;
 
-    constexpr void set_value(const T &value);
-    constexpr void set_value(T &&value);
-    constexpr void set_err(std::Panic::Frame &&error);
+    void set_value(const T &value);
+    void set_value(T &&value);
+    void set_err(std::Panic::Frame &&error);
 
-    constexpr void delete_error() noexcept;
-    constexpr void delete_value() noexcept;
+    void delete_error() noexcept;
+    void delete_value() noexcept;
 
   public:
     /// ------------------------------- Constructors (Null) -------------------------------
-    constexpr $question() noexcept;
-    constexpr $question(const std::null_t &) noexcept;
-    constexpr $question(std::null_t &&) noexcept;
+    $question() noexcept;
+    $question(const std::null_t &) noexcept;
+    $question(std::null_t &&) noexcept;
 
     /// ------------------------------- Constructors (Value) -------------------------------
-    constexpr $question(const T &value);
-    constexpr $question(T &&value);
+    $question(const T &value);
+    $question(T &&value);
 
     /// ------------------------------- Constructors (Error) -------------------------------
-    constexpr $question(const std::Panic::Frame &error);
-    constexpr $question(std::Panic::Frame &&error);
+    $question(const std::Panic::Frame &error);
+    $question(std::Panic::Frame &&error);
 
     /// --------------------------- Move Constructor & Assignment ---------------------------
-    constexpr $question($question &&other) noexcept;
+    $question($question &&other) noexcept;
 
-    constexpr $question &operator=($question &&other) noexcept;
+    $question &operator=($question &&other) noexcept;
 
     /// -------------------------- Copy Constructor & Assignment ----------------------------
-    constexpr $question(const $question &other);
-    constexpr $question &operator=(const $question &other);
+    $question(const $question &other);
+    $question &operator=(const $question &other);
 
     /// ------------------------------- Destructor -------------------------------
-    constexpr ~$question();
+    ~$question();
 
     /// ------------------------------- Operators -------------------------------
-    constexpr bool operator==(const std::null_t &) const noexcept;
-    constexpr bool operator!=(const std::null_t &) const noexcept;
+    bool operator==(const std::null_t &) const noexcept;
+    bool operator!=(const std::null_t &) const noexcept;
 
     template <typename E>
-    constexpr bool operator==(const E &) const noexcept;
+    bool operator==(const E &) const noexcept;
 
     template <typename E>
-    constexpr bool operator!=(const E &other) const noexcept;
+    bool operator!=(const E &other) const noexcept;
 
     template <typename E>
-    constexpr bool operator$contains(const E &other) const noexcept;
+    bool operator$contains(const E &other) const noexcept;
 
-    [[nodiscard]] constexpr bool operator$question() const noexcept;
+    [[nodiscard]] bool operator$question() const noexcept;
 
     /// ------------------------------- Casting -------------------------------
     template <typename E>
         requires std::Panic::Interface::Panicking<E>
-    constexpr E operator$cast(E * /*unused*/) const;
+    E operator$cast(E * /*unused*/) const;
 
-    constexpr T operator$cast(T * /*unused*/) const;
+    T operator$cast(T * /*unused*/) const;
 
-    [[nodiscard]] constexpr T &operator*();
-    [[nodiscard]] constexpr    operator T();
+    [[nodiscard]] T &operator*();
+    [[nodiscard]]    operator T();
 };
 
 H_NAMESPACE_END

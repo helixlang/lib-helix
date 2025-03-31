@@ -70,11 +70,11 @@ class basic {
         : data(s.raw(), s.size()) {}
 
     template <typename U = CharT>
-    constexpr basic(const char *str,
+    explicit basic(const char *str,
                     typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
     template <typename U = CharT>
-    constexpr basic(const char *str,
+    basic(const char *str,
                     usize       size,
                     typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
@@ -85,9 +85,9 @@ class basic {
     basic &operator=(const slice_t &s) noexcept;
 
     // Access Operators
-    CharT &operator[](size_t index) noexcept { return data[static_cast<size_t::c_type>(index)]; }
+    CharT &operator[](size_t index) noexcept { return data[static_cast<size_t>(index)]; }
     const CharT &operator[](size_t index) const noexcept {
-        return data[static_cast<size_t::c_type>(index)];
+        return data[static_cast<size_t>(index)];
     }
 
     // Mutable Methods
@@ -97,20 +97,22 @@ class basic {
     void append(const slice_t &s) noexcept { data.append(s.raw(), s.size()); }
     void clear() noexcept { data.clear(); }
     void replace(size_t pos, size_t len, const slice_t &other) noexcept {
-        data.replace(static_cast<size_t::c_type>(pos),
-                     static_cast<size_t::c_type>(len),
+        data.replace(static_cast<size_t>(pos),
+                     static_cast<size_t>(len),
                      libcxx::basic_string_view<CharT>(other));
     }
     void resize(size_t new_size, CharT c = CharT()) noexcept {
-        data.resize(static_cast<size_t::c_type>(new_size), c);
+        data.resize(static_cast<size_t>(new_size), c);
     }
 
     // Concatenation Operators
     basic &operator+=(const basic &other) noexcept;
     basic &operator+=(const CharT *str) noexcept;
+    basic &operator+=(const CharT str) noexcept;
     basic &operator+=(const slice_t &s) noexcept;
     basic  operator+(const basic &other) const;
     basic  operator+(const CharT *str) const;
+    basic  operator+(const CharT str) const;
     basic  operator+(const slice_t &s) const;
 
     // Comparison Operators
@@ -167,8 +169,8 @@ class basic {
 
 H_STD_NAMESPACE_END
 
-using short_string = std::String::basic<char>;
-using string       = std::String::basic<wchar_t>;
+using sstring = std::String::basic<char>;
+using string  = std::String::basic<wchar_t>;
 
 H_NAMESPACE_END
 
