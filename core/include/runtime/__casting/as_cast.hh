@@ -85,7 +85,7 @@ H_STD_NAMESPACE_BEGIN
 /// \param value The value to be cast.
 /// \return The value cast to the target type.
 template <typename Ty, typename Up>
-constexpr Ty as_cast(Up &value);
+Ty as_cast(Up &value);
 
 /// Performs a cast from type `Up` to type `Ty`, selecting the most appropriate casting mechanism.
 /// \tparam Ty The target type.
@@ -93,7 +93,7 @@ constexpr Ty as_cast(Up &value);
 /// \param value The value to be cast.
 /// \return The value cast to the target type, removing const qualifiers.
 template <typename Ty, typename Up>
-constexpr Ty as_cast(const Up &value);
+Ty as_cast(const Up &value);
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END

@@ -23,10 +23,10 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 template <typename Ty, typename Up>
-constexpr const Ty &as_const(Up &value);
+const Ty &as_const(Up &value);
 
 template <typename Ty, typename Up>
-constexpr const Ty &as_const(const Up &value);
+const Ty &as_const(const Up &value);
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END

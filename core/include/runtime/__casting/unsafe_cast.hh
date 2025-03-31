@@ -23,10 +23,10 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 template <typename Ty, typename Up>
-constexpr Ty as_unsafe(Up value);
+Ty as_unsafe(Up value);
 
 template <typename Ty, typename Up>
-constexpr const Ty as_unsafe(const Up value)  // NOLINT
+const Ty as_unsafe(const Up value)  // NOLINT
     requires(std::Meta::is_const<Up> ||
              std::Meta::is_const<Ty>);
 
