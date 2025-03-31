@@ -16,54 +16,15 @@
 #ifndef _$_HX_CORE_M4LIBC
 #define _$_HX_CORE_M4LIBC
 
-#undef _LIBCPP_BEGIN_NAMESPACE_STD
-#undef _LIBCPP_END_NAMESPACE_STD
-#undef _VSTD
-#  define _LIBCPP_BEGIN_NAMESPACE_STD namespace _LIBCPP_TYPE_VISIBILITY_DEFAULT libc { inline namespace _LIBCPP_ABI_NAMESPACE {
-#  define _LIBCPP_END_NAMESPACE_STD }}
-#  define _VSTD libc
-
-#include <cstddef>
-#include <cstdlib>
-#include <cstdio>
-#include <cassert>
-#include <ccomplex>
-#include <csignal>
-#include <ctgmath>
-#include <cmath>
-#include <cerrno>
-#include <cfenv>
-#include <clocale>
-#include <ctime>
-#include <csetjmp>
-#include <cstdarg>
-#include <cuchar>
-#include <cwchar>
-#include <cstring>
-#include <cwctype>
-#include <cctype>
-#include <cinttypes>
-#include <cfloat>
-
-#undef _LIBCPP_BEGIN_NAMESPACE_STD
-#undef _LIBCPP_END_NAMESPACE_STD
-#undef _VSTD
-#  define _LIBCPP_BEGIN_NAMESPACE_STD namespace _LIBCPP_TYPE_VISIBILITY_DEFAULT std { inline namespace _LIBCPP_ABI_NAMESPACE {
-#  define _LIBCPP_END_NAMESPACE_STD }}
-#  define _VSTD std
-
-namespace libc {
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/timeb.h>
 #include <sys/types.h>
 #include <memory.h>
-#include <search.h>
-#include <stdnoreturn.h>
 
 #ifndef _MSC_VER
-    #include "cxxabi.h"
     #include <unistd.h>
+    #include <cxxabi.h>
 #else
     #include <sys/utime.h>
     #include <sys/locking.h>
@@ -105,6 +66,5 @@ namespace libc {
     #include <share.h>
     #include <tchar.h>
 #endif
-}
 
 #endif  // _$_HX_CORE_M4LIBC

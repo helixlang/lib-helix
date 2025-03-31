@@ -22,6 +22,7 @@
 #   include <sys/resource.h>
 #   include <unistd.h>
 #   include <cxxabi.h>
+#   include <fcntl.h>
 #endif
 
 #endif  // _$_HX_CORE_M4UNIX

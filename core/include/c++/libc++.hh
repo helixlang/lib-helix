@@ -17,7 +17,29 @@
 #define _$_HX_CORE_M6LIBCPP
 
 #include <include/config/config.h>
+#include <include/c/libc.hh>
 
+#include <cstdlib>
+#include <cstddef>
+#include <cstdio>
+#include <cassert>
+#include <ccomplex>
+#include <csignal>
+#include <ctgmath>
+#include <cmath>
+#include <cerrno>
+#include <cfenv>
+#include <clocale>
+#include <ctime>
+#include <csetjmp>
+#include <cstdarg>
+#include <cuchar>
+#include <cwchar>
+#include <cstring>
+#include <cwctype>
+#include <cctype>
+#include <cinttypes>
+#include <cfloat>
 #include <algorithm>
 #include <array>
 #include <atomic>
