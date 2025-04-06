@@ -13,15 +13,15 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M5SLICE
-#define _$_HX_CORE_M5SLICE
+#ifndef _$_HX_CORE_M5SLICE_TPP
+#define _$_HX_CORE_M5SLICE_TPP
 
 #include <include/config/config.h>
 
 #include <include/c++/libc++.hh>
 #include <include/meta/meta.hh>
-#include <include/runtime/runtime.hh>
 #include <include/types/types.hh>
+#include <include/runtime/runtime.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -126,14 +126,14 @@ void slice<CharT, Traits>::replace(CharT *str, usize size) noexcept {
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-typename slice<CharT, Traits>::slice slice<CharT, Traits>::subslice(usize pos,
+slice<CharT, Traits> slice<CharT, Traits>::subslice(usize pos,
                                                                     usize len) const noexcept {
     return slice_t(data.substr(pos, len));
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-typename slice<CharT, Traits>::slice slice<CharT, Traits>::l_strip(char_vec &delim) const {
+slice<CharT, Traits> slice<CharT, Traits>::l_strip(char_vec &delim) const {
     usize start = 0;
     usize end   = length;
     while (start < end &&
@@ -145,7 +145,7 @@ typename slice<CharT, Traits>::slice slice<CharT, Traits>::l_strip(char_vec &del
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-typename slice<CharT, Traits>::slice slice<CharT, Traits>::r_strip(char_vec &delim) const {
+slice<CharT, Traits> slice<CharT, Traits>::r_strip(char_vec &delim) const {
     usize start = 0;
     usize end   = length;
     while (end > start &&
@@ -157,7 +157,7 @@ typename slice<CharT, Traits>::slice slice<CharT, Traits>::r_strip(char_vec &del
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-typename slice<CharT, Traits>::slice slice<CharT, Traits>::strip(char_vec &delim) const {
+slice<CharT, Traits> slice<CharT, Traits>::strip(char_vec &delim) const {
     return l_strip(delim).r_strip(delim);
 }
 
@@ -193,7 +193,7 @@ isize slice<CharT, Traits>::compare(slice &other) const noexcept {
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-typename slice<CharT, Traits>::slice_vec slice<CharT, Traits>::split_lines() const {
+slice<CharT, Traits>::slice_vec slice<CharT, Traits>::split_lines() const {
     slice_vec result;
     bool      encoding_CR = false;
     usize     start       = 0;
@@ -220,7 +220,7 @@ typename slice<CharT, Traits>::slice_vec slice<CharT, Traits>::split_lines() con
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-typename slice<CharT, Traits>::slice_vec slice<CharT, Traits>::split(slice    &delim,
+slice<CharT, Traits>::slice_vec slice<CharT, Traits>::split(slice    &delim,
                                                                      Operation op) const {
     slice_vec result;
     usize     start = 0;

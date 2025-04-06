@@ -13,8 +13,8 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M6STRING
-#define _$_HX_CORE_M6STRING
+#ifndef _$_HX_CORE_M6STRING_TPP
+#define _$_HX_CORE_M6STRING_TPP
 
 #include <include/config/config.h>
 #include <include/c++/libc++.hh>
@@ -27,7 +27,7 @@ H_STD_NAMESPACE_BEGIN
 
 namespace String::__internal {
     namespace {
-        constexpr static usize log2_sizeof_wchar_t = static_cast<usize>(sizeof(wchar_t) > 1) +
+        constexpr static usize log2_sizeof_wchar_t_2 = static_cast<usize>(sizeof(wchar_t) > 1) +
                                                      static_cast<usize>(sizeof(wchar_t) > 2) +
                                                      static_cast<usize>(sizeof(wchar_t) > 4);
     }
@@ -119,11 +119,11 @@ inline basic<CharT, Traits> basic<CharT, Traits>::operator+(const slice_t &s) co
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 template <typename U>
-basic<CharT, Traits>::basic(
+inline basic<CharT, Traits>::basic(
     const char *str,
-    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept {
+    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> *) noexcept {
     usize    size = LIBCXX_NAMESPACE::char_traits<char>::length(str);
-    auto *buff = static_cast<wchar_t *>(alloca((size + 1) << String::__internal::log2_sizeof_wchar_t));
+    auto *buff = static_cast<wchar_t *>(alloca((size + 1) << String::__internal::log2_sizeof_wchar_t_2));
 
     try {
         for (usize i = 0; i < size; ++i) {
@@ -136,11 +136,11 @@ basic<CharT, Traits>::basic(
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 template <typename U>
-basic<CharT, Traits>::basic(
+inline basic<CharT, Traits>::basic(
     const char *str,
     usize       size,
     typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> *) noexcept {
-    auto *buff = static_cast<wchar_t *>(alloca((size) << String::__internal::log2_sizeof_wchar_t));
+    auto *buff = static_cast<wchar_t *>(alloca((size) << String::__internal::log2_sizeof_wchar_t_2));
 
     try {
         for (usize i = 0; i < size; ++i) {
