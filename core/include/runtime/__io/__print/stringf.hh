@@ -19,6 +19,9 @@
 #include <include/config/config.h>
 
 #include <include/types/string/string.hh>
+#include <include/types/question/question_impl.hh>
+#include <include/runtime/__panic/panic_config.hh>
+#include <include/runtime/__error/runtime_error.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -37,29 +40,42 @@ H_STD_NAMESPACE_BEGIN
 /// f"hi: {some_expr() + 12}"    -> stringf("hi: \{\}", some_expr() + 12)
 ///
 template <typename... Ty>
-constexpr string stringf(string s, Ty &&...t) {
-    const array<string, sizeof...(t)> EAS = {to_string(H_STD_NAMESPACE::Memory::forward<Ty>(t))...};
+inline string stringf(string s, Ty &&...t) {
+    // Create an array of formatted argument strings
+    const string args[sizeof...(t)] = {to_string(H_STD_NAMESPACE::Memory::forward<Ty>(t))...};
+        
+    // Work with a copy of the input string to preserve the original
+    string result = Memory::move(s);
+    usize pos = 0;  // Start position for searching
 
-    usize pos = 0;
+    // Iterate over each argument
+    usize arg_index = 0;
+    while (arg_index < sizeof...(t)) {
+        // Find the next placeholder
+        auto placeholder = string::slice(L"\\{\\}", 4);  // Wide string placeholder
+        std::Questionable<usize> found_pos = result.lfind(placeholder, pos);
 
-#ifdef __GNUG__
-#pragma unroll
-#endif
-
-    for (auto &&arg : EAS) {
-        pos = s.lfind(L"\\{\\}", pos);
-
-        if (pos == string::npos) [[unlikely]] {
-            throw LIBCXX_NAMESPACE::runtime_error(
-                "error: [f-stirng engine]: format argument count mismatch, this should not "
-                "happen, please open a issue on github");
+        // If no placeholder is found, throw an error
+        if (!found_pos) {
+            _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"error: [f-string rt]: too many arguments for format string"));
         }
 
-        s.replace(pos, 4, arg);
-        pos += arg.size();
+        // Replace the placeholder with the argument
+        usize replace_pos = *found_pos;
+        result.replace(replace_pos, 4, args[arg_index]);
+
+        // Update position to after the replacement
+        pos = replace_pos + args[arg_index].size();
+        ++arg_index;
     }
 
-    return s;
+    // Check for remaining placeholders (too few arguments)
+    auto remaining_placeholder = string::slice(L"\\{\\}", 4);
+    if (result.lfind(remaining_placeholder, pos)) {
+        _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"error: [f-string rt]: too few arguments for format string"));
+    }
+
+    return result;
 }
 
 H_STD_NAMESPACE_END

@@ -19,9 +19,9 @@
 #include <include/config/config.h>
 
 #include <include/meta/meta.hh>
+#include <include/types/string/string.hh>
 #include <include/runtime/__io/__print/endl.hh>
 #include <include/runtime/__memory/memory.hh>
-#include <include/types/string/string.hh>
 
 H_NAMESPACE_BEGIN
 
