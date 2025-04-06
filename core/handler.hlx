@@ -107,7 +107,7 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
         if fd < 0 {
             return null;
         }
-        
+
         buffer = malloc(BUFFER_SIZE) as unsafe *char;
         finally: if buffer != &null: free(buffer);
 

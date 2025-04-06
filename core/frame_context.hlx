@@ -26,7 +26,7 @@ eval fn std::Panic::FrameContext::throw_object(error: unsafe *std::TypeErasure) 
         std::crash(std::Error::TypeMismatchError("Type mismatch when crashing."));
     }
 
-    let object: unsafe *T = (**error) as *T;
+    let object: unsafe *T = (**error) as unsafe *T;
     std::crash(*object);
 }
 

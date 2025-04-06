@@ -26,7 +26,7 @@ fn std::Panic::Frame::initialize(const obj: unsafe *T)
         static_assert(
             __inline_cpp("Panic::Interface::Panicking<T>"),
             r"Frame invoked with a type that lacks a panic operator. Ensure the type "
-             "declares `class ... with Panic::Panicking` and implements either `op "
+             "declares `class ... impl Panic::Panicking` and implements either `op "
              "panic fn(self) -> string` or the static equivalent."
         );
     }
