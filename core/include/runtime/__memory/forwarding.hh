@@ -27,12 +27,12 @@ namespace Memory {
 using libcxx::move;
 
 template <typename T>
-T &&forward(std::Meta::reference_removed<T> &t) noexcept {
+inline T &&forward(std::Meta::reference_removed<T> &t) noexcept {
     return static_cast<T &&>(t);
 }
 
 template <typename T>
-T &&forward(std::Meta::reference_removed<T> &&t) noexcept {
+inline T &&forward(std::Meta::reference_removed<T> &&t) noexcept {
     return static_cast<T &&>(t);
 }
 }  // namespace Memory

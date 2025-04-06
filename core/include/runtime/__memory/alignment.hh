@@ -37,7 +37,7 @@ namespace Memory {
 /// \throws      std::bad_alloc if memory allocation fails.
 ///
 template <typename T, typename... Args>
-T *new_aligned(Args &&...args) {
+inline T *new_aligned(Args &&...args) {
     static_assert(alignof(T) <= __STDCPP_DEFAULT_NEW_ALIGNMENT__ || __cpp_aligned_new,
                   "Your compiler does not support over-aligned allocations.");
 
@@ -64,7 +64,7 @@ T *new_aligned(Args &&...args) {
 /// Calling delete_aligned on a pointer not allocated by new_aligned<T> is undefined.
 ///
 template <typename T>
-void delete_aligned(T *ptr) {
+inline void delete_aligned(T *ptr) {
     if (!ptr) {
         return;
     }
