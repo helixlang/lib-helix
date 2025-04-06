@@ -18,10 +18,10 @@
 
 #include <include/config/config.h>
 
+#include <include/types/string/slice.hh>
 #include <include/meta/__interfaces/casting.hh>
 #include <include/runtime/__memory/forwarding.hh>
 #include <include/types/string/char_traits.hh>
-#include <include/types/string/slice.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

@@ -48,7 +48,9 @@ class slice {
 
     [[nodiscard("size() returns the length of the slice's data, which is essential for bounds "
                 "checking and iteration; discarding it may lead to unsafe or undefined behavior")]]
-    constexpr size_t size() const noexcept;
+    constexpr size_t size() const noexcept {
+        return data.size();
+    }
 
     constexpr slice() noexcept                   = default;
     constexpr slice(const slice &other) noexcept = default;

@@ -17,11 +17,11 @@
 #define _$_HX_CORE_M6STRING
 
 #include <include/meta/meta.hh>
+#include <include/types/string/slice.hh>
 #include <include/runtime/__memory/memory.hh>
 #include <include/types/string/basic.hh>
 #include <include/types/string/c-string.hh>
 #include <include/types/string/char_traits.hh>
-#include <include/types/string/slice.hh>
 
 #include "include/config/config.h"
 
@@ -29,6 +29,7 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 inline string to_string(libcxx::string str) { return {str.data(), str.size()}; }
+inline string to_string(libcxx::wstring str) { return {str.data(), str.size()}; }
 
 /// \include belongs to the helix standard library.
 /// \brief convert any type to a string
@@ -48,9 +49,9 @@ constexpr string to_string(Ty &&t) {
     } else if constexpr (std::Interface::Castable<Ty, string>) {
         return t.operator$cast(static_cast<string *>(nullptr));
     } else if constexpr (std::Meta::same_as<Ty, bool>) {
-        return t ? "true" : "false";
+        return t ? L"true" : L"false";
     } else if constexpr (LIBCXX_NAMESPACE::is_arithmetic_v<Ty>) {
-        return LIBCXX_NAMESPACE::to_string(t);
+        return {LIBCXX_NAMESPACE::to_wstring(t)};
     } else {
         LIBCXX_NAMESPACE::stringstream ss;
 
@@ -72,16 +73,16 @@ static_assert(sizeof(wchar_t) >= sizeof(char), "wchar_t must be at least as larg
 
 inline char char_to_cchar(wchar_t wc) {
     char temp[MB_CUR_MAX]; // stack-allocated, typically 4-6 bytes
-    
+
     int len = wctomb(temp, wc);
-    
+
     if (len <= 0) {
         throw libcxx::range_error("Invalid wchar_t conversion");
     }
     if (len > 1) {
         throw libcxx::range_error("wchar_t converts to multibyte, not single char");
     }
-    
+
     return temp[0];
 }
 
@@ -175,23 +176,43 @@ inline sstring string_to_sstring(const string& wstr) {
     sstring result;
     result.resize(max_size); // pre-allocate space in the internal string_t
 
-    char* buffer = const_cast<char*>(result.raw()); // access raw buffer (mutable)
+    char *buffer = static_cast<char*>(alloca(max_size));
     size_t buf_pos = 0;
-    char temp[MB_CUR_MAX]; // stack-allocated temp buffer for wctomb
+    char temp[MB_CUR_MAX + 1]; // stack-allocated temp buffer for wctomb
 
     // convert each wchar_t to multibyte
     for (size_t i = 0; i < wstr_size; ++i) {
         int len = wctomb(temp, raw_data[i]);
+
         if (len <= 0) {
             throw libcxx::range_error("Invalid wchar_t conversion at index " + libcxx::to_string(i));
         }
-        if (buf_pos + len > max_size) {
-            throw libcxx::runtime_error("Internal buffer overflow (unexpected)");
+
+        if (buf_pos + len >= max_size) {
+            throw libcxx::range_error("Buffer too small at index " + libcxx::to_string(i));
         }
+
         for (int j = 0; j < len; ++j) {
             buffer[buf_pos++] = temp[j];
         }
+
+        // clear the temp buffer for the next iteration
+        for (int j = 0; j < MB_CUR_MAX; ++j) {
+            temp[j] = '\0';
+        }
     }
+
+    // double-check for null-termination
+    if (buf_pos >= max_size) {
+        throw libcxx::range_error("Buffer too small for null-termination");
+    }
+
+    if (buffer[buf_pos - 1] != '\0') {
+        buffer[buf_pos++] = '\0'; // null-terminate
+    }
+
+    // create a new sstring from the buffer
+    result = sstring(buffer, buf_pos); // use the buffer as the raw data
 
     // resize to actual length and null-terminate
     result.resize(buf_pos);
