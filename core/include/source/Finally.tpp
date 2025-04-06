@@ -1,5 +1,5 @@
-#ifndef _$_HX_CORE_M7FINALLY
-#define _$_HX_CORE_M7FINALLY
+#ifndef _$_HX_CORE_M7FINALLY_TPP
+#define _$_HX_CORE_M7FINALLY_TPP
 
 
 #endif  // _$_HX_CORE_M7FINALLY

@@ -13,8 +13,8 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M4I128
-#define _$_HX_CORE_M4I128
+#ifndef _$_HX_CORE_M4I128_TPP
+#define _$_HX_CORE_M4I128_TPP
 
 #include <include/config/config.h>
 

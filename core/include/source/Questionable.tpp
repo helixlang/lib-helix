@@ -13,8 +13,8 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M12QUESTIONABLE
-#define _$_HX_CORE_M12QUESTIONABLE
+#ifndef _$_HX_CORE_M12QUESTIONABLE_TPP
+#define _$_HX_CORE_M12QUESTIONABLE_TPP
 
 #include <include/config/config.h>
 #include <include/c++/libc++.hh>
@@ -224,7 +224,7 @@ E $question<T>::operator$cast(E * /*unused*/) const {
                 return *reinterpret_cast<E *>(obj);
             }
             _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(
-                std::Error::NullValueError(L"Invalid Decay: error context object is null."));
+                std::Error::NullValueError(string(L"Invalid Decay: error context object is null.")));
         }
         data.error.operator$panic();
     }
@@ -255,11 +255,13 @@ T $question<T>::operator$cast(T * /*unused*/) const {
 
 template <class T>
 [[nodiscard]] T &$question<T>::operator*() {
-    return operator$cast(static_cast<T *>(nullptr));
+    thread_local static T result = operator$cast(static_cast<T *>(nullptr));
+    return result;
 }
 template <class T>
 [[nodiscard]] $question<T>::operator T() {
-    return operator$cast(static_cast<T *>(nullptr));
+    thread_local static T result = operator$cast(static_cast<T *>(nullptr));
+    return result;
 }
 
 H_NAMESPACE_END
