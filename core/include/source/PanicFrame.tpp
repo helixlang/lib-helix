@@ -13,8 +13,8 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M10PANICFRAME
-#define _$_HX_CORE_M10PANICFRAME
+#ifndef _$_HX_CORE_M10PANICFRAME_TPP
+#define _$_HX_CORE_M10PANICFRAME_TPP
 
 #include <include/config/config.h>
 #include <include/c++/libc++.hh>

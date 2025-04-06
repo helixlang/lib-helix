@@ -13,8 +13,8 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M17PANICFRAMECONTEXT
-#define _$_HX_CORE_M17PANICFRAMECONTEXT
+#ifndef _$_HX_CORE_M17PANICFRAMECONTEXT_TPP
+#define _$_HX_CORE_M17PANICFRAMECONTEXT_TPP
 
 #include <include/config/config.h>
 #include <include/c++/libc++.hh>
@@ -78,7 +78,7 @@ FrameContext::FrameContext(T *obj)
     if constexpr (!Panic::Interface::Panicking<T>) {
         static_assert(Panic::Interface::Panicking<T>,
                       "Frame invoked with an object that does not have a panic method, add "
-                      "`class ... with Panic::Interface::Panicking` "
+                      "`class ... impl Panic::Interface::Panicking` "
                       "to the definition, and implement 'op panic fn(self) -> string' or the "
                       "static variant.");
     }
