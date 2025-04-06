@@ -40,6 +40,17 @@ import frame_context::*;
 import handler::*;
 import frame::*;
 
+// ----- implementation of the core library ----- //
+ffi "c++" import "include/source/Casting.tpp"
+ffi "c++" import "include/source/Finally.tpp"
+ffi "c++" import "include/source/i128.tpp"
+ffi "c++" import "include/source/PanicFrame.tpp"
+ffi "c++" import "include/source/PanicFrameContext.tpp"
+ffi "c++" import "include/source/Questionable.tpp"
+ffi "c++" import "include/source/Slice.tpp"
+ffi "c++" import "include/source/String.tpp"
+ffi "c++" import "include/source/u128.tpp"
+
 fn _HX_FN_Vi_Q5_7_helixrt_init_Rv() -> void {
     // this is the first function call in main always.
     // anything here runs first.
