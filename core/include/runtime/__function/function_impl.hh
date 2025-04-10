@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M13FUNCTION_IMPL
 
 #include <include/config/config.h>
+
 #include <include/meta/meta.hh>
 #include <include/runtime/__memory/memory.hh>
 #include <include/meta/remove_reference.hh>
@@ -188,13 +189,16 @@ class $function<Rt(Tp...)> {
     struct Callable : $callable {
         alignas(alignof(libcxx::max_align_t)) T callable;
 
-        constexpr Callable(typename std::Meta::reference_removed<T> &&callable)  // NOLINT(google-explicit-constructor)
+        constexpr Callable(typename std::Meta::reference_removed<T>
+                               &&callable)  // NOLINT(google-explicit-constructor)
             : callable(std::Memory::forward<T>(callable)) {}
 
         constexpr Callable(const T &callable)  // NOLINT(google-explicit-constructor)
             : callable(callable) {}
 
-        constexpr Rt invoke(Tp... args) override { return callable(std::Memory::forward<Tp>(args)...); }
+        constexpr Rt invoke(Tp... args) override {
+            return callable(std::Memory::forward<Tp>(args)...);
+        }
 
         constexpr $callable *clone() const override {
             return std::Memory::new_aligned<Callable<T>>(callable);
@@ -216,17 +220,19 @@ class $function<Rt(Tp...)> {
         : callable(other.callable ? other.callable->clone() : nullptr) {}
 
     template <typename T>
-    constexpr $function(typename std::Meta::reference_removed<T> $call_o) {  // NOLINT(google-explicit-constructor)
-        callable = new Callable<libcxx::decay_t<T>>(std::Memory::forward<T>($call_o)); // NOLINT
+    constexpr $function(
+        typename std::Meta::reference_removed<T> $call_o) {  // NOLINT(google-explicit-constructor)
+        callable = new Callable<libcxx::decay_t<T>>(std::Memory::forward<T>($call_o));  // NOLINT
     }
 
     template <typename T>
     constexpr $function(T $call_o) {  // NOLINT(google-explicit-constructor)
-        callable = new Callable<libcxx::decay_t<T>>(std::Memory::forward<T>($call_o)); // NOLINT
+        callable = new Callable<libcxx::decay_t<T>>(std::Memory::forward<T>($call_o));  // NOLINT
     }
 
     constexpr $function(Rt (*func)(Tp...))  // NOLINT(google-explicit-constructor)
-        : callable(func ? new Callable<std::Meta::const_volatile_removed<Rt (*)(Tp...)>>(func) : nullptr) {}
+        : callable(func ? new Callable<std::Meta::const_volatile_removed<Rt (*)(Tp...)>>(func)
+                        : nullptr) {}
 
     constexpr ~$function() { reset(); }
 
@@ -252,18 +258,19 @@ class $function<Rt(Tp...)> {
     template <typename T>
     constexpr $function &operator=(T $call_o) {
         delete callable;
-        callable = new Callable<libcxx::decay_t<T>>(std::Memory::forward<T>($call_o)); // NOLINT
+        callable = new Callable<libcxx::decay_t<T>>(std::Memory::forward<T>($call_o));  // NOLINT
         return *this;
     }
 
     // Assignment for function pointers
     constexpr $function &operator=(Rt (*func)(Tp...)) {
         delete callable;
-        callable = func ? new Callable<Rt (*)(typename std::Meta::reference_removed<Tp>...)>(func) : nullptr;
+        callable = func ? new Callable<Rt (*)(typename std::Meta::reference_removed<Tp>...)>(func)
+                        : nullptr;
         return *this;
     }
 
-    explicit constexpr operator bool() const noexcept { return callable != nullptr; }
+    explicit constexpr           operator bool() const noexcept { return callable != nullptr; }
     [[nodiscard]] constexpr bool operator$question() const noexcept { return callable != nullptr; }
 
     constexpr Rt operator()(Tp... args) {
