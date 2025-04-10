@@ -198,11 +198,10 @@ class $question {
     template <typename E>
         requires std::Panic::Interface::Panicking<E>
     E operator$cast(E * /*unused*/) const;
-
     T operator$cast(T * /*unused*/) const;
 
     [[nodiscard]] T &operator*();
-    [[nodiscard]]    operator T();
+    [[nodiscard]] operator T();
 };
 
 H_NAMESPACE_END
