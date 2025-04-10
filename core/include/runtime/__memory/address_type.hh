@@ -22,7 +22,6 @@
 #include "stack_bounds.hh"
 #include "rot_bounds.hh"
 
-
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
@@ -55,7 +54,7 @@ inline AddressType address_type(const void *ptr) {
 
     return AddressType::Unknown;
 }
-}
+}  // namespace Memory
 
 H_NAMESPACE_END
 H_STD_NAMESPACE_END

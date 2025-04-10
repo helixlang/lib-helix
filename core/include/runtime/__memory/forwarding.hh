@@ -16,8 +16,9 @@
 #ifndef _$_HX_CORE_M11FORWARDING
 #define _$_HX_CORE_M11FORWARDING
 
-#include <include/c++/libc++.hh>
 #include <include/config/config.h>
+
+#include <include/c++/libc++.hh>
 #include <include/meta/remove_reference.hh>
 
 H_NAMESPACE_BEGIN

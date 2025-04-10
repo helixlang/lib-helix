@@ -17,9 +17,9 @@
 #define _$_HX_CORE_M9EXCHANGE
 
 #include <include/config/config.h>
-#include <include/meta/meta.hh>
 
-#include "forwarding.hh"
+#include <include/meta/meta.hh>
+#include <include/runtime/__memory/forwarding.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

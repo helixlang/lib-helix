@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M11ALLOCATION
 
 #include <include/config/config.h>
+
 #include "forwarding.hh"
 
 H_NAMESPACE_BEGIN
@@ -27,7 +28,7 @@ template <typename _Tp, typename... _Ty>
 constexpr _Tp *_H_RESERVED$new(_Ty &&...t) {          // NOLINT
     return new _Tp(std::Memory::forward<_Ty>(t)...);  // NOLINT
 }
-}
+}  // namespace Legacy
 
 H_NAMESPACE_END
 H_STD_NAMESPACE_END
