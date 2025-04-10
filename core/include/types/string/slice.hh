@@ -63,12 +63,12 @@ class slice {
 
     template <typename U = CharT>
     slice(const char *str,
-                    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
+          typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
     template <typename U = CharT>
     slice(const char *str,
-                    usize       size,
-                    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
+          usize       size,
+          typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
     constexpr operator view_t() const noexcept { return data; }
 
