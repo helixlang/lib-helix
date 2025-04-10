@@ -22,7 +22,7 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 namespace Panic {
-    class Frame;
+class Frame;
 };
 
 H_STD_NAMESPACE_END
@@ -71,7 +71,8 @@ H_STD_NAMESPACE_END
 /// //     fn (*std::Panic::Frame) -> void
 /// #[panic(&HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv)]
 /// \endcode
-static void (*HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv) ( const std::Panic::Frame * /* f */ );
+static void (*HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv)(
+    const std::Panic::Frame * /* f */);
 H_NAMESPACE_END
 
 #endif  // _$_HX_CORE_M9PANIC_FWD

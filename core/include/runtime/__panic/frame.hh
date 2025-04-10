@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M5FRAME
 
 #include <include/config/config.h>
+
 #include <include/runtime/__memory/memory.hh>
 #include <include/types/string/basic.hh>
 
@@ -128,8 +129,8 @@ class Frame {
     template <typename T>
     Frame(T obj, string filename, usize lineno);
 
-    constexpr Frame()  = delete;
-    ~Frame() = default;
+    constexpr Frame() = delete;
+    ~Frame()          = default;
 
     constexpr Frame(const Frame &)            = delete;
     constexpr Frame &operator=(const Frame &) = delete;

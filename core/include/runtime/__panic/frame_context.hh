@@ -95,9 +95,9 @@ class FrameContext {
     template <typename T>
     explicit FrameContext(T *obj);
 
-    [[noreturn]]  void    crash();
-    [[nodiscard]] void   *object() const;
-    [[nodiscard]] string  type_name() const;
+    [[noreturn]] void    crash();
+    [[nodiscard]] void  *object() const;
+    [[nodiscard]] string type_name() const;
 
     bool operator!=(const libcxx::type_info *rhs) const;
     bool operator==(const libcxx::type_info *rhs) const;
