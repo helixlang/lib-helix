@@ -16,8 +16,9 @@
 #ifndef _$_HX_CORE_M11ROT_BOUNDS
 #define _$_HX_CORE_M11ROT_BOUNDS
 
-#include <include/c++/libc++.hh>
 #include <include/config/config.h>
+
+#include <include/c++/libc++.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

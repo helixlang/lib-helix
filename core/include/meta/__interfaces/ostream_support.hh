@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M15OSTREAM_SUPPORT
 
 #include <include/config/config.h>
+
 #include <include/c++/libc++.hh>
 #include <include/meta/traits.hh>
 #include <include/meta/type_properties.hh>
@@ -29,7 +30,7 @@ template <typename T>
 concept SupportsOStream = requires(LIBCXX_NAMESPACE::ostream &os, T a) {
     { os << a } -> std::Meta::convertible_to<LIBCXX_NAMESPACE::ostream &>;
 };
-}
+}  // namespace Interface
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END

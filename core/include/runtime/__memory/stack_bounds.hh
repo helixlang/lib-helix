@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M13STACK_BOUNDS
 
 #include <include/config/config.h>
+
 #include <include/types/builtins/builtins.hh>
 
 H_NAMESPACE_BEGIN
