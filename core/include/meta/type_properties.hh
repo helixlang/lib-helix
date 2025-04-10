@@ -16,9 +16,10 @@
 #ifndef _$_HX_CORE_M15TYPE_PROPERTIES
 #define _$_HX_CORE_M15TYPE_PROPERTIES
 
+#include <include/config/config.h>
+
 #include <type_traits>
 
-#include <include/config/config.h>
 #include "const_traits.hh"
 #include "declval.hh"
 #include "integral_constant.hh"

@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M11UNSAFE_CAST
 
 #include <include/config/config.h>
+
 #include <include/meta/meta.hh>
 
 H_NAMESPACE_BEGIN
@@ -27,8 +28,7 @@ Ty as_unsafe(Up value);
 
 template <typename Ty, typename Up>
 const Ty as_unsafe(const Up value)  // NOLINT
-    requires(std::Meta::is_const<Up> ||
-             std::Meta::is_const<Ty>);
+    requires(std::Meta::is_const<Up> || std::Meta::is_const<Ty>);
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END

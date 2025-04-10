@@ -17,9 +17,10 @@
 #define _$_HX_CORE_M7CASTING
 
 #include <include/config/config.h>
+
+#include <include/meta/traits.hh>
 #include <include/meta/type_properties.hh>
 #include <include/types/string/char_traits.hh>
-#include <include/meta/traits.hh>
 
 #include "ostream_support.hh"
 
@@ -28,9 +29,9 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 namespace String {
-    template <typename CharT, typename Traits = libcxx::char_traits<CharT>>
-        requires CharTraits<Traits, CharT>
-    class basic;
+template <typename CharT, typename Traits = libcxx::char_traits<CharT>>
+    requires CharTraits<Traits, CharT>
+class basic;
 }
 
 H_STD_NAMESPACE_END
@@ -56,7 +57,7 @@ concept Castable = requires(T t, U *u) {
 
 template <typename T>
 concept ConvertibleToString = SupportsOStream<T> || Castable<T, string>;
-}
+}  // namespace Interface
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
