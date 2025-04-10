@@ -41,38 +41,33 @@ H_STD_NAMESPACE_BEGIN
 ///
 template <typename... Ty>
 inline string stringf(string s, Ty &&...t) {
-    // Create an array of formatted argument strings
     const string args[sizeof...(t)] = {to_string(H_STD_NAMESPACE::Memory::forward<Ty>(t))...};
-        
-    // Work with a copy of the input string to preserve the original
-    string result = Memory::move(s);
-    usize pos = 0;  // Start position for searching
 
-    // Iterate over each argument
+    string result = Memory::move(s);
+    usize  pos    = 0;
+
     usize arg_index = 0;
     while (arg_index < sizeof...(t)) {
-        // Find the next placeholder
         auto placeholder = string::slice(L"\\{\\}", 4);  // Wide string placeholder
         std::Questionable<usize> found_pos = result.lfind(placeholder, pos);
 
-        // If no placeholder is found, throw an error
-        if (!found_pos) {
-            _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"error: [f-string rt]: too many arguments for format string"));
+        if (found_pos == null) {
+            _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(
+                Error::RuntimeError(L"error: [f-string rt]: too many arguments for format string"));
         }
 
-        // Replace the placeholder with the argument
         usize replace_pos = *found_pos;
         result.replace(replace_pos, 4, args[arg_index]);
 
-        // Update position to after the replacement
         pos = replace_pos + args[arg_index].size();
         ++arg_index;
     }
 
-    // Check for remaining placeholders (too few arguments)
-    auto remaining_placeholder = string::slice(L"\\{\\}", 4);
-    if (result.lfind(remaining_placeholder, pos)) {
-        _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"error: [f-string rt]: too few arguments for format string"));
+    auto                     remaining_placeholder = string::slice(L"\\{\\}", 4);
+    std::Questionable<usize> remaining_pos         = result.lfind(remaining_placeholder, pos);
+    if (remaining_pos != null) {
+        _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(
+            Error::RuntimeError(L"error: [f-string rt]: too few arguments for format string"));
     }
 
     return result;

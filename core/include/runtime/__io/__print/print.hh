@@ -22,24 +22,50 @@
 #include <include/types/string/string.hh>
 #include <include/runtime/__io/__print/endl.hh>
 #include <include/runtime/__memory/memory.hh>
+#include <include/meta/type_properties.hh>
+#include <include/meta/const_traits.hh>
 
 H_NAMESPACE_BEGIN
 
+// template <typename... Args>
+// constexpr void print(Args &&...t) {
+//     if constexpr (sizeof...(t) == 0) {
+//         wprintf(L"\n");
+//         return;
+//     }
+
+//     ((wprintf(L"%s", std::to_string(std::Memory::forward<Args>(t)).raw())), ...);
+
+//     if constexpr (sizeof...(t) > 0) {
+//         if constexpr (!std::Meta::same_as<
+//                           std::Meta::const_volatile_removed<std::Meta::reference_removed<
+//                               decltype(LIBCXX_NAMESPACE::get<sizeof...(t) - 1>(
+//                                   tuple<Args...>(t...)))>>,
+//                           std::endl>) {
+//             wprintf(L"\n");
+//         }
+//     }
+// }
+
 template <typename... Args>
-constexpr void print(Args &&...t) {
+void print(Args &&...t) {
+    // Handle empty case
     if constexpr (sizeof...(t) == 0) {
         wprintf(L"\n");
         return;
     }
 
-    ((wprintf(L"%s", std::to_string(std::Memory::forward<Args>(t)).raw())), ...);
+    ((wprintf(L"%ls",
+              [&]() -> const string {
+                  auto str = std::to_string(t);
+                  return str;
+              }()
+                           .raw())),
+     ...);
 
     if constexpr (sizeof...(t) > 0) {
-        if constexpr (!std::Meta::same_as<
-                          std::Meta::const_volatile_removed<std::Meta::reference_removed<
-                              decltype(LIBCXX_NAMESPACE::get<sizeof...(t) - 1>(
-                                  tuple<Args...>(t...)))>>,
-                          std::endl>) {
+        using LastArg = libcxx::tuple_element_t<sizeof...(t) - 1, tuple<Args...>>;
+        if constexpr (!std::Meta::same_as<std::Meta::const_volatile_removed<LastArg>, std::endl>) {
             wprintf(L"\n");
         }
     }
