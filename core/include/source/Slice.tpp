@@ -126,8 +126,7 @@ void slice<CharT, Traits>::replace(CharT *str, usize size) noexcept {
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-slice<CharT, Traits> slice<CharT, Traits>::subslice(usize pos,
-                                                                    usize len) const noexcept {
+slice<CharT, Traits> slice<CharT, Traits>::subslice(usize pos, usize len) const noexcept {
     return slice_t(data.substr(pos, len));
 }
 
@@ -220,8 +219,7 @@ slice<CharT, Traits>::slice_vec slice<CharT, Traits>::split_lines() const {
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-slice<CharT, Traits>::slice_vec slice<CharT, Traits>::split(slice    &delim,
-                                                                     Operation op) const {
+slice<CharT, Traits>::slice_vec slice<CharT, Traits>::split(slice &delim, Operation op) const {
     slice_vec result;
     usize     start = 0;
     usize     end   = 0;
