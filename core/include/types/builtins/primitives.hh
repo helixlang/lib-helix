@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M10PRIMITIVES
 
 #include <include/config/config.h>
+
 #include <include/c++/libc++.hh>
 #include <include/meta/traits.hh>
 #include <include/meta/enable_if.hh>
@@ -43,7 +44,6 @@ using i64 = signed long long;
 using f32 = float;
 using f64 = double;
 using f80 = long double;
-
 
 #if defined(__LP64__) || defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) ||      \
     defined(__aarch64__) || defined(__arm64__) || defined(__mips64__) || defined(__mips64) || \
@@ -73,7 +73,7 @@ using isize = i8;
 using _H_RESERVED$char = wchar_t;
 
 namespace helix::std::Legacy {
-    using _H_RESERVED$char = char;
+using _H_RESERVED$char = char;
 }
 
 inline constexpr helix::std::null_t null;
@@ -94,7 +94,7 @@ using list = helix::libcxx::list<T>;
 template <typename T>
 using set = helix::libcxx::set<T>;
 
-template <typename ...T>
+template <typename... T>
 using tuple = helix::libcxx::tuple<T...>;
 
 struct i128;
@@ -114,55 +114,55 @@ struct u128 {
     u128(i16 val);
     u128(i8 val);
     u128(u64 high, u64 low);
-    u128(const i128& x);
+    u128(const i128 &x);
 
     // Arithmetic Operators
-    u128 operator+(const u128& other) const;
-    u128 operator-(const u128& other) const;
-    u128 operator*(const u128& other) const;
-    u128 operator/(const u128& divisor) const;
-    u128 operator%(const u128& divisor) const;
+    u128 operator+(const u128 &other) const;
+    u128 operator-(const u128 &other) const;
+    u128 operator*(const u128 &other) const;
+    u128 operator/(const u128 &divisor) const;
+    u128 operator%(const u128 &divisor) const;
 
     // Bitwise Operators
-    u128 operator&(const u128& other) const;
-    u128 operator|(const u128& other) const;
-    u128 operator^(const u128& other) const;
+    u128 operator&(const u128 &other) const;
+    u128 operator|(const u128 &other) const;
+    u128 operator^(const u128 &other) const;
     u128 operator~() const;
     u128 operator<<(int shift) const;
     u128 operator>>(int shift) const;
 
     // Comparison Operators
-    bool operator==(const u128& other) const;
-    bool operator!=(const u128& other) const;
-    bool operator<(const u128& other) const;
-    bool operator>(const u128& other) const;
-    bool operator<=(const u128& other) const;
-    bool operator>=(const u128& other) const;
+    bool operator==(const u128 &other) const;
+    bool operator!=(const u128 &other) const;
+    bool operator<(const u128 &other) const;
+    bool operator>(const u128 &other) const;
+    bool operator<=(const u128 &other) const;
+    bool operator>=(const u128 &other) const;
 
     // Assignment Operators
-    u128& operator=(const u128& other);
-    u128& operator+=(const u128& other);
-    u128& operator-=(const u128& other);
-    u128& operator*=(const u128& other);
-    u128& operator/=(const u128& other);
-    u128& operator%=(const u128& other);
-    u128& operator&=(const u128& other);
-    u128& operator|=(const u128& other);
-    u128& operator^=(const u128& other);
-    u128& operator<<=(int shift);
-    u128& operator>>=(int shift);
+    u128 &operator=(const u128 &other);
+    u128 &operator+=(const u128 &other);
+    u128 &operator-=(const u128 &other);
+    u128 &operator*=(const u128 &other);
+    u128 &operator/=(const u128 &other);
+    u128 &operator%=(const u128 &other);
+    u128 &operator&=(const u128 &other);
+    u128 &operator|=(const u128 &other);
+    u128 &operator^=(const u128 &other);
+    u128 &operator<<=(int shift);
+    u128 &operator>>=(int shift);
 
     // Increment/Decrement Operators
-    u128& operator++();
-    u128 operator++(int);
-    u128& operator--();
-    u128 operator--(int);
+    u128 &operator++();
+    u128  operator++(int);
+    u128 &operator--();
+    u128  operator--(int);
 
     // Unary Operators
     u128 operator+() const;
     u128 operator-() const;
 
-private:
+  private:
     static u128 mul_u64_to_u128(u64 a, u64 b);
 };
 
@@ -180,53 +180,53 @@ struct i128 {
     i128(i32 val);
     i128(i16 val);
     i128(i8 val);
-    i128(const u128& x);
+    i128(const u128 &x);
     i128(u64 high, u64 low);
 
     // Helper Functions
     bool is_negative() const;
 
     // Arithmetic Operators
-    i128 operator+(const i128& other) const;
-    i128 operator-(const i128& other) const;
-    i128 operator*(const i128& other) const;
-    i128 operator/(const i128& other) const;
-    i128 operator%(const i128& other) const;
+    i128 operator+(const i128 &other) const;
+    i128 operator-(const i128 &other) const;
+    i128 operator*(const i128 &other) const;
+    i128 operator/(const i128 &other) const;
+    i128 operator%(const i128 &other) const;
 
     // Bitwise Operators
-    i128 operator&(const i128& other) const;
-    i128 operator|(const i128& other) const;
-    i128 operator^(const i128& other) const;
+    i128 operator&(const i128 &other) const;
+    i128 operator|(const i128 &other) const;
+    i128 operator^(const i128 &other) const;
     i128 operator~() const;
     i128 operator<<(int shift) const;
     i128 operator>>(int shift) const;
 
     // Comparison Operators
-    bool operator==(const i128& other) const;
-    bool operator!=(const i128& other) const;
-    bool operator<(const i128& other) const;
-    bool operator>(const i128& other) const;
-    bool operator<=(const i128& other) const;
-    bool operator>=(const i128& other) const;
+    bool operator==(const i128 &other) const;
+    bool operator!=(const i128 &other) const;
+    bool operator<(const i128 &other) const;
+    bool operator>(const i128 &other) const;
+    bool operator<=(const i128 &other) const;
+    bool operator>=(const i128 &other) const;
 
     // Assignment Operators
-    i128& operator=(const i128& other);
-    i128& operator+=(const i128& other);
-    i128& operator-=(const i128& other);
-    i128& operator*=(const i128& other);
-    i128& operator/=(const i128& other);
-    i128& operator%=(const i128& other);
-    i128& operator&=(const i128& other);
-    i128& operator|=(const i128& other);
-    i128& operator^=(const i128& other);
-    i128& operator<<=(int shift);
-    i128& operator>>=(int shift);
+    i128 &operator=(const i128 &other);
+    i128 &operator+=(const i128 &other);
+    i128 &operator-=(const i128 &other);
+    i128 &operator*=(const i128 &other);
+    i128 &operator/=(const i128 &other);
+    i128 &operator%=(const i128 &other);
+    i128 &operator&=(const i128 &other);
+    i128 &operator|=(const i128 &other);
+    i128 &operator^=(const i128 &other);
+    i128 &operator<<=(int shift);
+    i128 &operator>>=(int shift);
 
     // Increment/Decrement Operators
-    i128& operator++();
-    i128 operator++(int);
-    i128& operator--();
-    i128 operator--(int);
+    i128 &operator++();
+    i128  operator++(int);
+    i128 &operator--();
+    i128  operator--(int);
 
     // Unary Operators
     i128 operator+() const;

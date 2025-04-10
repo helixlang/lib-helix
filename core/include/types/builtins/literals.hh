@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M8LITERALS
 
 #include <include/config/config.h>
+
 #include "num_data.hh"
 #include "primitives.hh"
 
@@ -80,12 +81,12 @@ constexpr i64 operator"" _i64(unsigned long long v) noexcept
 }
 
 u128 operator"" _u128(const char *str) noexcept {
-    u128 result(0);           // Integer part
-    u128 fraction(0);         // Fractional part (before exponent)
-    u128 fraction_place(1);   // Denominator for fractional part
-    int base = 10;            // Default to decimal
+    u128 result(0);          // Integer part
+    u128 fraction(0);        // Fractional part (before exponent)
+    u128 fraction_place(1);  // Denominator for fractional part
+    int  base         = 10;  // Default to decimal
     bool has_fraction = false;
-    int exponent = 0;         // Exponent value
+    int  exponent     = 0;  // Exponent value
     bool exp_negative = false;
 
     // Check for prefixes
@@ -115,16 +116,16 @@ u128 operator"" _u128(const char *str) noexcept {
     // Parse fractional part (if any)
     if (*str == '.') {
         has_fraction = true;
-        ++str; // Skip the decimal point
+        ++str;  // Skip the decimal point
         while (*str && *str != 'e' && *str != 'E') {
             if (base == 16 && (*str >= 'a' && *str <= 'f')) {
-                fraction = fraction * u128(base) + u128(*str - 'a' + 10);
+                fraction       = fraction * u128(base) + u128(*str - 'a' + 10);
                 fraction_place = fraction_place * u128(base);
             } else if (base == 16 && (*str >= 'A' && *str <= 'F')) {
-                fraction = fraction * u128(base) + u128(*str - 'A' + 10);
+                fraction       = fraction * u128(base) + u128(*str - 'A' + 10);
                 fraction_place = fraction_place * u128(base);
             } else if (*str >= '0' && *str <= '9' && (*str - '0' < base)) {
-                fraction = fraction * u128(base) + u128(*str - '0');
+                fraction       = fraction * u128(base) + u128(*str - '0');
                 fraction_place = fraction_place * u128(base);
             }
             ++str;
@@ -133,12 +134,12 @@ u128 operator"" _u128(const char *str) noexcept {
 
     // Parse exponent (if any)
     if (*str == 'e' || *str == 'E') {
-        ++str; // Skip 'e' or 'E'
+        ++str;  // Skip 'e' or 'E'
         if (*str == '-') {
             exp_negative = true;
             ++str;
         } else if (*str == '+') {
-            ++str; // Skip optional '+'
+            ++str;  // Skip optional '+'
         }
         while (*str) {
             exponent = exponent * 10 + (*str - '0');
@@ -146,9 +147,10 @@ u128 operator"" _u128(const char *str) noexcept {
         }
     }
 
-    // Combine integer and fractional parts (for base 10 only, as hex/binary don’t use exponents here)
+    // Combine integer and fractional parts (for base 10 only, as hex/binary don’t use exponents
+    // here)
     if (base == 10 && has_fraction) {
-        result = result * fraction_place + fraction; // Temporarily scale up
+        result = result * fraction_place + fraction;  // Temporarily scale up
     }
 
     // Apply exponent (multiply or divide by powers of base)
@@ -157,25 +159,27 @@ u128 operator"" _u128(const char *str) noexcept {
         for (int i = 0; i < exponent; ++i) {
             multiplier = multiplier * u128(base);
         }
-        result = (base == 10 && has_fraction) ? result / fraction_place * multiplier : result * multiplier;
+        result = (base == 10 && has_fraction) ? result / fraction_place * multiplier
+                                              : result * multiplier;
         if (exp_negative) {
             result = result / multiplier;
         }
     }
 
-    return result; // Return truncated integer part
+    return result;  // Return truncated integer part
 }
 
 i128 operator"" _i128(const char *str) noexcept {
     bool is_negative = (*str == '-');
-    if (is_negative) ++str; // Skip the '-' sign if present
+    if (is_negative)
+        ++str;  // Skip the '-' sign if present
 
-    i128 result(0);           // Integer part
-    i128 fraction(0);         // Fractional part (before exponent)
-    i128 fraction_place(1);   // Denominator for fractional part
-    int base = 10;            // Default to decimal
+    i128 result(0);          // Integer part
+    i128 fraction(0);        // Fractional part (before exponent)
+    i128 fraction_place(1);  // Denominator for fractional part
+    int  base         = 10;  // Default to decimal
     bool has_fraction = false;
-    int exponent = 0;         // Exponent value
+    int  exponent     = 0;  // Exponent value
     bool exp_negative = false;
 
     // Check for prefixes
@@ -205,16 +209,16 @@ i128 operator"" _i128(const char *str) noexcept {
     // Parse fractional part (if any)
     if (*str == '.') {
         has_fraction = true;
-        ++str; // Skip the decimal point
+        ++str;  // Skip the decimal point
         while (*str && *str != 'e' && *str != 'E') {
             if (base == 16 && (*str >= 'a' && *str <= 'f')) {
-                fraction = fraction * i128(base) + i128(*str - 'a' + 10);
+                fraction       = fraction * i128(base) + i128(*str - 'a' + 10);
                 fraction_place = fraction_place * i128(base);
             } else if (base == 16 && (*str >= 'A' && *str <= 'F')) {
-                fraction = fraction * i128(base) + i128(*str - 'A' + 10);
+                fraction       = fraction * i128(base) + i128(*str - 'A' + 10);
                 fraction_place = fraction_place * i128(base);
             } else if (*str >= '0' && *str <= '9' && (*str - '0' < base)) {
-                fraction = fraction * i128(base) + i128(*str - '0');
+                fraction       = fraction * i128(base) + i128(*str - '0');
                 fraction_place = fraction_place * i128(base);
             }
             ++str;
@@ -223,12 +227,12 @@ i128 operator"" _i128(const char *str) noexcept {
 
     // Parse exponent (if any)
     if (*str == 'e' || *str == 'E') {
-        ++str; // Skip 'e' or 'E'
+        ++str;  // Skip 'e' or 'E'
         if (*str == '-') {
             exp_negative = true;
             ++str;
         } else if (*str == '+') {
-            ++str; // Skip optional '+'
+            ++str;  // Skip optional '+'
         }
         while (*str) {
             exponent = exponent * 10 + (*str - '0');
@@ -236,9 +240,10 @@ i128 operator"" _i128(const char *str) noexcept {
         }
     }
 
-    // Combine integer and fractional parts (for base 10 only, as hex/binary don’t use exponents here)
+    // Combine integer and fractional parts (for base 10 only, as hex/binary don’t use exponents
+    // here)
     if (base == 10 && has_fraction) {
-        result = result * fraction_place + fraction; // Temporarily scale up
+        result = result * fraction_place + fraction;  // Temporarily scale up
     }
 
     // Apply exponent (multiply or divide by powers of base)
@@ -247,13 +252,14 @@ i128 operator"" _i128(const char *str) noexcept {
         for (int i = 0; i < exponent; ++i) {
             multiplier = multiplier * i128(base);
         }
-        result = (base == 10 && has_fraction) ? result / fraction_place * multiplier : result * multiplier;
+        result = (base == 10 && has_fraction) ? result / fraction_place * multiplier
+                                              : result * multiplier;
         if (exp_negative) {
             result = result / multiplier;
         }
     }
 
-    return is_negative ? -result : result; // Apply sign and return truncated integer part
+    return is_negative ? -result : result;  // Apply sign and return truncated integer part
 }
 
 constexpr f32 operator"" _f32(long double v) noexcept { return static_cast<float>(v); }

@@ -16,8 +16,9 @@
 #ifndef _$_HX_CORE_M6BITSET
 #define _$_HX_CORE_M6BITSET
 
-#include <include/c++/libc++.hh>
 #include <include/config/config.h>
+
+#include <include/c++/libc++.hh>
 #include <include/runtime/__panic/panic_fwd.hh>
 #include <include/meta/traits.hh>
 #include <include/meta/enable_if.hh>
@@ -73,24 +74,23 @@ struct __BitSet<T> {
     template <typename U, typename = std::Meta::enable_if<libcxx::is_arithmetic_v<U>>>
     HELIX_FORCE_INLINE constexpr __BitSet(const U val) noexcept
         : value(static_cast<T>(val)) {
-        #if defined(__clang__) || defined(__GNUC__) || defined(__MINGW32__)
-            #pragma GCC diagnostic push
-            #pragma GCC diagnostic warning "-Woverflow"
-        #elif defined(_MSC_VER)
-            #pragma warning(push)
-            #pragma warning(1 : 4307) // Warning C4307: integral constant overflow
-        #endif
+#if defined(__clang__) || defined(__GNUC__) || defined(__MINGW32__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic warning "-Woverflow"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(1 : 4307)  // Warning C4307: integral constant overflow
+#endif
 
-        if (val > static_cast<U>(__NumData<T>::max) ||
-            val < static_cast<U>(__NumData<T>::min)) {
+        if (val > static_cast<U>(__NumData<T>::max) || val < static_cast<U>(__NumData<T>::min)) {
             value = static_cast<T>(val);
         }
 
-        #if defined(__clang__) || defined(__GNUC__) || defined(__MINGW32__)
-            #pragma GCC diagnostic pop
-        #elif defined(_MSC_VER)
-            #pragma warning(pop)
-        #endif
+#if defined(__clang__) || defined(__GNUC__) || defined(__MINGW32__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
     }
 
     // Total digits/bits (as defined in __NumData)
@@ -121,19 +121,19 @@ struct __BitSet<T> {
     // ── Arithmetic Operators ──
     // Addition operator with compile-time diagnostic and runtime check in debug.
     HELIX_FORCE_INLINE constexpr __BitSet operator+(const __BitSet &other) const noexcept
-        // DIAGNOSE_IF(((__builtin_constant_p(value) && __builtin_constant_p(other.value)) &&
-        //                  (__NumData<T>::is_signed
-        //                       ? ((other.value > 0 && value > __NumData<T>::max - other.value) ||
-        //                          (other.value < 0 && value < __NumData<T>::min - other.value))
-        //                       : (value > __NumData<T>::max - other.value)),
-        //              "Addition out of bounds",
-        //              "warning"))
-        {
+    // DIAGNOSE_IF(((__builtin_constant_p(value) && __builtin_constant_p(other.value)) &&
+    //                  (__NumData<T>::is_signed
+    //                       ? ((other.value > 0 && value > __NumData<T>::max - other.value) ||
+    //                          (other.value < 0 && value < __NumData<T>::min - other.value))
+    //                       : (value > __NumData<T>::max - other.value)),
+    //              "Addition out of bounds",
+    //              "warning"))
+    {
         T res = value + other.value;
         return __BitSet(res);
     }
 
-    int some_func(const int* oj);
+    int some_func(const int *oj);
 
     HELIX_FORCE_INLINE constexpr __BitSet &operator+=(const __BitSet &other) noexcept {
         *this = *this + other;
@@ -423,8 +423,6 @@ struct __BitSet<T> {
     }
 };
 
-
-
 // -----------------------------------------------------------------------------
 // Composite __BitSet for Multiple Numeric Types
 // -----------------------------------------------------------------------------
@@ -445,56 +443,52 @@ struct __BitSet<__BitSet<Head>, __BitSet<Tail>...> {
         : head(h)
         , tail(t...) {}
 
-    #define NARROWING_WARNING_PUSH \
-        _Pragma("GCC diagnostic push") \
-        _Pragma("GCC diagnostic warning \"-Wnarrowing\"") \
-        _Pragma("clang diagnostic push") \
-        _Pragma("clang diagnostic warning \"-Wnarrowing\"") \
-        _Pragma("warning(push)") \
-        _Pragma("warning(1 : 4244)") // MSVC: possible loss of data
+#define NARROWING_WARNING_PUSH                                                               \
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic warning \"-Wnarrowing\"")         \
+        _Pragma("clang diagnostic push") _Pragma("clang diagnostic warning \"-Wnarrowing\"") \
+            _Pragma("warning(push)") _Pragma("warning(1 : 4244)")  // MSVC: possible loss of data
 
-    #define NARROWING_WARNING_POP \
-        _Pragma("GCC diagnostic pop") \
-        _Pragma("clang diagnostic pop") \
-        _Pragma("warning(pop)")
+#define NARROWING_WARNING_POP \
+    _Pragma("GCC diagnostic pop") _Pragma("clang diagnostic pop") _Pragma("warning(pop)")
 
     // Signed conversions
     HELIX_FORCE_INLINE constexpr explicit operator signed char() const noexcept {
         NARROWING_WARNING_PUSH
-        signed char result = static_cast<signed char>(tail) + 
-                            (static_cast<signed char>(head) << __BitSet<Tail...>::bits());
+        signed char result = static_cast<signed char>(tail) +
+                             (static_cast<signed char>(head) << __BitSet<Tail...>::bits());
         NARROWING_WARNING_POP
         return result;
     }
 
     HELIX_FORCE_INLINE constexpr explicit operator signed short() const noexcept {
         NARROWING_WARNING_PUSH
-        signed short result = static_cast<signed short>(tail) + 
-                             (static_cast<signed short>(head) << __BitSet<Tail...>::bits());
+        signed short result = static_cast<signed short>(tail) +
+                              (static_cast<signed short>(head) << __BitSet<Tail...>::bits());
         NARROWING_WARNING_POP
         return result;
     }
 
     HELIX_FORCE_INLINE constexpr explicit operator signed int() const noexcept {
         NARROWING_WARNING_PUSH
-        signed int result = static_cast<signed int>(tail) + 
-                           (static_cast<signed int>(head) << __BitSet<Tail...>::bits());
+        signed int result = static_cast<signed int>(tail) +
+                            (static_cast<signed int>(head) << __BitSet<Tail...>::bits());
         NARROWING_WARNING_POP
         return result;
     }
 
     HELIX_FORCE_INLINE constexpr explicit operator signed long() const noexcept {
         NARROWING_WARNING_PUSH
-        signed long result = static_cast<signed long>(tail) + 
-                            (static_cast<signed long>(head) << __BitSet<Tail...>::bits());
+        signed long result = static_cast<signed long>(tail) +
+                             (static_cast<signed long>(head) << __BitSet<Tail...>::bits());
         NARROWING_WARNING_POP
         return result;
     }
 
     HELIX_FORCE_INLINE constexpr explicit operator signed long long() const noexcept {
         NARROWING_WARNING_PUSH
-        signed long long result = static_cast<signed long long>(tail) + 
-                                 (static_cast<signed long long>(head) << __BitSet<Tail...>::bits());
+        signed long long result =
+            static_cast<signed long long>(tail) +
+            (static_cast<signed long long>(head) << __BitSet<Tail...>::bits());
         NARROWING_WARNING_POP
         return result;
     }
@@ -502,46 +496,47 @@ struct __BitSet<__BitSet<Head>, __BitSet<Tail>...> {
     // Unsigned conversions
     HELIX_FORCE_INLINE constexpr explicit operator unsigned char() const noexcept {
         NARROWING_WARNING_PUSH
-        unsigned char result = static_cast<unsigned char>(tail) + 
-                              (static_cast<unsigned char>(head) << __BitSet<Tail...>::bits());
+        unsigned char result = static_cast<unsigned char>(tail) +
+                               (static_cast<unsigned char>(head) << __BitSet<Tail...>::bits());
         NARROWING_WARNING_POP
         return result;
     }
 
     HELIX_FORCE_INLINE constexpr explicit operator unsigned short() const noexcept {
         NARROWING_WARNING_PUSH
-        unsigned short result = static_cast<unsigned short>(tail) + 
-                               (static_cast<unsigned short>(head) << __BitSet<Tail...>::bits());
+        unsigned short result = static_cast<unsigned short>(tail) +
+                                (static_cast<unsigned short>(head) << __BitSet<Tail...>::bits());
         NARROWING_WARNING_POP
         return result;
     }
 
     HELIX_FORCE_INLINE constexpr explicit operator unsigned int() const noexcept {
         NARROWING_WARNING_PUSH
-        unsigned int result = static_cast<unsigned int>(tail) + 
-                             (static_cast<unsigned int>(head) << __BitSet<Tail...>::bits());
+        unsigned int result = static_cast<unsigned int>(tail) +
+                              (static_cast<unsigned int>(head) << __BitSet<Tail...>::bits());
         NARROWING_WARNING_POP
         return result;
     }
 
     HELIX_FORCE_INLINE constexpr explicit operator unsigned long() const noexcept {
         NARROWING_WARNING_PUSH
-        unsigned long result = static_cast<unsigned long>(tail) + 
-                              (static_cast<unsigned long>(head) << __BitSet<Tail...>::bits());
+        unsigned long result = static_cast<unsigned long>(tail) +
+                               (static_cast<unsigned long>(head) << __BitSet<Tail...>::bits());
         NARROWING_WARNING_POP
         return result;
     }
 
     HELIX_FORCE_INLINE constexpr explicit operator unsigned long long() const noexcept {
         NARROWING_WARNING_PUSH
-        unsigned long long result = static_cast<unsigned long long>(tail) + 
-                                   (static_cast<unsigned long long>(head) << __BitSet<Tail...>::bits());
+        unsigned long long result =
+            static_cast<unsigned long long>(tail) +
+            (static_cast<unsigned long long>(head) << __BitSet<Tail...>::bits());
         NARROWING_WARNING_POP
         return result;
     }
 
-    #undef NARROWING_WARNING_PUSH
-    #undef NARROWING_WARNING_POP
+#undef NARROWING_WARNING_PUSH
+#undef NARROWING_WARNING_POP
 
     // Total bits = bits in head + bits in tail.
     HELIX_FORCE_INLINE static constexpr unsigned bits() noexcept {
