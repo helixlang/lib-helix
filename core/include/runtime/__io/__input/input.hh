@@ -17,13 +17,12 @@
 #define _$_HX_CORE_M5INPUT
 
 #include <include/config/config.h>
+
 #include <include/runtime/__memory/memory.hh>
 #include <include/meta/meta.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
-
-
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
