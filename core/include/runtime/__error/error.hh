@@ -16,9 +16,9 @@
 #ifndef _$_HX_CORE_M5ERROR
 #define _$_HX_CORE_M5ERROR
 
-#include "null_value_error.hh"
-#include "runtime_error.hh"
-#include "state_mismatch_error.hh"
-#include "type_mismatch_error.hh"
+#include <include/runtime/__error/null_value_error.hh>
+#include <include/runtime/__error/runtime_error.hh>
+#include <include/runtime/__error/state_mismatch_error.hh>
+#include <include/runtime/__error/type_mismatch_error.hh>
 
 #endif  // _$_HX_CORE_M5ERROR

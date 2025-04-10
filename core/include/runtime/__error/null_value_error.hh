@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M16NULL_VALUE_ERROR
 
 #include <include/config/config.h>
+
 #include <include/types/string/basic.hh>
 
 #include "error_base.hh"

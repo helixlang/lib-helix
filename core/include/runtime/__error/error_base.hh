@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M10ERROR_BASE
 
 #include <include/config/config.h>
+
 #include <include/runtime/__memory/memory.hh>
 #include <include/types/string/basic.hh>
 
@@ -24,22 +25,22 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 namespace Error {
-    class Error /* with Panicking */ {
-        public:
-          Error() = default;
-      
-          Error(const Error &other)     = default;
-          Error(Error &&other) noexcept = default;
-      
-          Error &operator=(const Error &other)     = default;
-          Error &operator=(Error &&other) noexcept = default;
-      
-          virtual ~Error() = default;
-      
-          [[nodiscard]] virtual string operator$panic() const { return L"An error occurred."; }
-          [[nodiscard]] virtual string operator$cast(string * /*unused*/) const = 0; // string cast
-      };
+class Error /* with Panicking */ {
+  public:
+    Error() = default;
+
+    Error(const Error &other)     = default;
+    Error(Error &&other) noexcept = default;
+
+    Error &operator=(const Error &other)     = default;
+    Error &operator=(Error &&other) noexcept = default;
+
+    virtual ~Error() = default;
+
+    [[nodiscard]] virtual string operator$panic() const { return L"An error occurred."; }
+    [[nodiscard]] virtual string operator$cast(string * /*unused*/) const = 0;  // string cast
 };
+};  // namespace Error
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
