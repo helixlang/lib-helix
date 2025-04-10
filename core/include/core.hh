@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M4CORE
 
 #include <include/config/config.h>
+
 #include <include/c++/libc++.hh>
 #include <include/meta/meta.hh>
 #include <include/runtime/runtime.hh>
