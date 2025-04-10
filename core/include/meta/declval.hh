@@ -21,7 +21,7 @@
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
-namespace Meta { /// portable bindings for declval
+namespace Meta {  /// portable bindings for declval
 template <class T>
 T &&__declval(int);  // NOLINT
 template <class T>

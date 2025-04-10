@@ -55,7 +55,6 @@ namespace libcxx = ::std;
 #define LIBCXX_NAMESPACE libcxx
 #define LIBC_NAMESPACE libc
 
-
 #define HELIX_FORCE_INLINE [[gnu::always_inline]] inline
 
 #if !defined(__has_builtin)
