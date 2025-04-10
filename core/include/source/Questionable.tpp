@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M12QUESTIONABLE_TPP
 
 #include <include/config/config.h>
+
 #include <include/c++/libc++.hh>
 #include <include/meta/meta.hh>
 #include <include/runtime/runtime.hh>
@@ -223,8 +224,8 @@ E $question<T>::operator$cast(E * /*unused*/) const {
             if (obj) {
                 return *reinterpret_cast<E *>(obj);
             }
-            _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(
-                std::Error::NullValueError(string(L"Invalid Decay: error context object is null.")));
+            _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(std::Error::NullValueError(
+                string(L"Invalid Decay: error context object is null.")));
         }
         data.error.operator$panic();
     }
@@ -234,7 +235,8 @@ E $question<T>::operator$cast(E * /*unused*/) const {
             return data.value;
         }
 
-        _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(std::Error::TypeMismatchError(L"Invalid cast: value type does not match requested type."));
+        _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(std::Error::TypeMismatchError(
+            L"Invalid cast: value type does not match requested type."));
     }
 
     _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(std::Error::NullValueError(L"Invalid Decay: value is null."));
