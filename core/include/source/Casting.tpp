@@ -29,7 +29,7 @@ H_STD_NAMESPACE_BEGIN
 template <typename Ty, typename Up>
 Ty as_cast(Up &value) {
     if constexpr (std::Meta::is_const<std::Meta::reference_removed<Up>> &&
-        std::Meta::same_as<std::Meta::const_removed<Up>, Ty>) {
+                  std::Meta::same_as<std::Meta::const_removed<Up>, Ty>) {
         return const_cast<Ty>(value);
     }
 
