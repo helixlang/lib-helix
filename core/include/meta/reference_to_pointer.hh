@@ -38,11 +38,11 @@ namespace _types {
     struct reference_to_pointer<T &&> {
         using type = T *;
     };
-}
+}  // namespace _types
 
 template <typename T>
 using ref_as_ptr = typename _types::reference_to_pointer<T>::type;
-}
+}  // namespace Meta
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END

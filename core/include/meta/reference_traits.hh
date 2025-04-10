@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M16REFERENCE_TRAITS
 
 #include <include/config/config.h>
+
 #include "integral_constant.hh"
 #include "traits.hh"
 
@@ -33,7 +34,8 @@ namespace _types {
     };
 
     template <typename T,
-              bool = (!Meta::same_as<decltype(_types::is_referenceable_helper::test<T>(0)), false_t>)>
+              bool =
+                  (!Meta::same_as<decltype(_types::is_referenceable_helper::test<T>(0)), false_t>)>
     struct add_rvalue_reference {
         using type = T;
     };
@@ -44,7 +46,8 @@ namespace _types {
     };
 
     template <typename T,
-              bool = (!Meta::same_as<decltype(_types::is_referenceable_helper::test<T>(0)), false_t>)>
+              bool =
+                  (!Meta::same_as<decltype(_types::is_referenceable_helper::test<T>(0)), false_t>)>
     struct add_lvalue_reference {
         using type = T;
     };
@@ -84,10 +87,10 @@ namespace _types {
     struct is_pointer : public false_t {};
 
     template <class T>
-    struct is_pointer<T*> : public true_t {};
+    struct is_pointer<T *> : public true_t {};
 
     template <class T>
-    struct is_pointer<T**> : public true_t {};
+    struct is_pointer<T **> : public true_t {};
 
 }  // namespace _types
 
@@ -97,7 +100,7 @@ using as_rvalue_reference = typename _types::add_rvalue_reference<T>::type;
 template <typename T>
 using as_lvalue_reference = typename _types::add_lvalue_reference<T>::type;
 
-template <typename T> // FIXME( add typename is msvc requires it )
+template <typename T>  // FIXME( add typename is msvc requires it )
 concept is_lval_reference = _types::is_lvalue_reference<T>::value;
 
 template <typename T>
@@ -110,7 +113,8 @@ template <typename T>
 concept is_pointer = _types::is_pointer<T>::value;
 
 template <typename T>
-concept is_referenceable = !Meta::same_as<decltype(_types::is_referenceable_helper::test<T>(0)), false_t>;
+concept is_referenceable =
+    !Meta::same_as<decltype(_types::is_referenceable_helper::test<T>(0)), false_t>;
 }  // namespace Meta
 
 H_STD_NAMESPACE_END

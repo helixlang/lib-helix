@@ -34,5 +34,4 @@ struct enable_if<true, T> {
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
 
-
 #endif  // _$_HX_CORE_M9ENABLE_IF

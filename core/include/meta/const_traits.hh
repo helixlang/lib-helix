@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M12CONST_TRAITS
 
 #include <include/config/config.h>
+
 #include "remove_reference.hh"
 
 H_NAMESPACE_BEGIN
@@ -24,56 +25,56 @@ H_STD_NAMESPACE_BEGIN
 
 namespace Meta {
 namespace _types {
-    
-template <typename T>
-struct remove_const {
-    using type = T;
-};
 
-template <typename T>
-struct remove_const<const T> {
-    using type = T;
-};
+    template <typename T>
+    struct remove_const {
+        using type = T;
+    };
 
-template <typename T>
-struct remove_const_volatile {
-    using type = T;
-};
+    template <typename T>
+    struct remove_const<const T> {
+        using type = T;
+    };
 
-template <typename T>
-struct remove_const_volatile<const T> {
-    using type = T;
-};
+    template <typename T>
+    struct remove_const_volatile {
+        using type = T;
+    };
 
-template <typename T>
-struct remove_const_volatile<volatile T> {
-    using type = T;
-};
+    template <typename T>
+    struct remove_const_volatile<const T> {
+        using type = T;
+    };
 
-template <typename T>
-struct remove_const_volatile<const volatile T> {
-    using type = T;
-};
+    template <typename T>
+    struct remove_const_volatile<volatile T> {
+        using type = T;
+    };
 
-template <typename T>
-struct remove_cvref {
-    using type = typename remove_const_volatile<typename remove_reference<T>::type>::type;
-};
+    template <typename T>
+    struct remove_const_volatile<const volatile T> {
+        using type = T;
+    };
 
-template <class T>
-struct add_const {
-    using type = const T;
-};
+    template <typename T>
+    struct remove_cvref {
+        using type = typename remove_const_volatile<typename remove_reference<T>::type>::type;
+    };
 
-template <class T>
-struct add_const_volatile {
-    using type = const T;
-};
+    template <class T>
+    struct add_const {
+        using type = const T;
+    };
 
-template <class T>
-struct add_cvref {
-    using type = const T;
-};
+    template <class T>
+    struct add_const_volatile {
+        using type = const T;
+    };
+
+    template <class T>
+    struct add_cvref {
+        using type = const T;
+    };
 }  // namespace _types
 
 template <class T>
@@ -97,6 +98,5 @@ using as_cvref = typename _types::add_cvref<T>::type;
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
-
 
 #endif  // _$_HX_CORE_M12CONST_TRAITS
