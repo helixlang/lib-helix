@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M17PANICFRAMECONTEXT_TPP
 
 #include <include/config/config.h>
+
 #include <include/c++/libc++.hh>
 #include <include/meta/meta.hh>
 #include <include/runtime/runtime.hh>
@@ -86,9 +87,7 @@ FrameContext::FrameContext(T *obj)
     handler = &FrameContext::throw_object<T>;
 }
 
-bool FrameContext::operator!=(const libcxx::type_info *rhs) const {
-    return !(*this == rhs);
-}
+bool FrameContext::operator!=(const libcxx::type_info *rhs) const { return !(*this == rhs); }
 
 bool FrameContext::operator==(const libcxx::type_info *rhs) const {
     if (this->error != nullptr) {
