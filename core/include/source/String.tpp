@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M6STRING_TPP
 
 #include <include/config/config.h>
+
 #include <include/c++/libc++.hh>
 #include <include/meta/meta.hh>
 #include <include/runtime/runtime.hh>
@@ -26,11 +27,11 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 namespace String::__internal {
-    namespace {
-        constexpr static usize log2_sizeof_wchar_t_2 = static_cast<usize>(sizeof(wchar_t) > 1) +
-                                                     static_cast<usize>(sizeof(wchar_t) > 2) +
-                                                     static_cast<usize>(sizeof(wchar_t) > 4);
-    }
+namespace {
+    constexpr static usize log2_sizeof_wchar_t_2 = static_cast<usize>(sizeof(wchar_t) > 1) +
+                                                   static_cast<usize>(sizeof(wchar_t) > 2) +
+                                                   static_cast<usize>(sizeof(wchar_t) > 4);
+}
 }  // namespace String::__internal
 
 namespace String {
@@ -45,7 +46,7 @@ template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline basic<CharT, Traits> &basic<CharT, Traits>::operator=(const CharT *str) noexcept {
     static constexpr CharT e[] = {0};
-    data = str ? str : e;
+    data                       = str ? str : e;
     return *this;
 }
 
@@ -121,16 +122,13 @@ template <typename CharT, typename Traits>
 template <typename U>
 inline basic<CharT, Traits>::basic(
     const char *str,
-    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> *) noexcept {
-    usize    size = LIBCXX_NAMESPACE::char_traits<char>::length(str);
-    auto *buff = static_cast<wchar_t *>(alloca((size + 1) << String::__internal::log2_sizeof_wchar_t_2));
-
-    try {
-        for (usize i = 0; i < size; ++i) {
-            buff[i] = static_cast<wchar_t>(static_cast<unsigned char>(str[i]));
-        }
-        data = buff;
-    } catch (...) { data = L""; }
+    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * /* unused */) noexcept {
+    if (!str) {
+        data = L"";
+        return;
+    }
+    usize size = LIBCXX_NAMESPACE::char_traits<char>::length(str);
+    data       = sstring_to_string(sstring(str, size)).data;
 }
 
 template <typename CharT, typename Traits>
@@ -139,22 +137,18 @@ template <typename U>
 inline basic<CharT, Traits>::basic(
     const char *str,
     usize       size,
-    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> *) noexcept {
-    auto *buff = static_cast<wchar_t *>(alloca((size) << String::__internal::log2_sizeof_wchar_t_2));
-
-    try {
-        for (usize i = 0; i < size; ++i) {
-            buff[i] = static_cast<wchar_t>(static_cast<unsigned char>(str[i]));
-        }
-        data = buff;
-    } catch (...) { data = L""; }
+    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * /* unused */) noexcept {
+    if (!str || size == 0) {
+        data = L"";
+        return;
+    }
+    data = sstring_to_string(sstring(str, size)).data;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline basic<CharT, Traits> basic<CharT, Traits>::subslice(size_t pos, size_t len) const noexcept {
-    return basic(
-        data.substr(static_cast<size_t>(pos), static_cast<size_t>(len)).c_str());
+    return basic(data.substr(static_cast<size_t>(pos), static_cast<size_t>(len)).c_str());
 }
 
 template <typename CharT, typename Traits>
@@ -317,14 +311,16 @@ inline std::Questionable<usize> basic<CharT, Traits>::find_last_of(slice needle,
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-inline std::Questionable<usize> basic<CharT, Traits>::find_first_not_of(slice needle, usize pos) const {
+inline std::Questionable<usize> basic<CharT, Traits>::find_first_not_of(slice needle,
+                                                                        usize pos) const {
     auto s = data.find_first_not_of(needle, pos);
     return s == string_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(s);
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-inline std::Questionable<usize> basic<CharT, Traits>::find_last_not_of(slice needle, usize pos) const {
+inline std::Questionable<usize> basic<CharT, Traits>::find_last_not_of(slice needle,
+                                                                       usize pos) const {
     auto s = data.find_last_not_of(needle, pos);
     return s == string_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(s);
 }
