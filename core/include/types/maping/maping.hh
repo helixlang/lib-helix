@@ -20,8 +20,6 @@
 
 H_NAMESPACE_BEGIN
 
-
-
 H_NAMESPACE_END
 
 #endif  // _$_HX_CORE_M6MAPING
