@@ -71,12 +71,12 @@ class basic {
 
     template <typename U = CharT>
     explicit basic(const char *str,
-                    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
+                   typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
     template <typename U = CharT>
     basic(const char *str,
-                    usize       size,
-                    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
+          usize       size,
+          typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
     // Assignment
     basic &operator=(const basic &other) noexcept = default;
@@ -85,7 +85,7 @@ class basic {
     basic &operator=(const slice_t &s) noexcept;
 
     // Access Operators
-    CharT &operator[](size_t index) noexcept { return data[static_cast<size_t>(index)]; }
+    CharT       &operator[](size_t index) noexcept { return data[static_cast<size_t>(index)]; }
     const CharT &operator[](size_t index) const noexcept {
         return data[static_cast<size_t>(index)];
     }
