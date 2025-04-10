@@ -17,6 +17,7 @@
 #define _$_HX_CORE_M14GENERATOR_IMPL
 
 #include <include/config/config.h>
+
 #include <include/runtime/__memory/memory.hh>
 
 H_NAMESPACE_BEGIN
