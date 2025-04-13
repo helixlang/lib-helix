@@ -68,8 +68,7 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     let open_file = fn (file_path: string) -> i32 {
         const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
             let fd: i32 = -1;
-            let err: errno_t = _sopen_s(&fd, std::string_to_sstring(file_path).raw(), O_RDONLY, _SH_DENYNO, 0);
-            
+            let err: errno_t = _wsopen_s(&fd, file_path.raw(), O_RDONLY | _O_BINARY, _SH_DENYNO, 0);
             return -1 if err != 0 else fd;
         } else {
             return open(std::string_to_sstring(file_path).raw(), O_RDONLY);
@@ -85,10 +84,12 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     };
 
     let read_file = fn (fd: i32, buffer: *char, size: u32) -> isize {
+        let byte_size: usize = size * sizeof(char);
+        
         const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
-            return _read(fd, buffer, size);
+            return _read(fd, buffer, byte_size);
         } else {
-            return read(fd, buffer, size);
+            return read(fd, buffer, byte_size);
         }
     };
 
@@ -99,28 +100,28 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     let get_line_from_file = fn (fd: i32, line_number: usize) -> string? {
         const BUFFER_SIZE: usize = 4096;
 
-        let buffer:       *char  = &null;
-        let bytes_read:    isize = 0;
-        let current_line:  usize = 1;
+        let byte_buffer:  *char   = &null;
+        let bytes_read:    isize  = 0;
+        let current_line:  usize  = 1;
         let line:          string;
 
         if fd < 0 {
             return null;
         }
 
-        buffer = malloc(BUFFER_SIZE) as unsafe *char;
-        finally: if buffer != &null: free(buffer);
+        byte_buffer = malloc(BUFFER_SIZE * sizeof(char)) as unsafe *char;
+        finally: if byte_buffer != &null { free(byte_buffer); }
 
-        if buffer == &null: return null;
+        if byte_buffer == &null: return null;
 
-        while (bytes_read = read_file(fd, buffer, BUFFER_SIZE)) > 0 {
-            for let i: isize = 0; i < bytes_read; ++i {
-                let ch: char = buffer[i];
-                
+        while (bytes_read = read_file(fd, byte_buffer, BUFFER_SIZE)) > 0 {
+            let bytes_count: usize = bytes_read / sizeof(char);
+
+            for let i: usize = 0; i < bytes_count; ++i {
+                let ch: char = byte_buffer[i];
                 if ch == '\n' {
                     if current_line == line_number:
                         return line;
-
                     line.clear();
                     ++current_line;
                 } else {
@@ -136,21 +137,21 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     };
 
     if fd < 0 {
-        print(f"{bold}{red}{error_t}:{reset}{white} file descriptor lost for {light_green}'{file_path}'{reset}. Maybe the file was moved or deleted?");
-        print(f"    {bold}{red}panic reason:{reset}{white} {message}");
+        print(bold + red + error_t + ":" + reset + white + " file descriptor lost for " + light_green + "\'" + file_path + "\'" + reset + ". Maybe the file was moved or deleted?");
+        print("    " + bold + red + "panic reason:" + reset + white + " " + message);
+        
         (*((*frame).get_context())).crash();
     }
 
-    print(f"{bold}{red}{error_t}:{reset}{white} {message}");
-    print(f"    --> {white} file {light_green}{file_path}{white}:{yellow}{line_no}{reset}");
+    print(bold + red + error_t + ":" + reset + white + " " + message);
+    print("    --> " + white + " file " + light_green + file_path + white + ":" + yellow + line_no + reset);
 
     let line = get_line_from_file(fd, line_no);
     if line != null:
-        print(f"   {bold}{line_no} | {reset}{red}{line}{reset}");
+        print("   " + bold + line_no + " | " + reset + red + line + reset);
     else:
-        print(f"   {bold}{line_no} | {reset}{red}Error reading file{reset}");
+        print("   " + bold + line_no + " | " + reset + red + "Error reading file" + reset);
 
-    // signal process termination
     (*((*frame).get_context())).crash();
 }
 
