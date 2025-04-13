@@ -40,34 +40,36 @@ H_STD_NAMESPACE_BEGIN
 /// f"hi: {some_expr() + 12}"    -> stringf("hi: \{\}", some_expr() + 12)
 ///
 template <typename... Ty>
-inline string stringf(string s, Ty &&...t) {
-    const string args[sizeof...(t)] = {to_string(H_STD_NAMESPACE::Memory::forward<Ty>(t))...};
+inline string stringf(string fmt, Ty &&...args) {
+    const wchar_t placeholder_chars[] = {L'\\', L'{', L'\\', L'}'};
+    const string::slice placeholder = string::slice(placeholder_chars, 4);
 
-    string result = Memory::move(s);
-    usize  pos    = 0;
+    const string arg_strs[sizeof...(Ty)] = {to_string(H_STD_NAMESPACE::Memory::forward<Ty>(args))...};
+
+    string result = Memory::move(fmt);
+    usize pos = 0;
 
     usize arg_index = 0;
-    while (arg_index < sizeof...(t)) {
-        auto placeholder = string::slice(L"\\{\\}", 4);  // Wide string placeholder
-        std::Questionable<usize> found_pos = result.lfind(placeholder, pos);
-
-        if (found_pos == null) {
-            _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(
-                Error::RuntimeError(L"error: [f-string rt]: too many arguments for format string"));
+    while (arg_index < sizeof...(Ty)) {
+        auto found = result.lfind(placeholder, pos);
+        if (found == null) {
+            _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"[f-string rt]: too many arguments for format string"));
         }
 
-        usize replace_pos = *found_pos;
-        result.replace(replace_pos, 4, args[arg_index]);
 
-        pos = replace_pos + args[arg_index].size();
+        usize replace_pos = *found;
+        const string& arg_str = arg_strs[arg_index];
+
+        result.replace(replace_pos, placeholder.size(), arg_str);
+
+        pos = replace_pos + arg_str.size();
         ++arg_index;
     }
 
-    auto                     remaining_placeholder = string::slice(L"\\{\\}", 4);
-    std::Questionable<usize> remaining_pos         = result.lfind(remaining_placeholder, pos);
-    if (remaining_pos != null) {
-        _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(
-            Error::RuntimeError(L"error: [f-string rt]: too few arguments for format string"));
+    // Ensure no placeholders are left
+    auto leftover = result.lfind(placeholder, pos);
+    if (leftover != null) {
+        _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"[f-string rt]: too few arguments for format string"));
     }
 
     return result;

@@ -134,4 +134,21 @@ class slice {
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
 
+// make hash able
+namespace std {
+template <>
+struct hash<helix::std::String::slice<wchar_t>> {
+    size_t operator()(const helix::std::String::slice<wchar_t> &s) const noexcept {
+        return std::hash<std::wstring>{}(std::wstring(s.raw(), s.size()));
+    }
+};
+
+template <>
+struct hash<helix::std::String::slice<char>> {
+    size_t operator()(const helix::std::String::slice<char> &s) const noexcept {
+        return std::hash<std::string>{}(std::string(s.raw(), s.size()));
+    }
+};
+}  // namespace std
+
 #endif  // _$_HX_CORE_M5SLICE
