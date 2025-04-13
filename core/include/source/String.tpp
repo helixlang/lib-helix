@@ -285,28 +285,28 @@ template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline std::Questionable<usize> basic<CharT, Traits>::lfind(slice needle, usize pos) const {
     auto s = data.find(needle, pos);
-    return s == string_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(s);
+    return s == string_t::npos ? null : std::Questionable<usize>(s);
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline std::Questionable<usize> basic<CharT, Traits>::rfind(slice needle, usize pos) const {
     auto s = data.rfind(needle, pos);
-    return s == string_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(s);
+    return s == string_t::npos ? null : std::Questionable<usize>(s);
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline std::Questionable<usize> basic<CharT, Traits>::find_first_of(slice needle, usize pos) const {
     auto s = data.find_first_of(needle, pos);
-    return s == string_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(s);
+    return s == string_t::npos ? null : std::Questionable<usize>(s);
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline std::Questionable<usize> basic<CharT, Traits>::find_last_of(slice needle, usize pos) const {
     auto s = data.find_last_of(needle, pos);
-    return s == string_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(s);
+    return s == string_t::npos ? null : std::Questionable<usize>(s);
 }
 
 template <typename CharT, typename Traits>
@@ -314,7 +314,7 @@ template <typename CharT, typename Traits>
 inline std::Questionable<usize> basic<CharT, Traits>::find_first_not_of(slice needle,
                                                                         usize pos) const {
     auto s = data.find_first_not_of(needle, pos);
-    return s == string_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(s);
+    return s == string_t::npos ? null : std::Questionable<usize>(s);
 }
 
 template <typename CharT, typename Traits>
@@ -322,7 +322,7 @@ template <typename CharT, typename Traits>
 inline std::Questionable<usize> basic<CharT, Traits>::find_last_not_of(slice needle,
                                                                        usize pos) const {
     auto s = data.find_last_not_of(needle, pos);
-    return s == string_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(s);
+    return s == string_t::npos ? null : std::Questionable<usize>(s);
 }
 
 template class basic<char>;

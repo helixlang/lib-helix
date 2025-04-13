@@ -18,10 +18,10 @@
 
 #include <include/config/config.h>
 
-#include <include/types/string/slice.hh>
 #include <include/meta/__interfaces/casting.hh>
 #include <include/runtime/__memory/forwarding.hh>
 #include <include/types/string/char_traits.hh>
+#include <include/types/string/slice.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -173,5 +173,35 @@ using sstring = std::String::basic<char>;
 using string  = std::String::basic<wchar_t>;
 
 H_NAMESPACE_END
+
+namespace std {
+template <>
+struct hash<helix::string> {
+    size_t operator()(const helix::string &s) const noexcept {
+        return std::hash<std::wstring>{}(std::wstring(s.raw(), s.size()));
+    }
+};
+
+template <>
+struct hash<helix::sstring> {
+    size_t operator()(const helix::sstring &s) const noexcept {
+        return std::hash<std::string>{}(std::string(s.raw(), s.size()));
+    }
+};
+
+template <>
+struct hash<helix::string::slice> {
+    size_t operator()(const helix::string::slice &s) const noexcept {
+        return std::hash<std::wstring>{}(std::wstring(s.raw(), s.size()));
+    }
+};
+
+template <>
+struct hash<helix::sstring::slice> {
+    size_t operator()(const helix::sstring::slice &s) const noexcept {
+        return std::hash<std::string>{}(std::string(s.raw(), s.size()));
+    }
+};
+}  // namespace libcxx
 
 #endif  // _$_HX_CORE_M5BASIC
