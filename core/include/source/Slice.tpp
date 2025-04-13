@@ -247,42 +247,42 @@ template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 std::Questionable<usize> slice<CharT, Traits>::lfind(slice &needle) const {
     usize pos = data.find(needle);
-    return pos == view_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(pos);
+    return pos == view_t::npos ? null : std::Questionable<usize>(pos);
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 std::Questionable<usize> slice<CharT, Traits>::rfind(slice &needle) const {
     usize pos = data.rfind(needle);
-    return pos == view_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(pos);
+    return pos == view_t::npos ? null : std::Questionable<usize>(pos);
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 std::Questionable<usize> slice<CharT, Traits>::find_first_of(slice &needle) const {
     usize pos = data.find_first_of(needle);
-    return pos == view_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(pos);
+    return pos == view_t::npos ? null : std::Questionable<usize>(pos);
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 std::Questionable<usize> slice<CharT, Traits>::find_last_of(slice &needle) const {
     usize pos = data.find_last_of(needle);
-    return pos == view_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(pos);
+    return pos == view_t::npos ? null : std::Questionable<usize>(pos);
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 std::Questionable<usize> slice<CharT, Traits>::find_first_not_of(slice &needle) const {
     usize pos = data.find_first_not_of(needle);
-    return pos == view_t::npos ? std::Questionable<usize>() : std::Questionable<usize>(pos);
+    return pos == view_t::npos ? null : std::Questionable<usize>(pos);
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 std::Questionable<usize> slice<CharT, Traits>::find_last_not_of(slice &needle) const {
     usize pos = data.find_last_not_of(needle);
-    return (pos == view_t::npos) ? std::Questionable<usize>() : std::Questionable<usize>(pos);
+    return (pos == view_t::npos) ? null : std::Questionable<usize>(pos);
 }
 
 template <typename CharT, typename Traits>

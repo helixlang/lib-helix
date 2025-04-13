@@ -185,13 +185,13 @@ bool $question<T>::operator==(const E &) const noexcept {
         return is_err(&typeid(E));
     }
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
     if constexpr (false) {
 #endif
         _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(
             std::Error::TypeMismatchError(L"Invalid: error type does not match any panic state."));
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
     }
 #endif
 }
@@ -257,13 +257,29 @@ T $question<T>::operator$cast(T * /*unused*/) const {
 
 template <class T>
 [[nodiscard]] T &$question<T>::operator*() {
-    thread_local static T result = operator$cast(static_cast<T *>(nullptr));
-    return result;
+    if (state == $State::Value) {
+        thread_local static T &result = data.value;
+        return result;
+    }
+
+    if (state == $State::Error) {
+        data.error.operator$panic();
+    }
+
+    _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(std::Error::NullValueError(L"Invalid Decay: value is null."));
 }
 template <class T>
 [[nodiscard]] $question<T>::operator T() {
-    thread_local static T result = operator$cast(static_cast<T *>(nullptr));
-    return result;
+    if (state == $State::Value) {
+        thread_local static T &result = data.value;
+        return result;
+    }
+
+    if (state == $State::Error) {
+        data.error.operator$panic();
+    }
+
+    _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(std::Error::NullValueError(L"Invalid Decay: value is null."));
 }
 
 H_NAMESPACE_END
