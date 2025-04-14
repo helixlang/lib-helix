@@ -62,6 +62,7 @@
 #include <limits>
 #include <list>
 #include <locale>
+#include <codecvt>
 #include <map>
 #include <memory>
 #include <mutex>

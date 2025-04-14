@@ -29,6 +29,7 @@
 /// \note This panic handler is globally accessible to any Helix module that wildcard-imports `core.hlx`.
 
 ffi "c++" import "include/runtime/__panic/panic.hh";
+ffi "c++" import "include/runtime/__panic/stacktrace.hh";
 
 /// \brief Displays runtime panic details and signals program termination.
 ///
@@ -65,92 +66,144 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     const yellow:      string = "\033[33m";
     const light_green: string = "\033[92m";
 
-    let open_file = fn (file_path: string) -> i32 {
-        const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
-            let fd: i32 = -1;
-            let err: errno_t = _wsopen_s(&fd, file_path.raw(), O_RDONLY | _O_BINARY, _SH_DENYNO, 0);
-            return -1 if err != 0 else fd;
-        } else {
-            return open(std::string_to_sstring(file_path).raw(), O_RDONLY);
-        }
-    };
-
-    let close_file = fn (fd: i32) {
-        const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
-            _close(fd);
-        } else {
-            close(fd);
-        }
-    };
-
-    let read_file = fn (fd: i32, buffer: *char, size: u32) -> isize {
-        let byte_size: usize = size * sizeof(char);
-        
-        const eval if defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER) {
-            return _read(fd, buffer, byte_size);
-        } else {
-            return read(fd, buffer, byte_size);
-        }
-    };
-
-    const fd: i32 = open_file(file_path);
-    finally:
-        if fd >= 0: close_file(fd);
-
-    let get_line_from_file = fn (fd: i32, line_number: usize) -> string? {
-        const BUFFER_SIZE: usize = 4096;
-
-        let byte_buffer:  *char   = &null;
-        let bytes_read:    isize  = 0;
-        let current_line:  usize  = 1;
-        let line:          string;
-
-        if fd < 0 {
+    fn read_file(const file: *string) -> string? {
+        let content = libcxx::ifstream(std::string_to_sstring(*file).raw(), libcxx::ios::binary);
+    
+        if !content {
             return null;
         }
 
-        byte_buffer = malloc(BUFFER_SIZE * sizeof(char)) as unsafe *char;
-        finally: if byte_buffer != &null { free(byte_buffer); }
+        let utf8_str = libcxx::string((libcxx::istreambuf_iterator<std::Legacy::char>(content)), libcxx::istreambuf_iterator::<std::Legacy::char>());
+        
+        let conv: libcxx::wstring_convert::<libcxx::codecvt_utf8::<char>>;
+        let wide = string(conv.from_bytes(utf8_str));
+        
+        if wide.length() > 0 {
+            return wide;
+        }
 
-        if byte_buffer == &null: return null;
+        return null;
+    }
 
-        while (bytes_read = read_file(fd, byte_buffer, BUFFER_SIZE)) > 0 {
-            let bytes_count: usize = bytes_read / sizeof(char);
+    fn lines_in_file(const content: *string) -> usize {
+        let current_line: usize = 1;
+        let i: usize = 0;
+        let len: usize = (*content).length();
 
-            for let i: usize = 0; i < bytes_count; ++i {
-                let ch: char = byte_buffer[i];
-                if ch == '\n' {
-                    if current_line == line_number:
-                        return line;
-                    line.clear();
-                    ++current_line;
-                } else {
-                    line += ch;
-                }
+        while i < len {
+            let ch: char = (*content)[i];
+
+            if ch == '\n' {
+                ++current_line;
+                ++i;
+            } else if ch == '\r' && (i + 1 < len) && (*content)[i + 1] == '\n' {
+                ++current_line;
+                i += 2;
+            } else {
+                ++i;
             }
         }
 
-        if current_line == line_number:
+        return current_line;
+    }
+
+    fn get_line(line_no: usize, const content: *string) -> string? {
+        let current_line: usize = 1;
+        let line: string;
+        let i: usize = 0;
+        let len: usize = (*content).length();
+
+        while i < len {
+            let ch: char = (*content)[i];
+
+            if ch == '\n' {
+                if current_line == line_no {
+                    return line;
+                }
+                line.clear();
+                ++current_line;
+                ++i;
+            } else if ch == '\r' && (i + 1 < len) && (*content)[i + 1] == '\n' {
+                if current_line == line_no {
+                    return line;
+                }
+                line.clear();
+                ++current_line;
+                i += 2;
+            } else {
+                line += ch;
+                ++i;
+            }
+        }
+
+        if current_line == line_no {
             return line;
+        }
 
         return null;
+    }
+
+    let print_error_reading_file = fn (const file: *string, line_num: usize) {
+        print(bold + red + error_t + ":" + reset + white + " file could not be read " + light_green + " " + (*file) + white + ":" + yellow + std::to_string(line_num) + reset + ". Maybe the file was moved or deleted?");
+        print("    " + bold + red + "panic reason:" + reset + white + " " + message);
     };
 
-    if fd < 0 {
-        print(bold + red + error_t + ":" + reset + white + " file descriptor lost for " + light_green + "\'" + file_path + "\'" + reset + ". Maybe the file was moved or deleted?");
-        print("    " + bold + red + "panic reason:" + reset + white + " " + message);
-        
+    const question_file_content: string? = read_file(&file_path);
+
+    if question_file_content == null {
+        print_error_reading_file(&file_path, line_no);
         (*((*frame).get_context())).crash();
     }
 
-    print(bold + red + error_t + ":" + reset + white + " " + message);
-    print("    --> " + white + " file " + light_green + file_path + white + ":" + yellow + line_no + reset);
+    const file_content: string = question_file_content as string;
+    let total_lines = lines_in_file(&file_content);
+    
+    if line_no > total_lines {
+        print_error_reading_file(&file_path, line_no);
+        (*((*frame).get_context())).crash();
+    }
 
-    let line = get_line_from_file(fd, line_no);
-    if line != null:
-        print("   " + bold + line_no + " | " + reset + red + line + reset);
-    else:
-        print("   " + bold + line_no + " | " + reset + red + "Error reading file" + reset);
+    let line: string? = get_line(line_no, &file_content);
+
+    if line == null {
+        print_error_reading_file(&file_path, line_no);
+        (*((*frame).get_context())).crash();
+    }
+
+    // format the line number to fit in a 5 character space + 1 space
+    let line_no_str: string = std::to_string(line_no);
+    let spaces: string;
+    
+    for let i: usize = line_no_str.length(); i < 4; ++i {
+        spaces += " ";
+    }
+
+    line_no_str = spaces + line_no_str + " ";
+
+    print(red + "panic: " + reset + yellow + error_t + reset + "(" + bold + message + reset + ")");
+    print("    --> " + white + " file " + light_green + file_path + white + ":" + yellow + std::to_string(line_no) + reset);
+    print(line_no_str + "| " + reset + line);
+    
+    let marker: string;
+    let spaces_ended: bool = false;
+
+    for let i: usize = 0; i < (*line).length(); ++i {
+        if (*line)[i] == ' ' {
+            if !spaces_ended {
+                marker += " ";
+            }
+        } else {
+            spaces_ended = true;
+            marker += "^";
+        }
+    }
+    print("     | " + red + marker + reset + "\n");
+
+    let trace = std::StackTrace::get_frames(10);
+    
+    for frame in trace {
+        print(f"function: {frame.function}, file: {frame.file}, line: {frame.line}");
+    }
 
     (*((*frame).get_context())).crash();
 }
