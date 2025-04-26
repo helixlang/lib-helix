@@ -68,6 +68,7 @@ local function core_setup()
     add_headerfiles("core/**.h")
     add_headerfiles("core/**.hh")
     add_headerfiles("core/**.tpp")
+    
 end
 
 -- Determine ABI and runtime
