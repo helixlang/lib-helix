@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M13QUESTION_IMPL
 #define _$_HX_CORE_M13QUESTION_IMPL
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/runtime/__panic/frame.hh>  // THIS is the issue
 #include <include/types/builtins/primitives.hh>
@@ -149,6 +149,7 @@ class $question {
     void set_value(const T &value);
     void set_value(T &&value);
     void set_err(std::Panic::Frame &&error);
+    void set_err(std::Panic::Frame &error);
 
     void delete_error() noexcept;
     void delete_value() noexcept;
