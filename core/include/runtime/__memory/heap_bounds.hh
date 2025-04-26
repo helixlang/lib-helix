@@ -16,9 +16,11 @@
 #ifndef _$_HX_CORE_M12HEAP_BOUNDS
 #define _$_HX_CORE_M12HEAP_BOUNDS
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/c++/libc++.hh>
+
+#include <psapi.h>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -47,7 +49,7 @@ inline void *heap_start(void **start = nullptr) {
 #elif defined(_WIN32)
     PROCESS_MEMORY_COUNTERS_EX pmc;
     GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc));
-    hp_start = pmc.PrivateUsage;
+    hp_start = (void*)pmc.PrivateUsage;
 #endif
     called = true;
     return (start != nullptr) ? (*start = hp_start) : (hp_start);

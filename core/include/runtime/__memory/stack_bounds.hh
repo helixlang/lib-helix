@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M13STACK_BOUNDS
 #define _$_HX_CORE_M13STACK_BOUNDS
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/types/builtins/builtins.hh>
 
