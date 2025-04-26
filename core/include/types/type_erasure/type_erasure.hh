@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M12TYPE_ERASURE
 #define _$_HX_CORE_M12TYPE_ERASURE
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include "erasure_base.hh"
 #include "erasure_impl.hh"

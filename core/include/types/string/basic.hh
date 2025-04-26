@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M5BASIC
 #define _$_HX_CORE_M5BASIC
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/meta/__interfaces/casting.hh>
 #include <include/runtime/__memory/forwarding.hh>
@@ -70,7 +70,7 @@ class basic {
         : data(s.raw(), s.size()) {}
 
     template <typename U = CharT>
-    explicit basic(const char *str,
+    basic(const char *str,
                    typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
     template <typename U = CharT>

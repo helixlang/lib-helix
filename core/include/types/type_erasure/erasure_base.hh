@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M12ERASURE_BASE
 #define _$_HX_CORE_M12ERASURE_BASE
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/c++/libc++.hh>
 

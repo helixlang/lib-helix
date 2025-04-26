@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M6STRING
 #define _$_HX_CORE_M6STRING
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/meta/meta.hh>
 #include <include/types/string/slice.hh>
@@ -98,8 +98,14 @@ inline string to_string(Ty &&t) {
 // compile-time check for wchar_t size
 static_assert(sizeof(wchar_t) >= sizeof(char), "wchar_t must be at least as large as char");
 
+
+#ifdef _MSC_VER
+#pragma warning(push) // remove msvc deprecation warning
+#pragma warning(disable : 4996)
+#endif
+
 inline char char_to_cchar(wchar_t wc) {
-    char temp[MB_CUR_MAX];  // stack-allocated, typically 4-6 bytes
+    char* temp = (char*)alloca(MB_CUR_MAX);  // stack-allocated, typically 4-6 bytes
 
     int len = wctomb(temp, wc);
 
@@ -112,6 +118,10 @@ inline char char_to_cchar(wchar_t wc) {
 
     return temp[0];
 }
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 inline string sstring_to_string(const sstring &cstr) {
     if (cstr.is_empty()) {

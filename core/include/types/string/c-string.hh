@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M8C_STRING
 #define _$_HX_CORE_M8C_STRING
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/types/builtins/builtins.hh>
 #include <include/types/question/question.hh>
@@ -110,9 +110,18 @@ constexpr inline usize transform(T *dest, const T *src, usize n) noexcept {
     return LIBCXX_NAMESPACE::wcsxfrm(dest, src, n);
 }
 
-constexpr inline const char *error(int errnum) noexcept {
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+
+inline const char *error(int errnum) noexcept {
     return LIBCXX_NAMESPACE::strerror(errnum);  // No modern alternative for this
 }
+
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 }  // namespace String
 
 H_STD_NAMESPACE_END

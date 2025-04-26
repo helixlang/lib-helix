@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M12ERASURE_IMPL
 #define _$_HX_CORE_M12ERASURE_IMPL
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/runtime/__error/error.hh>
 #include <include/runtime/__memory/memory.hh>

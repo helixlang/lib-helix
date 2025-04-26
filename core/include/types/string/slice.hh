@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M5SLICE
 #define _$_HX_CORE_M5SLICE
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/types/builtins/primitives.hh>
 #include <include/types/builtins/size_t.hh>
