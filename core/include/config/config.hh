@@ -18,6 +18,17 @@
 
 namespace std {}  // namespace std
 
+#if __cplusplus < 202002L
+#error "C++20 or higher is required to use Helix."
+#endif
+
+const long LIBHELIX_VERSION_FULL = (25 << 16) | (4 << 8) | (15);
+const long LIBHELIX_MAJOR_VERSION = (LIBHELIX_VERSION_FULL >> 16) & 0xFF;
+const long LIBHELIX_MINOR_VERSION = (LIBHELIX_VERSION_FULL >>  8) & 0xFF;
+const long LIBHELIX_PATCH_VERSION = (LIBHELIX_VERSION_FULL      ) & 0xFF;
+
+constexpr long LIBHELIX_STANDARD = LIBHELIX_MAJOR_VERSION;
+
 #ifndef _LIBCPP_NODEBUG
 #define _LIBCPP_NODEBUG
 #endif
