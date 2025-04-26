@@ -29,7 +29,7 @@
 /// \note This panic handler is globally accessible to any Helix module that wildcard-imports `core.hlx`.
 
 ffi "c++" import "include/runtime/__panic/panic.hh";
-ffi "c++" import "include/runtime/__panic/stacktrace.hh";
+// ffi "c++" import "include/runtime/__panic/stacktrace.hh";
 
 /// \brief Displays runtime panic details and signals program termination.
 ///
@@ -54,8 +54,12 @@ ffi "c++" import "include/runtime/__panic/stacktrace.hh";
 fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const frame: *std::Panic::Frame) {
     const file_path: string = (*frame).file();
     const message:   string = (*frame).reason();
-    const error_t:   string = (*((*frame).get_context())).type_name();
     const line_no:   usize  = (*frame).line();
+    const eval if defined(_MSC_VER) {
+        const error_t: string = string((*((*frame).get_context())).type_name()).split(" ")[1];
+    } else {
+        const error_t: string = (*((*frame).get_context())).type_name();
+    }
 
     const bold:        string = "\033[1m";
     const red:         string = "\033[31m";
@@ -199,11 +203,11 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     }
     print("     | " + red + marker + reset + "\n");
 
-    let trace = std::StackTrace::get_frames(10);
+    // let trace = std::StackTrace::get_frames(10);
     
-    for frame in trace {
-        print(f"function: {frame.function}, file: {frame.file}, line: {frame.line}");
-    }
+    // for frame in trace {
+    //     print(f"function: {frame.function}, file: {frame.file}, line: {frame.line}");
+    // }
 
     (*((*frame).get_context())).crash();
 }
