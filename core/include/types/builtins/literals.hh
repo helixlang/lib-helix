@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M8LITERALS
 #define _$_HX_CORE_M8LITERALS
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include "num_data.hh"
 #include "primitives.hh"

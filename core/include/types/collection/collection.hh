@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M10COLLECTION
 #define _$_HX_CORE_M10COLLECTION
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 H_NAMESPACE_BEGIN
 

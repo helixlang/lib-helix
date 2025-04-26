@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M8F128_BIT
 #define _$_HX_CORE_M8F128_BIT
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 H_NAMESPACE_BEGIN
 

@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M10PRIMITIVES
 #define _$_HX_CORE_M10PRIMITIVES
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/c++/libc++.hh>
 #include <include/meta/traits.hh>

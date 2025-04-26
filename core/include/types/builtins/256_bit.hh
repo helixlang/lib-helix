@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M7256_BIT
 #define _$_HX_CORE_M7256_BIT
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include "bitset.hh"
 
