@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M16REFERENCE_TRAITS
 #define _$_HX_CORE_M16REFERENCE_TRAITS
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include "integral_constant.hh"
 #include "traits.hh"

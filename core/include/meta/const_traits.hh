@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M12CONST_TRAITS
 #define _$_HX_CORE_M12CONST_TRAITS
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include "remove_reference.hh"
 

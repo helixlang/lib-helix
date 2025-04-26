@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M7DECLVAL
 #define _$_HX_CORE_M7DECLVAL
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

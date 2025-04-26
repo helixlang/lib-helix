@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M16REMOVE_REFERENCE
 #define _$_HX_CORE_M16REMOVE_REFERENCE
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
