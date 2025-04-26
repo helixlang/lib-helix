@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M7C_ARRAY
 #define _$_HX_CORE_M7C_ARRAY
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/types/builtins/builtins.hh>
 

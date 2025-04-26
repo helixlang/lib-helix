@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M13ADDRESS_TYPE
 #define _$_HX_CORE_M13ADDRESS_TYPE
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include "heap_bounds.hh"
 #include "stack_bounds.hh"

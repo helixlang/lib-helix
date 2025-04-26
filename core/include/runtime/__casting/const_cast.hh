@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M10CONST_CAST
 #define _$_HX_CORE_M10CONST_CAST
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/meta/meta.hh>
 

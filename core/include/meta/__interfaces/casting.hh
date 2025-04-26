@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M7CASTING
 #define _$_HX_CORE_M7CASTING
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/meta/traits.hh>
 #include <include/meta/type_properties.hh>

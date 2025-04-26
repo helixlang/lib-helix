@@ -70,7 +70,7 @@
 #ifndef _$_HX_CORE_M7AS_CAST
 #define _$_HX_CORE_M7AS_CAST
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/meta/meta.hh>
 #include <include/runtime/__casting/const_cast.hh>

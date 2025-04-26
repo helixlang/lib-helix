@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M13FRAME_CONTEXT
 #define _$_HX_CORE_M13FRAME_CONTEXT
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/runtime/__function/function_impl.hh>
 #include <include/types/type_erasure/erasure_base.hh>

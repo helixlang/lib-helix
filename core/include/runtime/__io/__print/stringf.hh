@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M7STRINGF
 #define _$_HX_CORE_M7STRINGF
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/types/string/string.hh>
 #include <include/types/question/question_impl.hh>

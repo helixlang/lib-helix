@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M5SLICE_TPP
 #define _$_HX_CORE_M5SLICE_TPP
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/c++/libc++.hh>
 #include <include/meta/meta.hh>

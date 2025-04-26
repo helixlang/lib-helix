@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M10ERROR_BASE
 #define _$_HX_CORE_M10ERROR_BASE
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/runtime/__memory/memory.hh>
 #include <include/types/string/basic.hh>

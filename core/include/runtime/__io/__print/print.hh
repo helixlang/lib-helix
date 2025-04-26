@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M5PRINT
 #define _$_HX_CORE_M5PRINT
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/meta/meta.hh>
 #include <include/types/string/string.hh>

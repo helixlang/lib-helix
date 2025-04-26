@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M11ALLOCATION
 #define _$_HX_CORE_M11ALLOCATION
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include "forwarding.hh"
 

@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M20STATE_MISMATCH_ERROR
 #define _$_HX_CORE_M20STATE_MISMATCH_ERROR
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/types/string/basic.hh>
 

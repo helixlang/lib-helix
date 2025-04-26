@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M5PANIC
 #define _$_HX_CORE_M5PANIC
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/runtime/__panic/panic_fwd.hh>
 #include <include/runtime/__panic/panic_config.hh>

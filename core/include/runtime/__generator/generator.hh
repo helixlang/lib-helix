@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M9GENERATOR
 #define _$_HX_CORE_M9GENERATOR
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/runtime/__generator/generator_impl.hh>
 

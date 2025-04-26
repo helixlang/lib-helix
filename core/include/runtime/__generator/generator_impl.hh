@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M14GENERATOR_IMPL
 #define _$_HX_CORE_M14GENERATOR_IMPL
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/runtime/__memory/memory.hh>
 

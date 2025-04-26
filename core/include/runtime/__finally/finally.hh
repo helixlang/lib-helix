@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M7FINALLY
 #define _$_HX_CORE_M7FINALLY
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/runtime/__function/function.hh>
 #include <include/runtime/__memory/memory.hh>

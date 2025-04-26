@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M4ENDL
 #define _$_HX_CORE_M4ENDL
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/types/string/string.hh>
 

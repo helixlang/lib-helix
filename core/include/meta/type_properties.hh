@@ -16,14 +16,14 @@
 #ifndef _$_HX_CORE_M15TYPE_PROPERTIES
 #define _$_HX_CORE_M15TYPE_PROPERTIES
 
-#include <include/config/config.h>
-
+#include <include/config/config.hh>
 #include <type_traits>
 
 #include "const_traits.hh"
 #include "declval.hh"
 #include "integral_constant.hh"
 #include "reference_traits.hh"
+
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -73,6 +73,8 @@ namespace _types {
     template <class T>
     using all_extents_removed = typename _types::remove_all_extents_impl<T>::type;
 
+#ifndef _MSC_VER
+
     template <typename T>
     struct wellformed_destructor {
         template <typename U>
@@ -84,6 +86,15 @@ namespace _types {
 
         static const bool value = decltype(test<T>(12))::value;
     };
+
+#else
+
+    template <typename T>
+    struct wellformed_destructor {
+        static constexpr bool value = libcxx::is_destructible_v<T>;
+    };
+
+#endif
 
     template <class T, bool>
     struct destructible;

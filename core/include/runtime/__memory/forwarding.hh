@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M11FORWARDING
 #define _$_HX_CORE_M11FORWARDING
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/c++/libc++.hh>
 #include <include/meta/remove_reference.hh>
