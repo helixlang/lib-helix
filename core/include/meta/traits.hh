@@ -16,7 +16,8 @@
 #ifndef _$_HX_CORE_M6TRAITS
 #define _$_HX_CORE_M6TRAITS
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
+#include <utility>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -46,7 +47,7 @@ constexpr bool same_as<T, T> = true;
 #endif
 
 template <class Up, class T>
-concept convertible_to = is_convertible<Up, T> && requires { static_cast<T>(declval<Up>()); };
+concept convertible_to = is_convertible<Up, T> && requires { static_cast<T>(libcxx::declval<Up>()); };
 
 template <class Up, class T>
 concept is_same_as = same_as<Up, T>;
