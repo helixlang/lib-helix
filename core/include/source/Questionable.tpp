@@ -16,7 +16,7 @@
 #ifndef _$_HX_CORE_M12QUESTIONABLE_TPP
 #define _$_HX_CORE_M12QUESTIONABLE_TPP
 
-#include <include/config/config.h>
+#include <include/config/config.hh>
 
 #include <include/c++/libc++.hh>
 #include <include/meta/meta.hh>
@@ -49,6 +49,11 @@ void $question<T>::set_value(T &&value) {
 template <class T>
 void $question<T>::set_err(std::Panic::Frame &&error) {
     new (&data.error) std::Panic::Frame(std::Memory::move(error));
+}
+
+template <class T>
+void $question<T>::set_err(std::Panic::Frame &error) {
+    new (&data.error) std::Panic::Frame(error);
 }
 
 template <class T>
