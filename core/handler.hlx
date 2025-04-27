@@ -79,8 +79,13 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
 
         var utf8_str = libcxx::string((libcxx::istreambuf_iterator<std::Legacy::char>(content)), libcxx::istreambuf_iterator::<std::Legacy::char>());
         
+        // disable the warning for the conversion both on clang, gcc and msvc
+        __inline_cpp("_HELIX_SUPPRESS_DEPRECATED_WARN_PUSH");
+
         var conv: libcxx::wstring_convert::<libcxx::codecvt_utf8::<char>>;
         var wide = string(conv.from_bytes(utf8_str));
+
+        __inline_cpp("_HELIX_SUPPRESS_DEPRECATED_WARN_POP");
         
         if wide.length() > 0 {
             return wide;

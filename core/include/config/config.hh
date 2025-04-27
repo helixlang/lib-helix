@@ -22,10 +22,10 @@ namespace std {}  // namespace std
 #error "C++20 or higher is required to use Helix."
 #endif
 
-const long LIBHELIX_VERSION_FULL = (25 << 16) | (4 << 8) | (15);
+const long LIBHELIX_VERSION_FULL  = (25 << 16) | (4 << 8) | (15);
 const long LIBHELIX_MAJOR_VERSION = (LIBHELIX_VERSION_FULL >> 16) & 0xFF;
-const long LIBHELIX_MINOR_VERSION = (LIBHELIX_VERSION_FULL >>  8) & 0xFF;
-const long LIBHELIX_PATCH_VERSION = (LIBHELIX_VERSION_FULL      ) & 0xFF;
+const long LIBHELIX_MINOR_VERSION = (LIBHELIX_VERSION_FULL >> 8) & 0xFF;
+const long LIBHELIX_PATCH_VERSION = (LIBHELIX_VERSION_FULL) & 0xFF;
 
 constexpr long LIBHELIX_STANDARD = LIBHELIX_MAJOR_VERSION;
 
@@ -69,19 +69,32 @@ namespace libcxx = ::std;
 #define HELIX_FORCE_INLINE [[gnu::always_inline]] inline
 
 #if !defined(__has_builtin)
-#define __has_builtin(x) 0
+#   define __has_builtin(x) 0
 #endif
+
 #if !defined(__GNUC__) && !defined(__clang__)
-#define __builtin_constant_p(x) 0
+#   define __builtin_constant_p(x) 0
 #endif
+
 #if defined(__has_attribute)
-#if __has_attribute(diagnose_if)
-#define DIAGNOSE_IF(args) __attribute__((diagnose_if args))
+#   if __has_attribute(diagnose_if)
+#       define DIAGNOSE_IF(args) __attribute__((diagnose_if args))
+#   else
+#       define DIAGNOSE_IF(args)
+#   endif
 #else
-#define DIAGNOSE_IF(args)
+#   define DIAGNOSE_IF(args)
 #endif
-#else
-#define DIAGNOSE_IF(args)
+
+#if defined(__clang__) || defined(__GNUC__)
+#   define _HELIX_SUPPRESS_DEPRECATED_WARN_PUSH                                       \
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated\"") \
+        _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define _HELIX_SUPPRESS_DEPRECATED_WARN_POP _Pragma("GCC diagnostic pop")
+#else  // msvc based
+#define _HELIX_SUPPRESS_DEPRECATED_WARN_PUSH \
+    __pragma(warning(push)) __pragma(warning(disable : 4996)) __pragma(warning(disable : 4995))
+#define _HELIX_SUPPRESS_DEPRECATED_WARN_POP __pragma(warning(pop))
 #endif
 
 #endif
