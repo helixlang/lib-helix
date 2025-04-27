@@ -31,7 +31,7 @@ fn std::Panic::Frame::initialize(const obj: unsafe *T)
         );
     }
 
-    let object: unsafe *T = &null;
+    var object: unsafe *T = &null;
 
     static_assert(
         __inline_cpp("libcxx::is_copy_constructible_v<T>") || __inline_cpp("libcxx::is_move_constructible_v<T>"),

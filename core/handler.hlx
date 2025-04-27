@@ -71,16 +71,16 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     const light_green: string = "\033[92m";
 
     fn read_file(const file: *string) -> string? {
-        let content = libcxx::ifstream(std::string_to_sstring(*file).raw(), libcxx::ios::binary);
+        var content = libcxx::ifstream(std::string_to_sstring(*file).raw(), libcxx::ios::binary);
     
         if !content {
             return null;
         }
 
-        let utf8_str = libcxx::string((libcxx::istreambuf_iterator<std::Legacy::char>(content)), libcxx::istreambuf_iterator::<std::Legacy::char>());
+        var utf8_str = libcxx::string((libcxx::istreambuf_iterator<std::Legacy::char>(content)), libcxx::istreambuf_iterator::<std::Legacy::char>());
         
-        let conv: libcxx::wstring_convert::<libcxx::codecvt_utf8::<char>>;
-        let wide = string(conv.from_bytes(utf8_str));
+        var conv: libcxx::wstring_convert::<libcxx::codecvt_utf8::<char>>;
+        var wide = string(conv.from_bytes(utf8_str));
         
         if wide.length() > 0 {
             return wide;
@@ -90,12 +90,12 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     }
 
     fn lines_in_file(const content: *string) -> usize {
-        let current_line: usize = 1;
-        let i: usize = 0;
-        let len: usize = (*content).length();
+        var current_line: usize = 1;
+        var i: usize = 0;
+        var len: usize = (*content).length();
 
         while i < len {
-            let ch: char = (*content)[i];
+            var ch: char = (*content)[i];
 
             if ch == '\n' {
                 ++current_line;
@@ -112,13 +112,13 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     }
 
     fn get_line(line_no: usize, const content: *string) -> string? {
-        let current_line: usize = 1;
-        let line: string;
-        let i: usize = 0;
-        let len: usize = (*content).length();
+        var current_line: usize = 1;
+        var line: string;
+        var i: usize = 0;
+        var len: usize = (*content).length();
 
         while i < len {
-            let ch: char = (*content)[i];
+            var ch: char = (*content)[i];
 
             if ch == '\n' {
                 if current_line == line_no {
@@ -147,7 +147,7 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
         return null;
     }
 
-    let print_error_reading_file = fn (const file: *string, line_num: usize) {
+    var print_error_reading_file = fn (const file: *string, line_num: usize) {
         print(bold + red + error_t + ":" + reset + white + " file could not be read " + light_green + " " + (*file) + white + ":" + yellow + std::to_string(line_num) + reset + ". Maybe the file was moved or deleted?");
         print("    " + bold + red + "panic reason:" + reset + white + " " + message);
     };
@@ -160,14 +160,14 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     }
 
     const file_content: string = question_file_content as string;
-    let total_lines = lines_in_file(&file_content);
+    var total_lines = lines_in_file(&file_content);
     
     if line_no > total_lines {
         print_error_reading_file(&file_path, line_no);
         (*((*frame).get_context())).crash();
     }
 
-    let line: string? = get_line(line_no, &file_content);
+    var line: string? = get_line(line_no, &file_content);
 
     if line == null {
         print_error_reading_file(&file_path, line_no);
@@ -175,10 +175,10 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     }
 
     // format the line number to fit in a 5 character space + 1 space
-    let line_no_str: string = std::to_string(line_no);
-    let spaces: string;
+    var line_no_str: string = std::to_string(line_no);
+    var spaces: string;
     
-    for let i: usize = line_no_str.length(); i < 4; ++i {
+    for var i: usize = line_no_str.length(); i < 4; ++i {
         spaces += " ";
     }
 
@@ -188,10 +188,10 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     print("    --> " + white + " file " + light_green + file_path + white + ":" + yellow + std::to_string(line_no) + reset);
     print(line_no_str + "| " + reset + line);
     
-    let marker: string;
-    let spaces_ended: bool = false;
+    var marker: string;
+    var spaces_ended: bool = false;
 
-    for let i: usize = 0; i < (*line).length(); ++i {
+    for var i: usize = 0; i < (*line).length(); ++i {
         if (*line)[i] == ' ' {
             if !spaces_ended {
                 marker += " ";
@@ -203,7 +203,7 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     }
     print("     | " + red + marker + reset + "\n");
 
-    // let trace = std::StackTrace::get_frames(10);
+    // var trace = std::StackTrace::get_frames(10);
     
     // for frame in trace {
     //     print(f"function: {frame.function}, file: {frame.file}, line: {frame.line}");
@@ -220,7 +220,7 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
 /// ```
 /// error: expected an '*i32' (pointer) but got an 'i32' (copy) instead
 ///     --> file tests/main.hlx:1:4
-///    1 | let result: i32? = divide(val1, val2);
+///    1 | var result: i32? = divide(val1, val2);
 ///      :                    ~~~~~~~^^^^~~~~~~~
 ///    2 | if result? {
 ///    3 |     print(f"value: {result}");

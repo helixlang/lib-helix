@@ -36,10 +36,10 @@
 ///     print(x); // Prints 2, 4, 6, 8
 /// }
 ///
-/// let inclusive_range = [x for x in ..=10];
+/// var inclusive_range = [x for x in ..=10];
 /// print(inclusive_range); // Prints [0, 1, 2, ..., 10]
 ///
-/// let exclusive_range = [x for x in 5..15];
+/// var exclusive_range = [x for x in 5..15];
 /// print(exclusive_range); // Prints [5, 6, 7, ..., 14]
 /// ```
 ///
@@ -136,9 +136,9 @@
 module std {
     class Range
       requires <T> if T has std::Interface::RangeCompliant {
-        let first: T;
-        let last:  T;
-        let step:  isize;
+        var first: T;
+        var last:  T;
+        var step:  isize;
 
         fn Range(self, first: T, last: T, step: isize = 1) {
             self.first = first;
@@ -153,17 +153,17 @@ module std {
         }
 
         op in fn iter(self) -> yield T {
-            let current = self.first;
+            var current = self.first;
 
             while current < self.last {
                 yield current;
                 
                 if (self.step < 0) {
-                    for (let _: isize = 0; _ > self.step; ++_) {
+                    for (var _: isize = 0; _ > self.step; ++_) {
                         ++current;
                     }
                 } else {
-                    for (let _: isize = 0; _ < self.step; ++_) {
+                    for (var _: isize = 0; _ < self.step; ++_) {
                         ++current;
                     }
                 }

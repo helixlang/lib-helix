@@ -13,38 +13,27 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-#ifndef _$_HX_CORE_M12CONVERSIONS
-#define _$_HX_CORE_M12CONVERSIONS
-
-#include <include/config/config.hh>
-
-#include <include/meta/meta.hh>
-#include <include/runtime/__memory/forwarding.hh>
+class AttributeError derives std::Error {
+    priv var msg: string;
 
 
-H_NAMESPACE_BEGIN
-H_STD_NAMESPACE_BEGIN
+    fn AttributeError(self, msg: string) {
+        self.msg(std::Memory::move(msg));
+    }
+    
+    default fn AttributeError(self);
+    default fn AttributeError(self, const other: std::Memory::reference::<AttributeError>);
+    default fn AttributeError(self, other: std::Memory::move_reference::<AttributeError>);
+    default op = fn (self, const other: std::Memory::reference::<AttributeError>) -> std::Memory::reference::<AttributeError>;
+    default op = fn (self, other: std::Memory::move_reference::<AttributeError>) -> std::Memory::reference::<AttributeError>;
 
-namespace Memory {
-template <typename T>
-    requires(!std::Meta::is_lval_reference<T>)
-constexpr std::Meta::ref_as_ptr<T> as_pointer(T &&ref) noexcept {
-    return &ref;
+    override default op delete fn (self);
+    
+    override const op panic fn (self) -> string {
+        return self.msg;
+    }
+
+    override const op as fn (self) -> string {
+        return msg;
+    }
 }
-
-template <typename T>
-constexpr T &&as_reference(T *ptr) noexcept {
-    return *ptr;
-}
-
-template <typename T>
-using reference = T&;
-
-template <typename T>
-using move_reference = T&&;
-}  // namespace Memory
-
-H_NAMESPACE_END
-H_STD_NAMESPACE_END
-
-#endif  // _$_HX_CORE_M12CONVERSIONS
