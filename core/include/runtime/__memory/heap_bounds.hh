@@ -20,7 +20,9 @@
 
 #include <include/c++/libc++.hh>
 
+#ifdef _MSC_VER
 #include <psapi.h>
+#endif
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN

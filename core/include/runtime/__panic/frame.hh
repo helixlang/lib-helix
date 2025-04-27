@@ -132,8 +132,8 @@ class Frame {
     constexpr Frame() = delete;
     ~Frame()          = default;
 
-    constexpr Frame(const Frame &)            = default;
-    constexpr Frame &operator=(const Frame &) = delete;
+    Frame(const Frame &)            = default;
+    Frame &operator=(const Frame &) = default;
 
     Frame(Frame &&other) noexcept            = default;
     Frame &operator=(Frame &&other) noexcept = default;
