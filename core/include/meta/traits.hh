@@ -47,7 +47,7 @@ constexpr bool same_as<T, T> = true;
 #endif
 
 template <class Up, class T>
-concept convertible_to = is_convertible<Up, T> && requires { static_cast<T>(libcxx::declval<Up>()); };
+concept is_convertible_to = is_convertible<Up, T> && requires { static_cast<T>(libcxx::declval<Up>()); };
 
 template <class Up, class T>
 concept is_same_as = same_as<Up, T>;

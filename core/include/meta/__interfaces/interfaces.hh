@@ -29,8 +29,8 @@ H_STD_NAMESPACE_BEGIN
 namespace Interface {
     template <typename self>
     concept RangeCompliant = requires(self $_1738523894814_8910, self $_1738523894814_7822) {
-        { ++$_1738523894814_8910 } -> std::Meta::convertible_to<self>;
-        { $_1738523894814_8910 < $_1738523894814_7822 } -> std ::Meta ::convertible_to<bool>;
+        { ++$_1738523894814_8910 } -> std::Meta::is_convertible_to<self>;
+        { $_1738523894814_8910 < $_1738523894814_7822 } -> std ::Meta ::is_convertible_to<bool>;
     };
 }
 

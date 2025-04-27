@@ -66,9 +66,9 @@ namespace Interface {
     /// ```
     template <typename T>
     concept Panicking = requires(T obj) {
-        { obj.operator$panic() } -> std::Meta::convertible_to<string>;
+        { obj.operator$panic() } -> std::Meta::is_convertible_to<string>;
     } || requires {
-        { T::operator$panic() } -> std::Meta::convertible_to<string>;
+        { T::operator$panic() } -> std::Meta::is_convertible_to<string>;
     };
 
     /// \concept PanickingStatic
@@ -90,7 +90,7 @@ namespace Interface {
     /// ```
     template <typename T>
     concept PanickingStatic = requires(T obj) {
-        { T::operator$panic() } -> std::Meta::convertible_to<string>;
+        { T::operator$panic() } -> std::Meta::is_convertible_to<string>;
     };
 
     /// \concept PanickingInstance
@@ -112,7 +112,7 @@ namespace Interface {
     /// ```
     template <typename T>
     concept PanickingInstance = requires(T obj) {
-        { obj.operator$panic() } -> std::Meta::convertible_to<string>;
+        { obj.operator$panic() } -> std::Meta::is_convertible_to<string>;
     };
 }  // namespace Interface
 }  // namespace Panic

@@ -28,7 +28,7 @@ H_STD_NAMESPACE_BEGIN
 namespace Interface {
 template <typename T>
 concept SupportsOStream = requires(LIBCXX_NAMESPACE::ostream &os, T a) {
-    { os << a } -> std::Meta::convertible_to<LIBCXX_NAMESPACE::ostream &>;
+    { os << a } -> std::Meta::is_convertible_to<LIBCXX_NAMESPACE::ostream &>;
 };
 }  // namespace Interface
 
