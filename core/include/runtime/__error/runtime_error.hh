@@ -26,7 +26,7 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 namespace Error {
-class RuntimeError : public Error {
+class RuntimeError : public BaseError {
   public:
     RuntimeError() = default;
 

@@ -26,7 +26,7 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 namespace Error {
-class TypeMismatchError : public Error {
+class TypeMismatchError : public BaseError {
   public:
     TypeMismatchError() = default;
 

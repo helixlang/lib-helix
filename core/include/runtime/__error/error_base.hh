@@ -25,20 +25,20 @@ H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
 namespace Error {
-class Error /* with Panicking */ {
+class BaseError /* with Panicking */ {
   public:
-    Error() = default;
+    BaseError() = default;
 
-    Error(const Error &other)     = default;
-    Error(Error &&other) noexcept = default;
+    BaseError(const BaseError &other)     = default;
+    BaseError(BaseError &&other) noexcept = default;
 
-    Error &operator=(const Error &other)     = default;
-    Error &operator=(Error &&other) noexcept = default;
+    auto operator=(const BaseError &other) -> BaseError&    = default;
+    auto operator=(BaseError &&other) noexcept -> BaseError& = default;
 
-    virtual ~Error() = default;
+    virtual ~BaseError() = default;
 
-    [[nodiscard]] virtual string operator$panic() const { return L"An error occurred."; }
-    [[nodiscard]] virtual string operator$cast(string * /*unused*/) const = 0;  // string cast
+    [[nodiscard]] virtual inline auto operator$panic() const -> string { return L"An error occurred."; }
+    [[nodiscard]] virtual inline auto operator$cast(string * /*unused*/) const -> string = 0;  // string cast
 };
 };  // namespace Error
 
