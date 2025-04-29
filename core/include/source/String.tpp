@@ -35,6 +35,8 @@ namespace {
 }  // namespace String::__internal
 
 namespace String {
+/////////////////////////////// ASSIGNMENT //////////////////////////////////////
+
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline basic<CharT, Traits> &basic<CharT, Traits>::operator=(basic &&other) noexcept {
@@ -57,6 +59,8 @@ inline basic<CharT, Traits> &basic<CharT, Traits>::operator=(const slice_t &s) n
     return *this;
 }
 
+///////////////////////////// ADDITION ASSIGNMENT //////////////////////////////////////
+
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline basic<CharT, Traits> &basic<CharT, Traits>::operator+=(const basic &other) noexcept {
@@ -73,17 +77,22 @@ inline basic<CharT, Traits> &basic<CharT, Traits>::operator+=(const CharT *str) 
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-inline basic<CharT, Traits> &basic<CharT, Traits>::operator+=(const CharT chr) noexcept {
-    data += chr;
+inline basic<CharT, Traits> &basic<CharT, Traits>::operator+=(const slice_t &s) noexcept {
+    data.append(s.raw(), s.size());
     return *this;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-inline basic<CharT, Traits> &basic<CharT, Traits>::operator+=(const slice_t &s) noexcept {
-    data.append(s.raw(), s.size());
+template <typename U> requires std::Meta::is_convertible_to<U, CharT>
+inline basic<CharT, Traits> &basic<CharT, Traits>::operator+=(const U chr) noexcept {
+    static_assert(std::Meta::is_same_as<U, CharT>,
+        "Error: Tried to add a string type to a non-char type.");
+    data += chr;
     return *this;
 }
+
+///////////////////////////////////// ADDITION /////////////////////////////////////
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
@@ -103,19 +112,24 @@ inline basic<CharT, Traits> basic<CharT, Traits>::operator+(const CharT *str) co
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-inline basic<CharT, Traits> basic<CharT, Traits>::operator+(const CharT chr) const {
-    basic result = *this;
-    result += chr;
-    return result;
-}
-
-template <typename CharT, typename Traits>
-    requires CharTraits<Traits, CharT>
 inline basic<CharT, Traits> basic<CharT, Traits>::operator+(const slice_t &s) const {
     basic result = *this;
     result += s;
     return result;
 }
+
+template <typename CharT, typename Traits>
+    requires CharTraits<Traits, CharT>
+template <typename U> requires std::Meta::is_convertible_to<U, CharT>
+inline basic<CharT, Traits> basic<CharT, Traits>::operator+(const U chr) const {
+    static_assert(std::Meta::is_same_as<U, CharT>,
+        "Error: Tried to add a string type to a non-char type.");
+    basic result = *this;
+    result += chr;
+    return result;
+}
+
+////////////////////////////////////// CONSTRUCTORS //////////////////////////////////////
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
@@ -144,6 +158,8 @@ inline basic<CharT, Traits>::basic(
     }
     data = sstring_to_string(sstring(str, size)).data;
 }
+
+//////////////////////////////////// SUBSTRING //////////////////////////////////////
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
@@ -245,6 +261,8 @@ inline vec<basic<CharT, Traits>> basic<CharT, Traits>::split_lines() const {
     return result;
 }
 
+/////////////////////////////////////// FIND //////////////////////////////////////
+
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline std::Questionable<usize> basic<CharT, Traits>::lfind(slice needle) const {
@@ -281,48 +299,193 @@ inline std::Questionable<usize> basic<CharT, Traits>::find_last_not_of(slice nee
     return slice_t(data.data(), data.size()).find_last_not_of(needle);
 }
 
+///////////////////////// FIND WITH POSITION /////////////////////////
+
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-inline std::Questionable<usize> basic<CharT, Traits>::lfind(slice needle, usize pos) const {
-    auto s = data.find(needle, pos);
-    return s == string_t::npos ? null : std::Questionable<usize>(s);
+inline std::Questionable<usize> basic<CharT, Traits>::lfind(const basic& needle, usize pos) const {
+    // For empty needle, return pos if valid
+    if (needle.size() == 0) {
+        return pos <= size() ? std::Questionable<usize>(pos) : null;
+    }
+    
+    // Bounds check
+    if (pos >= size() || size() < needle.size()) {
+        return null;
+    }
+    
+    auto fnd = data.find(needle.raw(), pos, needle.size());
+    return fnd != npos ? std::Questionable<usize>(fnd) : null;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline std::Questionable<usize> basic<CharT, Traits>::rfind(slice needle, usize pos) const {
-    auto s = data.rfind(needle, pos);
-    return s == string_t::npos ? null : std::Questionable<usize>(s);
+    // For empty needle, return min(pos, size())
+    if (needle.size() == 0) {
+        return std::Questionable<usize>(pos < size() ? pos : size());
+    }
+    
+    // If needle is larger than string or string is empty, no match
+    if (size() < needle.size() || size() == 0) {
+        return null;
+    }
+    
+    // Adjust pos if it's beyond string length
+    if (pos >= size() - needle.size() + 1) {
+        pos = size() - needle.size();
+    }
+    
+    // Manual implementation for exact match of a slice
+    const CharT* haystack_ptr = data.data();
+    const CharT* needle_ptr = needle.raw();
+    const usize needle_length = needle.size();
+    
+    // Search backward from pos
+    for (usize i = pos + 1; i > 0; --i) {
+        bool found = true;
+        for (usize j = 0; j < needle_length; ++j) {
+            if (haystack_ptr[i - 1 + j] != needle_ptr[j]) {
+                found = false;
+                break;
+            }
+        }
+        if (found) {
+            return std::Questionable<usize>(i - 1);
+        }
+    }
+    
+    return null;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline std::Questionable<usize> basic<CharT, Traits>::find_first_of(slice needle, usize pos) const {
-    auto s = data.find_first_of(needle, pos);
-    return s == string_t::npos ? null : std::Questionable<usize>(s);
+    // For empty needle or invalid pos, return null
+    if (needle.size() == 0 || pos >= size()) {
+        return null;
+    }
+    
+    // Manual implementation for matching any character in needle
+    const CharT* haystack_ptr = data.data() + pos;
+    const CharT* needle_ptr = needle.raw();
+    const usize haystack_length = size() - pos;
+    const usize needle_length = needle.size();
+    
+    for (usize i = 0; i < haystack_length; ++i) {
+        for (usize j = 0; j < needle_length; ++j) {
+            if (haystack_ptr[i] == needle_ptr[j]) {
+                return std::Questionable<usize>(pos + i);
+            }
+        }
+    }
+    
+    return null;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 inline std::Questionable<usize> basic<CharT, Traits>::find_last_of(slice needle, usize pos) const {
-    auto s = data.find_last_of(needle, pos);
-    return s == string_t::npos ? null : std::Questionable<usize>(s);
+    // For empty needle or empty string, return null
+    if (needle.size() == 0 || size() == 0) {
+        return null;
+    }
+    
+    // Adjust pos if it's beyond string length
+    if (pos >= size()) {
+        pos = size() - 1;
+    }
+    
+    // Manual implementation for matching any character in needle
+    const CharT* haystack_ptr = data.data();
+    const CharT* needle_ptr = needle.raw();
+    const usize needle_length = needle.size();
+    
+    // Search backward from pos
+    for (usize i = pos + 1; i > 0; --i) {
+        for (usize j = 0; j < needle_length; ++j) {
+            if (haystack_ptr[i - 1] == needle_ptr[j]) {
+                return std::Questionable<usize>(i - 1);
+            }
+        }
+    }
+    
+    return null;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-inline std::Questionable<usize> basic<CharT, Traits>::find_first_not_of(slice needle,
-                                                                        usize pos) const {
-    auto s = data.find_first_not_of(needle, pos);
-    return s == string_t::npos ? null : std::Questionable<usize>(s);
+inline std::Questionable<usize> basic<CharT, Traits>::find_first_not_of(slice needle, usize pos) const {
+    // For empty string or invalid pos, return null
+    if (size() == 0 || pos >= size()) {
+        return null;
+    }
+    
+    // For empty needle, return first position
+    if (needle.size() == 0) {
+        return std::Questionable<usize>(pos);
+    }
+    
+    // Manual implementation for finding first character not in needle
+    const CharT* haystack_ptr = data.data() + pos;
+    const CharT* needle_ptr = needle.raw();
+    const usize haystack_length = size() - pos;
+    const usize needle_length = needle.size();
+    
+    for (usize i = 0; i < haystack_length; ++i) {
+        bool found = false;
+        for (usize j = 0; j < needle_length; ++j) {
+            if (haystack_ptr[i] == needle_ptr[j]) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return std::Questionable<usize>(pos + i);
+        }
+    }
+    
+    return null;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-inline std::Questionable<usize> basic<CharT, Traits>::find_last_not_of(slice needle,
-                                                                       usize pos) const {
-    auto s = data.find_last_not_of(needle, pos);
-    return s == string_t::npos ? null : std::Questionable<usize>(s);
+inline std::Questionable<usize> basic<CharT, Traits>::find_last_not_of(slice needle, usize pos) const {
+    // For empty string, return null
+    if (size() == 0) {
+        return null;
+    }
+    
+    // For empty needle, return last valid position
+    if (needle.size() == 0) {
+        return std::Questionable<usize>(pos < size() ? pos : size() - 1);
+    }
+    
+    // Adjust pos if it's beyond string length
+    if (pos >= size()) {
+        pos = size() - 1;
+    }
+    
+    // Manual implementation for finding last character not in needle
+    const CharT* haystack_ptr = data.data();
+    const CharT* needle_ptr = needle.raw();
+    const usize needle_length = needle.size();
+    
+    // Search backward from pos
+    for (usize i = pos + 1; i > 0; --i) {
+        bool found = false;
+        for (usize j = 0; j < needle_length; ++j) {
+            if (haystack_ptr[i - 1] == needle_ptr[j]) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            return std::Questionable<usize>(i - 1);
+        }
+    }
+    
+    return null;
 }
 
 template class basic<char>;

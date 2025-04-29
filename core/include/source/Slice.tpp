@@ -38,33 +38,36 @@ namespace String {
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 slice<CharT, Traits>::slice(const CharT *str) noexcept
-    : length(str ? Traits::length(str) : 0)
-    , data(str, length) {}
+    : len(str ? Traits::length(str) : 0)
+    , data(str, len) {}
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 slice<CharT, Traits>::slice(const CharT *str, size_t size) noexcept
-    : length(size)
-    , data(str, length) {}
+    : len(size)
+    , data(str, len) {}
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 slice<CharT, Traits>::slice(view_t view) noexcept
-    : length(view.size())
+    : len(view.size())
     , data(view) {}
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 slice<CharT, Traits>::slice(char_vec &vec) noexcept
-    : length(vec.size())
-    , data(vec.data(), length) {}
+    : len(vec.size())
+    , data(vec.data(), len) {}
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 slice<CharT, Traits>::slice(char_vec &&vec) noexcept
-    : length(vec.size())
-    , data(std::Memory::move(vec).data(), length) {}
+    : len(vec.size())
+    , data(std::Memory::move(vec).data(), len) {}
 
+/// NOTE: The code bellow needs to be reviewed to ensure that it is correct and safe.
+/// I'm not sure if i should be using CharT or wchar_t here.
+/// if further testing shows that this is not correct, need to change it to use CharT.
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 template <typename U>
@@ -82,6 +85,8 @@ slice<CharT, Traits>::slice(const char *str,
     } catch (...) { this->replace((wchar_t *)nullptr, 1_usize); }
 }
 
+/// Same as above, also needs to be reviewed.
+/// NOTE: The code bellow needs to be reviewed to ensure that it is correct and safe.
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 template <typename U>
@@ -105,36 +110,36 @@ void slice<CharT, Traits>::exchange(slice &other) noexcept {
     view_t tmp     = this->data;
     this->data     = other.data;
     other.data     = tmp;
-    size_t tmp_len = this->length;
-    this->length   = other.length;
-    other.length   = tmp_len;
+    size_t tmp_len = this->len;
+    this->len   = other.len;
+    other.len   = tmp_len;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 void slice<CharT, Traits>::replace(slice &other) noexcept {
     this->data   = other.data;
-    this->length = other.length;
+    this->len = other.len;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 void slice<CharT, Traits>::replace(CharT *str, usize size) noexcept {
     this->data   = view_t(str, size);
-    this->length = size;
+    this->len = size;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-slice<CharT, Traits> slice<CharT, Traits>::subslice(usize pos, usize len) const noexcept {
-    return slice_t(data.substr(pos, len));
+slice<CharT, Traits> slice<CharT, Traits>::subslice(usize pos, usize leng) const noexcept {
+    return slice_t(data.substr(pos, leng));
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 slice<CharT, Traits> slice<CharT, Traits>::l_strip(char_vec &delim) const {
     usize start = 0;
-    usize end   = length;
+    usize end   = len;
     while (start < end &&
            libcxx::find(delim.begin(), delim.end(), this->operator[](start)) != delim.end()) {
         ++start;
@@ -146,7 +151,7 @@ template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 slice<CharT, Traits> slice<CharT, Traits>::r_strip(char_vec &delim) const {
     usize start = 0;
-    usize end   = length;
+    usize end   = len;
     while (end > start &&
            libcxx::find(delim.begin(), delim.end(), this->operator[](end - 1)) != delim.end()) {
         --end;
@@ -163,13 +168,13 @@ slice<CharT, Traits> slice<CharT, Traits>::strip(char_vec &delim) const {
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 bool slice<CharT, Traits>::starts_with(slice &needle) const {
-    return length >= needle.size() && subslice(0, needle.size()) == needle;
+    return len >= needle.size() && subslice(0, needle.size()) == needle;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 bool slice<CharT, Traits>::ends_with(slice &needle) const {
-    return length >= needle.size() && subslice(length - needle.size(), needle.size()) == needle;
+    return len >= needle.size() && subslice(len - needle.size(), needle.size()) == needle;
 }
 
 template <typename CharT, typename Traits>
@@ -180,14 +185,14 @@ bool slice<CharT, Traits>::contains(slice &needle) const {
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
-bool slice<CharT, Traits>::contains(wchar_t &chr) const {
+bool slice<CharT, Traits>::contains(CharT &chr) const {
     return data.find(chr) != view_t::npos;
 }
 
 template <typename CharT, typename Traits>
     requires CharTraits<Traits, CharT>
 isize slice<CharT, Traits>::compare(slice &other) const noexcept {
-    return Traits::compare(data.data(), other.data.data(), length);
+    return Traits::compare(data.data(), other.data.data(), len);
 }
 
 template <typename CharT, typename Traits>
@@ -197,7 +202,7 @@ slice<CharT, Traits>::slice_vec slice<CharT, Traits>::split_lines() const {
     bool      encoding_CR = false;
     usize     start       = 0;
     usize     end         = 0;
-    while (end < length) {
+    while (end < len) {
         if (this->operator[](end) == '\r') {
             encoding_CR = true;
         } else if (this->operator[](end) == '\n') {
@@ -223,7 +228,7 @@ slice<CharT, Traits>::slice_vec slice<CharT, Traits>::split(slice &delim, Operat
     slice_vec result;
     usize     start = 0;
     usize     end   = 0;
-    while (end < length) {
+    while (end < len) {
         if (subslice(end, delim.size()) == delim) {
             if (op == Operation::Keep) {
                 result.push_back(subslice(start, end - start));
