@@ -66,6 +66,9 @@ namespace libcxx = ::std;
 #define LIBCXX_NAMESPACE libcxx
 #define LIBC_NAMESPACE libc
 
+// muted yellow color
+#define DEBUG_PRINT(...) print("\033[33m", __VA_ARGS__, "\033[0m")
+
 #define HELIX_FORCE_INLINE [[gnu::always_inline]] inline
 
 #if !defined(__has_builtin)
