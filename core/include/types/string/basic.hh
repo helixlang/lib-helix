@@ -22,6 +22,7 @@
 #include <include/runtime/__memory/forwarding.hh>
 #include <include/types/string/char_traits.hh>
 #include <include/types/string/slice.hh>
+#include "meta/traits.hh"
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -108,12 +109,17 @@ class basic {
     // Concatenation Operators
     basic &operator+=(const basic &other) noexcept;
     basic &operator+=(const CharT *str) noexcept;
-    basic &operator+=(const CharT str) noexcept;
     basic &operator+=(const slice_t &s) noexcept;
+
+    template <typename U = CharT> requires std::Meta::is_convertible_to<U, CharT>
+    basic &operator+=(const U chr) noexcept;
+    
     basic  operator+(const basic &other) const;
     basic  operator+(const CharT *str) const;
-    basic  operator+(const CharT str) const;
     basic  operator+(const slice_t &s) const;
+    
+    template <typename U = CharT> requires std::Meta::is_convertible_to<U, CharT>
+    basic  operator+(const U chr) const;
 
     // Comparison Operators
     bool operator==(const basic &other) const noexcept { return data == other.data; }
@@ -128,6 +134,7 @@ class basic {
     size_t       size() const noexcept { return data.size(); }
     size_t       length() const noexcept { return data.length(); }
     bool         is_empty() const noexcept { return data.empty(); }
+    string_t  &raw_string() noexcept { return data; }
 
     // Slice Conversion
     operator slice_t() const noexcept { return slice_t(data.data(), data.size()); }
@@ -149,7 +156,7 @@ class basic {
     bool contains(CharT c) const noexcept { return data.find(c) != npos; }
 
     constexpr bool operator$contains(slice needle) const { return contains(needle); }
-    constexpr bool operator$contains(wchar_t chr) const { return contains(chr); }
+    constexpr bool operator$contains(CharT chr) const { return contains(chr); }
 
     std::Questionable<usize> lfind(slice needle) const;
     std::Questionable<usize> rfind(slice needle) const;
@@ -158,7 +165,7 @@ class basic {
     std::Questionable<usize> find_first_not_of(slice needle) const;
     std::Questionable<usize> find_last_not_of(slice needle) const;
 
-    std::Questionable<usize> lfind(slice needle, usize pos) const;
+    std::Questionable<usize> lfind(const basic& needle, usize pos) const;
     std::Questionable<usize> rfind(slice needle, usize pos) const;
     std::Questionable<usize> find_first_of(slice needle, usize pos) const;
     std::Questionable<usize> find_last_of(slice needle, usize pos) const;

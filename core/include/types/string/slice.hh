@@ -33,7 +33,7 @@ template <typename CharT, typename Traits = libcxx::char_traits<CharT>>
 class slice {
     using view_t = libcxx::basic_string_view<CharT>;
 
-    usize  length;
+    usize  len;
     view_t data{};
 
   public:
@@ -84,7 +84,7 @@ class slice {
     [[nodiscard("is_empty() indicates whether the slice has no data, crucial for control flow; "
                 "discarding it may lead to incorrect assumptions")]]
     constexpr bool is_empty() const noexcept {
-        return length == 0;
+        return len == 0;
     }
     [[nodiscard("subslice() creates a view into a portion of the slice, vital for safe substring "
                 "operations; ignoring it wastes the result")]]
@@ -94,11 +94,13 @@ class slice {
     slice r_strip(char_vec &delim = {' ', '\t', '\n', '\r'}) const;
     slice strip(char_vec &delim = {' ', '\t', '\n', '\r'}) const;
 
+    usize length() const noexcept { return len; }
+
     bool starts_with(slice &needle) const;
     bool ends_with(slice &needle) const;
 
     bool contains(slice &needle) const;
-    bool contains(wchar_t &chr) const;
+    bool contains(CharT &chr) const;
 
     bool operator==(const slice &other) const noexcept { return data == other.data; }
     bool operator!=(const slice &other) const noexcept { return data != other.data; }
@@ -108,7 +110,7 @@ class slice {
     bool operator>=(const slice &other) const noexcept { return data >= other.data; }
 
     constexpr bool operator$contains(slice &needle) const { return contains(needle); }
-    constexpr bool operator$contains(wchar_t &chr) const { return contains(chr); }
+    constexpr bool operator$contains(CharT &chr) const { return contains(chr); }
 
     isize compare(slice &other) const noexcept;
 
