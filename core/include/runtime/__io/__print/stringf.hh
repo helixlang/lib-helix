@@ -13,63 +13,135 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
+
+// MIGRATE: TO HELIX CORE
+// FIXME: slice is very broken if mem forwarded or taken from const char*
+
 #ifndef _$_HX_CORE_M7STRINGF
 #define _$_HX_CORE_M7STRINGF
 
 #include <include/config/config.hh>
-
-#include <include/types/string/string.hh>
-#include <include/types/question/question_impl.hh>
-#include <include/runtime/__panic/panic_config.hh>
 #include <include/runtime/__error/runtime_error.hh>
+#include <include/runtime/__panic/panic_config.hh>
+#include <include/types/question/question_impl.hh>
+#include <include/types/string/string.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
+template <typename... Ty>
+inline string stringf(string fmt) {
+    return fmt;
+}
+
 /// \include belongs to the helix standard library.
 /// \brief format a string with arguments
 ///
-/// TODO: = is not yet suppoted
+/// a fmt string looks like this: "hello {} world {}" or "hello \\{ {} world \\}" (escaped braces - ony the {} gets replaced, while the \\{ changes to { and the \\} changes to })
+/// each if the args go though a to_string function and are replaced in the string
 ///
-/// the following calls can happen in helix and becomes the following c++:
-///
-/// f"hi: {var}"   -> stringf("hi: \{\}", var)
-/// f"hi: {var1=}" -> stringf("hi: var1=\{\}", var1)
-///
-/// f"hi: {(some_expr() + 12)=}" -> stringf("hi: (some_expr() + 12)=\{\}", some_expr())
-/// f"hi: {some_expr() + 12}"    -> stringf("hi: \{\}", some_expr() + 12)
-///
+/// \param fmt the format string
+/// \param args the arguments to format into the string
+/// \return the formatted string
+// template <typename... Ty>
+// inline string stringf(string fmt, Ty &&...args) {
+//     const static string placeholder  = L"{}";
+//     const static string escape_open  = L"\\{";
+//     const static string escape_close = L"\\}";
+
+//     // logic to use
+//     // 1. find the first placeholder in the string
+//     // note its position
+//     // convert arg1 to string and replace the placeholder with the string
+//     // increment the position ticker by the length of what was just added
+//     // repeat until all args are used, if theres any mismatch then throw an error
+//     // 2. if there are no placeholders then just return the string as is
+
+//     string::string_t::size_type search_pos = 0;
+
+//     ([&] {
+//         string arg = to_string(std::Memory::forward<Ty>(args));
+
+//         usize new_pos = fmt.raw_string().find(placeholder.raw(), search_pos, placeholder.length());
+//         if (new_pos == string::string_t::npos) {
+//             _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"[f-string rt]: too few arguments for format string"));
+//         }
+
+//         fmt.replace(new_pos, placeholder.length(), arg);
+
+//         // now we need to find every escaped brace from new_pos to search_pos
+//         string::string_t::size_type escape_pos = fmt.raw_string().find(escape_open.raw(), search_pos, escape_open.length());
+//         while (escape_pos != string::string_t::npos && escape_pos < new_pos) {
+//             fmt.raw_string().erase(escape_pos, 1);
+//             escape_pos = fmt.raw_string().find(escape_open.raw(), escape_pos, escape_open.length());
+//             new_pos--;
+//         }
+
+//         escape_pos = fmt.raw_string().find(escape_close.raw(), search_pos, escape_close.length());
+//         while (escape_pos != string::string_t::npos && escape_pos < new_pos) {
+//             fmt.raw_string().erase(escape_pos, 1);
+//             escape_pos = fmt.raw_string().find(escape_close.raw(), escape_pos, escape_close.length());
+//             new_pos--;
+//         }
+    
+//         search_pos = new_pos + arg.length();
+//     }(), ...);
+
+//     if (fmt.raw_string().find(placeholder.raw(), search_pos, placeholder.length()) != string::string_t::npos) {
+//         _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(std::Error::RuntimeError("[f-string rt]: too many arguments for format string"));
+//     }
+
+//     // if there are any escaped braces left then remove them
+//     string::string_t::size_type escape_pos = fmt.raw_string().find(escape_open.raw(), search_pos, escape_open.length());
+//     while (escape_pos != string::string_t::npos) {
+//         fmt.raw_string().erase(escape_pos, 1);
+//         escape_pos = fmt.raw_string().find(escape_open.raw(), escape_pos, escape_open.length());
+//     }
+
+//     escape_pos = fmt.raw_string().find(escape_close.raw(), search_pos, escape_close.length());
+//     while (escape_pos != string::string_t::npos) {
+//         fmt.raw_string().erase(escape_pos, 1);
+//         escape_pos = fmt.raw_string().find(escape_close.raw(), escape_pos, escape_close.length());
+//     }
+
+//     return fmt;
+// }
+
 template <typename... Ty>
 inline string stringf(string fmt, Ty &&...args) {
-    const wchar_t placeholder_chars[] = {L'\\', L'{', L'\\', L'}'};
-    const string::slice placeholder = string::slice(placeholder_chars, 4);
+    const static string placeholder  = L"{}";
+    const static string escape_open  = L"\\{";
+    const static string escape_close = L"\\}";
 
-    const string arg_strs[sizeof...(Ty)] = {to_string(H_STD_NAMESPACE::Memory::forward<Ty>(args))...};
+    string result;
+    result.raw_string().reserve(fmt.size() + (sizeof...(args) * 8));
 
-    string result = Memory::move(fmt);
-    usize pos = 0;
+    usize index = 0;
+    usize pos   = 0;
+    const string args_arr[] = {to_string(std::Memory::forward<Ty>(args))...};
 
-    usize arg_index = 0;
-    while (arg_index < sizeof...(Ty)) {
-        auto found = result.lfind(placeholder, pos);
-        if (found == null) {
-            _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"[f-string rt]: too many arguments for format string"));
+    for (size_t i = 0; i < fmt.size();) {
+        if (i + 1 < fmt.size() && fmt[i] == L'\\' && (fmt[i + 1] == L'{' || fmt[i + 1] == L'}')) {
+            result.push_back(fmt[i + 1]);
+            i += 2;
+            ++pos;
+        } else if (i + 1 < fmt.size() && fmt[i] == L'{' && fmt[i + 1] == L'}') {
+            if (index >= sizeof...(args)) {
+                _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"[f-string rt]: too few format specifiers (\"{}\")"));
+            }
+            result.append(args_arr[index++]);
+            pos += args_arr[index - 1].size();
+            i   += 2;
+        } else {
+            result.push_back(fmt[i]);
+            ++i;
+            ++pos;
         }
 
-
-        usize replace_pos = *found;
-        const string& arg_str = arg_strs[arg_index];
-
-        result.replace(replace_pos, placeholder.size(), arg_str);
-
-        pos = replace_pos + arg_str.size();
-        ++arg_index;
     }
 
-    // Ensure no placeholders are left
-    auto leftover = result.lfind(placeholder, pos);
-    if (leftover != null) {
-        _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"[f-string rt]: too few arguments for format string"));
+    if (fmt.raw_string().find(placeholder.raw(), pos, placeholder.length()) != string::string_t::npos) {
+        _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"[f-string rt]: too many format specifiers (\"{}\")"));
     }
 
     return result;
