@@ -94,10 +94,26 @@ namespace libcxx = ::std;
     _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated\"") \
         _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #define _HELIX_SUPPRESS_DEPRECATED_WARN_POP _Pragma("GCC diagnostic pop")
-#else  // msvc based
-#define _HELIX_SUPPRESS_DEPRECATED_WARN_PUSH \
-    __pragma(warning(push)) __pragma(warning(disable : 4996)) __pragma(warning(disable : 4995))
-#define _HELIX_SUPPRESS_DEPRECATED_WARN_POP __pragma(warning(pop))
+#elif defined(_MSC_VER)
+#   define _HELIX_SUPPRESS_DEPRECATED_WARN_PUSH \
+        __pragma(warning(push)) __pragma(warning(disable : 4996)) __pragma(warning(disable : 4995))
+#   define _HELIX_SUPPRESS_DEPRECATED_WARN_POP __pragma(warning(pop))
+#else
+#   define _HELIX_SUPPRESS_DEPRECATED_WARN_PUSH
+#   define _HELIX_SUPPRESS_DEPRECATED_WARN_POP
+#endif
+
+#if defined(__clang__) || defined(__GNUC__)
+#   define _HELIX_SUPPRESS_UNREACHABLE_WARN_PUSH                                       \
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wunreachable\"") \
+        _Pragma("GCC diagnostic ignored \"-Wunreachable-code\"")
+#define _HELIX_SUPPRESS_UNREACHABLE_WARN_POP _Pragma("GCC diagnostic pop")
+#elif defined(_MSC_VER)
+#   define _HELIX_SUPPRESS_UNREACHABLE_WARN_PUSH __pragma(warning(push)) __pragma(warning(disable : 4702))
+#   define _HELIX_SUPPRESS_UNREACHABLE_WARN_POP __pragma(warning(pop))
+#else
+#   define _HELIX_SUPPRESS_UNREACHABLE_WARN_PUSH
+#   define _HELIX_SUPPRESS_UNREACHABLE_WARN_POP
 #endif
 
 #endif
