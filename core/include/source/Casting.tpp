@@ -16,12 +16,12 @@
 #ifndef _$_HX_CORE_M7CASTING_TPP
 #define _$_HX_CORE_M7CASTING_TPP
 
-#include <include/config/config.hh>
-
 #include <include/c++/libc++.hh>
+#include <include/config/config.hh>
 #include <include/meta/meta.hh>
 #include <include/runtime/runtime.hh>
 #include <include/types/types.hh>
+
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -45,7 +45,14 @@ Ty as_cast(Up &value) {
         return value.operator$cast(static_cast<Ty *>(nullptr));
     }
 
+    // Code below is not reachable, but we need to keep it for the sake of the compiler
+    _HELIX_SUPPRESS_UNREACHABLE_WARN_PUSH
+    if constexpr (std::Meta::is_const<Ty>) {
+        return const_cast<Ty>(value);
+    }
+
     return static_cast<Ty>(value);
+    _HELIX_SUPPRESS_UNREACHABLE_WARN_POP
 }
 
 template <typename Ty, typename Up>
@@ -54,7 +61,9 @@ Ty as_cast(const Up &value) {
         return static_cast<Ty>(value);
     }
 
-    return as_cast<Ty>(const_cast<Up &>(value));  // NOLINT
+    _HELIX_SUPPRESS_UNREACHABLE_WARN_PUSH
+    return as_cast<Ty>(const_cast<Up &>(value));
+    _HELIX_SUPPRESS_UNREACHABLE_WARN_POP
 }
 
 template <typename Ty, typename Up>
