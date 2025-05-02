@@ -49,7 +49,6 @@ inline void Frame::operator$panic() const {
     HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(this);
     throw;
 }
-
 }  // namespace Panic
 
 H_STD_NAMESPACE_END

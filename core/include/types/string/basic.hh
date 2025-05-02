@@ -17,12 +17,13 @@
 #define _$_HX_CORE_M5BASIC
 
 #include <include/config/config.hh>
-
 #include <include/meta/__interfaces/casting.hh>
 #include <include/runtime/__memory/forwarding.hh>
 #include <include/types/string/char_traits.hh>
 #include <include/types/string/slice.hh>
+
 #include "meta/traits.hh"
+
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -72,7 +73,7 @@ class basic {
 
     template <typename U = CharT>
     basic(const char *str,
-                   typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
+          typename libcxx::enable_if_t<!libcxx::is_same_v<U, char>> * = nullptr) noexcept;
 
     template <typename U = CharT>
     basic(const char *str,
@@ -105,21 +106,24 @@ class basic {
     void resize(size_t new_size, CharT c = CharT()) noexcept {
         data.resize(static_cast<size_t>(new_size), c);
     }
+    bool empty() const noexcept { return data.empty(); }
 
     // Concatenation Operators
     basic &operator+=(const basic &other) noexcept;
     basic &operator+=(const CharT *str) noexcept;
     basic &operator+=(const slice_t &s) noexcept;
 
-    template <typename U = CharT> requires std::Meta::is_convertible_to<U, CharT>
+    template <typename U = CharT>
+        requires std::Meta::is_convertible_to<U, CharT>
     basic &operator+=(const U chr) noexcept;
-    
-    basic  operator+(const basic &other) const;
-    basic  operator+(const CharT *str) const;
-    basic  operator+(const slice_t &s) const;
-    
-    template <typename U = CharT> requires std::Meta::is_convertible_to<U, CharT>
-    basic  operator+(const U chr) const;
+
+    basic operator+(const basic &other) const;
+    basic operator+(const CharT *str) const;
+    basic operator+(const slice_t &s) const;
+
+    template <typename U = CharT>
+        requires std::Meta::is_convertible_to<U, CharT>
+    basic operator+(const U chr) const;
 
     // Comparison Operators
     bool operator==(const basic &other) const noexcept { return data == other.data; }
@@ -134,7 +138,7 @@ class basic {
     size_t       size() const noexcept { return data.size(); }
     size_t       length() const noexcept { return data.length(); }
     bool         is_empty() const noexcept { return data.empty(); }
-    string_t  &raw_string() noexcept { return data; }
+    string_t    &raw_string() noexcept { return data; }
 
     // Slice Conversion
     operator slice_t() const noexcept { return slice_t(data.data(), data.size()); }
@@ -152,11 +156,41 @@ class basic {
     vec<basic> split_lines() const;
 
     // Search
+    bool starts_with(const basic &needle) const noexcept { return data.starts_with(needle.data); }
+    bool starts_with(CharT c) const noexcept { return data.starts_with(c); }
+    bool starts_with(slice needle) const noexcept { return data.starts_with(needle.raw()); }
+    
+    bool ends_with(const basic &needle) const noexcept { return data.ends_with(needle.data); }
+    bool ends_with(CharT c) const noexcept { return data.ends_with(c); }
+    bool ends_with(slice needle) const noexcept { return data.ends_with(needle.raw()); }
+
     bool contains(const basic &needle) const noexcept { return data.find(needle.data) != npos; }
     bool contains(CharT c) const noexcept { return data.find(c) != npos; }
 
     constexpr bool operator$contains(slice needle) const { return contains(needle); }
     constexpr bool operator$contains(CharT chr) const { return contains(chr); }
+
+    // add iterators for the string
+    using iterator               = typename string_t::iterator;
+    using const_iterator         = typename string_t::const_iterator;
+    using reverse_iterator       = typename string_t::reverse_iterator;
+    using const_reverse_iterator = typename string_t::const_reverse_iterator;
+
+    iterator begin() noexcept { return data.begin(); }
+    iterator end() noexcept { return data.end(); }
+
+    const_iterator begin() const noexcept { return data.begin(); }
+    const_iterator end() const noexcept { return data.end(); }
+    const_iterator cbegin() const noexcept { return data.cbegin(); }
+    const_iterator cend() const noexcept { return data.cend(); }
+
+    reverse_iterator rbegin() noexcept { return data.rbegin(); }
+    reverse_iterator rend() noexcept { return data.rend(); }
+
+    const_reverse_iterator rbegin() const noexcept { return data.rbegin(); }
+    const_reverse_iterator rend() const noexcept { return data.rend(); }
+    const_reverse_iterator crbegin() const noexcept { return data.crbegin(); }
+    const_reverse_iterator crend() const noexcept { return data.crend(); }
 
     std::Questionable<usize> lfind(slice needle) const;
     std::Questionable<usize> rfind(slice needle) const;
@@ -165,7 +199,7 @@ class basic {
     std::Questionable<usize> find_first_not_of(slice needle) const;
     std::Questionable<usize> find_last_not_of(slice needle) const;
 
-    std::Questionable<usize> lfind(const basic& needle, usize pos) const;
+    std::Questionable<usize> lfind(const basic &needle, usize pos) const;
     std::Questionable<usize> rfind(slice needle, usize pos) const;
     std::Questionable<usize> find_first_of(slice needle, usize pos) const;
     std::Questionable<usize> find_last_of(slice needle, usize pos) const;
@@ -209,6 +243,6 @@ struct hash<helix::sstring::slice> {
         return std::hash<std::string>{}(std::string(s.raw(), s.size()));
     }
 };
-}  // namespace libcxx
+}  // namespace std
 
 #endif  // _$_HX_CORE_M5BASIC
