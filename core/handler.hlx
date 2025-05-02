@@ -56,10 +56,12 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     const message:   string = (*frame).reason();
     const line_no:   usize  = (*frame).line();
     const eval if defined(_MSC_VER) {
-        const error_t: string = string((*((*frame).get_context())).type_name()).split(" ")[1];
+        var error_t: string = string((*((*frame).get_context())).type_name()).split(" ")[1];
     } else {
-        const error_t: string = (*((*frame).get_context())).type_name();
+        var error_t: string = (*((*frame).get_context())).type_name();
     }
+
+    // error_t = std::abi::demangle_parttial(error_t);
 
     const bold:        string = "\033[1m";
     const red:         string = "\033[31m";
@@ -215,6 +217,7 @@ fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const
     // }
 
     (*((*frame).get_context())).crash();
+    libcxx::abort(); // Ensure the program terminates after the panic handler is executed
 }
 
 /// \section CommentedErrorReporting Example Error Reporting (Commented Section)

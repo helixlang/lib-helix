@@ -35,6 +35,7 @@
 
 #[trivially_import(true)]
 
+import abi::*;
 import range::*;
 import frame_context::*;
 import handler::*;
