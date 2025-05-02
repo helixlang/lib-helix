@@ -13,7 +13,7 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-class AttributeError derives std::Error::BaseError {
+default class AttributeError derives std::Error::BaseError {
     priv var msg: string;
 
     fn AttributeError(self, msg: string) {
@@ -21,10 +21,6 @@ class AttributeError derives std::Error::BaseError {
     }
     
     default fn AttributeError(self);
-    default fn AttributeError(self, other: std::Memory::reference::<AttributeError>);
-    default fn AttributeError(self, other: std::Memory::move_reference::<AttributeError>);
-    default op = fn (self, other: std::Memory::reference::<AttributeError>) -> std::Memory::reference::<AttributeError>;
-    default op = fn (self, other: std::Memory::move_reference::<AttributeError>) -> std::Memory::reference::<AttributeError>;
 
     override default op delete fn (self);
     
@@ -36,3 +32,4 @@ class AttributeError derives std::Error::BaseError {
         return msg;
     }
 }
+

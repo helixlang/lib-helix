@@ -26,5 +26,6 @@
 #include "conversions.hh"
 #include "allocation.hh"
 #include "platform_memory.hh"
+#include "c-array.hh"
 
 #endif  // _$_HX_CORE_M7MEMORY
