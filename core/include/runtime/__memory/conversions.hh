@@ -36,13 +36,10 @@ template <typename T>
 constexpr T &&as_reference(T *ptr) noexcept {
     return *ptr;
 }
-
-template <typename T>
-using reference = T&;
-
-template <typename T>
-using move_reference = T&&;
 }  // namespace Memory
+
+#define reference(T)      T&;
+#define move_reference(T) T&&;
 
 H_NAMESPACE_END
 H_STD_NAMESPACE_END
