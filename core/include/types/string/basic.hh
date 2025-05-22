@@ -22,9 +22,6 @@
 #include <include/types/string/char_traits.hh>
 #include <include/types/string/slice.hh>
 
-#include "meta/traits.hh"
-
-
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
@@ -103,9 +100,12 @@ class basic {
                      static_cast<size_t>(len),
                      libcxx::basic_string_view<CharT>(other));
     }
+    
+    void reserve(size_t new_cap) noexcept { data.reserve(static_cast<size_t>(new_cap)); }
     void resize(size_t new_size, CharT c = CharT()) noexcept {
         data.resize(static_cast<size_t>(new_size), c);
     }
+
     bool empty() const noexcept { return data.empty(); }
 
     // Concatenation Operators

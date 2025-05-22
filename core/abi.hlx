@@ -114,7 +114,7 @@ module std::abi {
         }
 
         var len_pos: usize = input.rfind("$L");
-        if (len_pos == string::npos) {
+        if len_pos == string::npos {
             panic std::Error::StateMismatchError("Invalid mangled name: missing length");
         }
 
