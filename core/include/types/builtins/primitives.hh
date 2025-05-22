@@ -82,8 +82,8 @@ inline constexpr helix::std::null_t null;
 template <typename T>
 using vec = helix::libcxx::vector<T>;
 
-template <typename K, typename V>
-using map = helix::libcxx::unordered_map<K, V>;
+template <typename K, typename V, class C = helix::libcxx::less<K>, class A = helix::libcxx::allocator<helix::libcxx::pair<const K, V> > >
+using map = helix::libcxx::map<K, V, C, A>;
 
 template <typename T, usize S>
 using array = helix::libcxx::array<T, S>;
