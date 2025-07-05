@@ -1,0 +1,501 @@
+{
+  "namespace": "std::String",
+  "description": "String types and string manipulation utilities for the Helix language",
+  "classes": [
+    {
+      "name": "basic<Char, Traits>",
+      "description": "Represents a basic string type with specified character type and traits, similar to std::basic_string in C++",
+      "template_parameters": ["Char", "Traits"],
+      "type_aliases": [
+        "char_traits = Traits",
+        "char_t = CharT",
+        "size_t = usize",
+        "string_t = libcxx::basic_string<CharT, Traits>",
+        "slice_t = slice",
+        "slice_vec = vec<slice_t>",
+        "char_vec = vec<CharT>"
+      ],
+      "constants": [
+        {
+          "name": "npos",
+          "description": "Maximum possible value for size_t, used to indicate no position",
+          "value": "string_t::npos",
+          "specifiers": ["static", "constexpr"]
+        }
+      ],
+      "constructors": [
+        {
+          "name": "basic",
+          "signature": "basic() noexcept",
+          "description": "Default constructor",
+          "specifiers": ["constexpr"]
+        },
+        {
+          "name": "basic",
+          "signature": "basic(const basic& other) noexcept",
+          "description": "Copy constructor",
+          "specifiers": ["constexpr"]
+        },
+        {
+          "name": "basic",
+          "signature": "basic(basic&& other) noexcept",
+          "description": "Move constructor",
+          "specifiers": ["constexpr"]
+        },
+        {
+          "name": "basic",
+          "signature": "basic(const libcxx::basic_string<CharT, Traits>& str) noexcept",
+          "description": "Constructor from C++ string",
+          "specifiers": ["constexpr"]
+        },
+        {
+          "name": "basic",
+          "signature": "basic(const CharT* str) noexcept",
+          "description": "Constructor from C-style string",
+          "specifiers": ["constexpr"]
+        },
+        {
+          "name": "basic",
+          "signature": "basic(const CharT chr, size_t count) noexcept",
+          "description": "Constructor with character repeated count times",
+          "specifiers": ["constexpr"]
+        },
+        {
+          "name": "basic",
+          "signature": "basic(const CharT* str, size_t len) noexcept",
+          "description": "Constructor from C-style string with length",
+          "specifiers": ["constexpr"]
+        },
+        {
+          "name": "basic",
+          "signature": "basic(const slice_t& s) noexcept",
+          "description": "Constructor from string slice",
+          "specifiers": ["constexpr"]
+        }
+      ],
+      "operators": [
+        {
+          "name": "operator=",
+          "signature": "op =(self, const basic& other) -> &basic",
+          "description": "Copy assignment operator",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "operator=",
+          "signature": "op =(self, basic&& other) -> &basic",
+          "description": "Move assignment operator",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "operator=",
+          "signature": "op =(self, const CharT* str) -> &basic",
+          "description": "Assignment from C-style string",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "operator[]",
+          "signature": "op [](self, index: size_t) -> &CharT",
+          "description": "Access character at index (mutable)",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "operator[]",
+          "signature": "op [](self, index: size_t) -> const &CharT",
+          "description": "Access character at index (const)",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator+=",
+          "signature": "op +=(self, const basic& other) -> &basic",
+          "description": "Append another string",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "operator+=",
+          "signature": "op +=(self, const CharT* str) -> &basic",
+          "description": "Append C-style string",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "operator+=",
+          "signature": "op +=(self, const U chr) -> &basic",
+          "description": "Append character",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "operator+",
+          "signature": "op +(self, const basic& other) -> basic",
+          "description": "Concatenate with another string",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "operator+",
+          "signature": "op +(self, const CharT* str) -> basic",
+          "description": "Concatenate with C-style string",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "operator+",
+          "signature": "op +(self, const U chr) -> basic",
+          "description": "Concatenate with character",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "operator==",
+          "signature": "op ==(self, const basic& other) -> bool",
+          "description": "Equality comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator!=",
+          "signature": "op !=(self, const basic& other) -> bool",
+          "description": "Inequality comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator<",
+          "signature": "op <(self, const basic& other) -> bool",
+          "description": "Less than comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator>",
+          "signature": "op >(self, const basic& other) -> bool",
+          "description": "Greater than comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator<=",
+          "signature": "op <=(self, const basic& other) -> bool",
+          "description": "Less than or equal comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator>=",
+          "signature": "op >=(self, const basic& other) -> bool",
+          "description": "Greater than or equal comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator slice_t",
+          "signature": "op slice_t(self) -> slice_t",
+          "description": "Conversion to slice",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator as",
+          "signature": "op as(self, const slice_t*) -> slice_t",
+          "description": "Cast to slice",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator as",
+          "signature": "op as(self, const char_t*) -> const char_t*",
+          "description": "Cast to C-style string",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator in",
+          "signature": "op in(self, needle: slice) -> bool",
+          "description": "Contains operator for slice",
+          "specifiers": ["constexpr", "const"]
+        },
+        {
+          "name": "operator in",
+          "signature": "op in(self, chr: CharT) -> bool",
+          "description": "Contains operator for character",
+          "specifiers": ["constexpr", "const"]
+        }
+      ],
+      "methods": [
+        {
+          "name": "push_back",
+          "signature": "push_back(self, c: CharT) -> void",
+          "description": "Appends a character to the end of the string",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "append",
+          "signature": "append(self, const basic& other) -> void",
+          "description": "Appends another string",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "append",
+          "signature": "append(self, const CharT* str, len: size_t) -> void",
+          "description": "Appends C-style string with length",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "append",
+          "signature": "append(self, const slice_t& s) -> void",
+          "description": "Appends string slice",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "clear",
+          "signature": "clear(self) -> void",
+          "description": "Clears the string content",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "replace",
+          "signature": "replace(self, pos: size_t, len: size_t, const slice_t& other) -> void",
+          "description": "Replaces portion of string with another slice",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "reserve",
+          "signature": "reserve(self, new_cap: size_t) -> void",
+          "description": "Reserves capacity for the string",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "resize",
+          "signature": "resize(self, new_size: size_t, c: CharT = CharT()) -> void",
+          "description": "Resizes the string to new size",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "empty",
+          "signature": "empty(self) -> bool",
+          "description": "Checks if string is empty",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "raw",
+          "signature": "raw(self) -> const CharT*",
+          "description": "Returns raw C-style string pointer",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "size",
+          "signature": "size(self) -> size_t",
+          "description": "Returns the size of the string",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "length",
+          "signature": "length(self) -> size_t",
+          "description": "Returns the length of the string",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "is_empty",
+          "signature": "is_empty(self) -> bool",
+          "description": "Checks if string is empty",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "raw_string",
+          "signature": "raw_string(self) -> &string_t",
+          "description": "Returns reference to underlying C++ string",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "subslice",
+          "signature": "subslice(self, pos: size_t, len: size_t) -> basic",
+          "description": "Returns a substring",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "l_strip",
+          "signature": "l_strip(self, const char_vec& delim = {' ', '\\t', '\\n', '\\r'}) -> basic",
+          "description": "Strips whitespace from the left",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "r_strip",
+          "signature": "r_strip(self, const char_vec& delim = {' ', '\\t', '\\n', '\\r'}) -> basic",
+          "description": "Strips whitespace from the right",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "strip",
+          "signature": "strip(self, const char_vec& delim = {' ', '\\t', '\\n', '\\r'}) -> basic",
+          "description": "Strips whitespace from both ends",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "split",
+          "signature": "split(self, const basic& delim, op: slice_t::Operation = slice_t::Operation::Remove) -> vec<basic>",
+          "description": "Splits string by delimiter",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "split_lines",
+          "signature": "split_lines(self) -> vec<basic>",
+          "description": "Splits string by newlines",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "starts_with",
+          "signature": "starts_with(self, const basic& needle) -> bool",
+          "description": "Checks if string starts with needle",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "starts_with",
+          "signature": "starts_with(self, c: CharT) -> bool",
+          "description": "Checks if string starts with character",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "starts_with",
+          "signature": "starts_with(self, needle: slice) -> bool",
+          "description": "Checks if string starts with slice",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "ends_with",
+          "signature": "ends_with(self, const basic& needle) -> bool",
+          "description": "Checks if string ends with needle",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "ends_with",
+          "signature": "ends_with(self, c: CharT) -> bool",
+          "description": "Checks if string ends with character",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "ends_with",
+          "signature": "ends_with(self, needle: slice) -> bool",
+          "description": "Checks if string ends with slice",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "contains",
+          "signature": "contains(self, const basic& needle) -> bool",
+          "description": "Checks if string contains needle",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "contains",
+          "signature": "contains(self, c: CharT) -> bool",
+          "description": "Checks if string contains character",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "lfind",
+          "signature": "lfind(self, needle: slice) -> usize?",
+          "description": "Finds first occurrence of needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "rfind",
+          "signature": "rfind(self, needle: slice) -> usize?",
+          "description": "Finds last occurrence of needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "find_first_of",
+          "signature": "find_first_of(self, needle: slice) -> usize?",
+          "description": "Finds first occurrence of any character in needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "find_last_of",
+          "signature": "find_last_of(self, needle: slice) -> usize?",
+          "description": "Finds last occurrence of any character in needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "find_first_not_of",
+          "signature": "find_first_not_of(self, needle: slice) -> usize?",
+          "description": "Finds first character not in needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "find_last_not_of",
+          "signature": "find_last_not_of(self, needle: slice) -> usize?",
+          "description": "Finds last character not in needle",
+          "specifiers": ["const"]
+        }
+      ],
+      "iterators": [
+        {
+          "name": "iterator",
+          "description": "Mutable iterator type"
+        },
+        {
+          "name": "const_iterator",
+          "description": "Constant iterator type"
+        },
+        {
+          "name": "reverse_iterator",
+          "description": "Mutable reverse iterator type"
+        },
+        {
+          "name": "const_reverse_iterator",
+          "description": "Constant reverse iterator type"
+        }
+      ],
+      "iterator_methods": [
+        {
+          "name": "begin",
+          "signature": "begin(self) -> iterator",
+          "description": "Returns iterator to beginning",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "end",
+          "signature": "end(self) -> iterator",
+          "description": "Returns iterator to end",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "begin",
+          "signature": "begin(self) -> const_iterator",
+          "description": "Returns const iterator to beginning",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "end",
+          "signature": "end(self) -> const_iterator",
+          "description": "Returns const iterator to end",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "cbegin",
+          "signature": "cbegin(self) -> const_iterator",
+          "description": "Returns const iterator to beginning",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "cend",
+          "signature": "cend(self) -> const_iterator",
+          "description": "Returns const iterator to end",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "rbegin",
+          "signature": "rbegin(self) -> reverse_iterator",
+          "description": "Returns reverse iterator to beginning",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "rend",
+          "signature": "rend(self) -> reverse_iterator",
+          "description": "Returns reverse iterator to end",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "crbegin",
+          "signature": "crbegin(self) -> const_reverse_iterator",
+          "description": "Returns const reverse iterator to beginning",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "crend",
+          "signature": "crend(self) -> const_reverse_iterator",
+          "description": "Returns const reverse iterator to end",
+          "specifiers": ["const", "noexcept"]
+        }
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    var str: std::String::basic<char> = std::String::basic(\"Hello, World!\");\n    str += \" How are you?\";\n    \n    print(\"String:\", str);\n    print(\"Length:\", str.length());\n    print(\"Contains 'World':\", str.contains(\"World\"));\n    \n    var parts: vec<std::String::basic<char>> = str.split(\", \");\n    for part in parts {\n        print(\"Part:\", part);\n    }\n    \n    var stripped: std::String::basic<char> = str.strip();\n    print(\"Stripped:\", stripped);\n}"
+      }
+    }
+  ]
+}

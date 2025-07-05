@@ -1,0 +1,36 @@
+{
+  "namespace": "std::Panic::Interface",
+  "description": "Interface definitions for panic-capable types in the Helix language",
+  "interfaces": [
+    {
+      "name": "Panicking<T>",
+      "description": "Interface for types that can panic",
+      "requirements": "Must implement 'fn op panic(self) -> Frame' operator",
+      "signature": "Panicking<T>",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    class MyError {\n        message: string;\n        \n        fn MyError(self, msg: string) {\n            self.message = msg;\n        }\n        \n        fn op panic(self) -> std::Panic::Frame {\n            return std::Panic::Frame(self, __FILE__, __LINE__);\n        }\n    }\n    \n    // MyError now satisfies Panicking<MyError>\n    var error: MyError = MyError(\"Something went wrong\");\n    panic error;\n}"
+      }
+    },
+    {
+      "name": "PanickingStatic<T>",
+      "description": "Interface for types that can panic with static method",
+      "requirements": "Must implement 'static fn op panic() -> Frame' operator, but is static",
+      "signature": "PanickingStatic<T>",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    class StaticError {\n        static fn op panic() -> std::Panic::Frame {\n            return std::Panic::Frame(StaticError(), __FILE__, __LINE__);\n        }\n    }\n    \n    // StaticError now satisfies PanickingStatic<StaticError>\n    panic StaticError::op_panic();\n}"
+      }
+    },
+    {
+      "name": "PanickingInstance<T>",
+      "description": "Interface for types that can panic with instance method",
+      "requirements": "Must implement 'fn op panic(self) -> Frame' operator, but is instance based",
+      "signature": "PanickingInstance<T>",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    class InstanceError {\n        error_code: i32;\n        \n        fn InstanceError(self, code: i32) {\n            self.error_code = code;\n        }\n        \n        fn op panic(self) -> std::Panic::Frame {\n            return std::Panic::Frame(self, __FILE__, __LINE__);\n        }\n    }\n    \n    // InstanceError now satisfies PanickingInstance<InstanceError>\n    var error: InstanceError = InstanceError(404);\n    panic error;\n}"
+      }
+    }
+  ]
+}

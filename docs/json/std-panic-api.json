@@ -1,0 +1,109 @@
+{
+  "namespace": "std::Panic",
+  "description": "Panic handling and error propagation system for the Helix language",
+  "classes": [
+    {
+      "name": "FrameContext",
+      "description": "Provides context for a panic frame",
+      "methods": [
+        {
+          "name": "crash",
+          "description": "Terminates the program with the panic context",
+          "signature": "crash(self) -> void",
+          "specifiers": ["noreturn"]
+        },
+        {
+          "name": "object",
+          "description": "Returns a pointer to the object that caused the panic",
+          "signature": "object(self) -> *void"
+        },
+        {
+          "name": "type_name",
+          "description": "Returns the type name of the object that caused the panic",
+          "signature": "type_name(self) -> string"
+        },
+        {
+          "name": "operator==",
+          "description": "Equality comparison with type_info",
+          "signature": "op ==(self, const libcxx::type_info& other) -> bool"
+        }
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    try {\n        panic std::Error::RuntimeError(\"Test error\");\n    } catch (frame: std::Panic::Frame) {\n        var context: *std::Panic::FrameContext = frame.get_context();\n        print(\"Panic type:\", context.type_name());\n        print(\"Panic object:\", context.object());\n    }\n}"
+      }
+    },
+    {
+      "name": "Frame",
+      "description": "Represents a panic frame with error context and location information",
+      "constructors": [
+        {
+          "name": "Frame",
+          "signature": "Frame<T>(obj: T, filename: const char*, lineno: usize)",
+          "description": "Creates a panic frame with object, filename, and line number",
+          "template_parameters": ["T"]
+        },
+        {
+          "name": "Frame",
+          "signature": "Frame<T>(obj: T, filename: string, lineno: usize)",
+          "description": "Creates a panic frame with object, filename as string, and line number",
+          "template_parameters": ["T"]
+        },
+        {
+          "name": "Frame",
+          "signature": "Frame(Frame& obj, const string& filename, usize lineno)",
+          "description": "Creates a panic frame from another frame (noreturn)",
+          "specifiers": ["noreturn"]
+        },
+        {
+          "name": "Frame",
+          "signature": "Frame(Frame&& obj, const string& filename, usize lineno)",
+          "description": "Creates a panic frame from another frame (move, noreturn)",
+          "specifiers": ["noreturn"]
+        }
+      ],
+      "methods": [
+        {
+          "name": "file",
+          "description": "Returns the filename where the panic occurred",
+          "signature": "file(self) -> string",
+          "specifiers": ["const"],
+          "attributes": ["nodiscard"]
+        },
+        {
+          "name": "line",
+          "description": "Returns the line number where the panic occurred",
+          "signature": "line(self) -> usize",
+          "specifiers": ["const"],
+          "attributes": ["nodiscard"]
+        },
+        {
+          "name": "reason",
+          "description": "Returns the reason for the panic",
+          "signature": "reason(self) -> string",
+          "specifiers": ["const"],
+          "attributes": ["nodiscard"]
+        },
+        {
+          "name": "get_context",
+          "description": "Returns the panic context",
+          "signature": "get_context(self) -> *FrameContext",
+          "specifiers": ["const"],
+          "attributes": ["nodiscard"]
+        }
+      ],
+      "operators": [
+        {
+          "name": "operator panic",
+          "description": "Panic operator used in helix code as 'panic ...'",
+          "signature": "op panic(self) -> void",
+          "syntax": "panic ...",
+          "specifiers": ["noreturn"],
+          "note": "panic operator can be defined by implementing 'fn op panic(self) -> Frame'"
+        }
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    fn divide(a: i32, b: i32) -> i32 {\n        if (b == 0) {\n            panic std::Error::RuntimeError(\"Division by zero\");\n        }\n        return a / b;\n    }\n    \n    try {\n        var result: i32 = divide(10, 0);\n        print(\"Result:\", result);\n    } catch (frame: std::Panic::Frame) {\n        print(\"Panic occurred in file:\", frame.file());\n        print(\"At line:\", frame.line());\n        print(\"Reason:\", frame.reason());\n    }\n}"
+      }
+    }
+  ]
+}

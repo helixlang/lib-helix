@@ -1,0 +1,54 @@
+{
+  "namespace": "helix::language_features",
+  "description": "Core language features and syntax elements of the Helix programming language",
+  "language_features": [
+    {
+      "name": "finally block",
+      "description": "Finally block syntax for cleanup code that always executes",
+      "syntax": "finally {}",
+      "example": {
+        "main": "fn main() -> void {\n    var file: *File = null;\n    \n    try {\n        file = std::Legacy::new<File>(\"data.txt\");\n        // Process file\n        file.read();\n    } catch (error: std::Error::RuntimeError) {\n        print(\"Error:\", error.message());\n    } finally {\n        // This always executes, even if an exception occurs\n        if (file != null) {\n            file.close();\n            delete file;\n        }\n        print(\"Cleanup completed\");\n    }\n}"
+      }
+    },
+    {
+      "name": "cast syntax",
+      "description": "Type casting syntax with optional specifiers",
+      "syntax": "T as <spec?> U",
+      "specifiers": ["const", "unsafe"],
+      "examples": [
+        {
+          "name": "Basic cast",
+          "code": "var float_val: f32 = 42 as f32;"
+        },
+        {
+          "name": "Const cast",
+          "code": "var const_val: const i32 = 42 as const i32;"
+        },
+        {
+          "name": "Unsafe cast",
+          "code": "var ptr: *void = int_ptr as unsafe *void;"
+        }
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    var int_val: i32 = 42;\n    var float_val: f32 = int_val as f32;\n    var const_val: const i32 = int_val as const i32;\n    \n    print(\"Int:\", int_val);\n    print(\"Float:\", float_val);\n    print(\"Const:\", const_val);\n    \n    // Unsafe cast example\n    var ptr: *i32 = &int_val;\n    var void_ptr: *void = ptr as unsafe *void;\n    print(\"Pointer cast successful\");\n}"
+      }
+    },
+    {
+      "name": "lambda syntax",
+      "description": "Anonymous function syntax",
+      "syntax": "fn (...) -> T",
+      "example": {
+        "main": "fn main() -> void {\n    // Simple lambda\n    var add: fn(i32, i32) -> i32 = fn(a: i32, b: i32) -> i32 {\n        return a + b;\n    };\n    \n    print(\"Addition:\", add(5, 3));\n    \n    // Lambda with capture\n    var multiplier: i32 = 10;\n    var multiply: fn(i32) -> i32 = fn(x: i32) -> i32 {\n        return x * multiplier;\n    };\n    \n    print(\"Multiplication:\", multiply(4));\n    \n    // Using lambda with higher-order functions\n    var numbers: vec<i32> = {1, 2, 3, 4, 5};\n    var squared: vec<i32> = numbers.map(fn(x: i32) -> i32 {\n        return x * x;\n    });\n    \n    for num in squared {\n        print(\"Squared:\", num);\n    }\n}"
+      }
+    },
+    {
+      "name": "nullable/panicable type syntax",
+      "description": "Optional type syntax that can represent null values or panic states",
+      "syntax": "T?",
+      "note": "T? becomes Questionable<T> in the underlying implementation",
+      "example": {
+        "main": "fn main() -> void {\n    fn safe_divide(a: i32, b: i32) -> i32? {\n        if (b == 0) {\n            return null; // Returns null for division by zero\n        }\n        return a / b;\n    }\n    \n    fn risky_divide(a: i32, b: i32) -> i32? {\n        if (b == 0) {\n            return std::Error::RuntimeError(\"Division by zero\"); // Returns error\n        }\n        return a / b;\n    }\n    \n    // Safe usage\n    var result1: i32? = safe_divide(10, 2);\n    if (result1 ?) {\n        print(\"Result:\", result1 as i32);\n    } else {\n        print(\"Division failed\");\n    }\n    \n    // Handling null\n    var result2: i32? = safe_divide(10, 0);\n    if (result2 == null) {\n        print(\"Got null result\");\n    }\n    \n    // Handling errors\n    var result3: i32? = risky_divide(10, 0);\n    if (std::Error::RuntimeError in result3) {\n        var error: std::Error::RuntimeError = result3 as std::Error::RuntimeError;\n        print(\"Got error:\", error.message());\n    }\n}"
+      }
+    }
+  ]
+}

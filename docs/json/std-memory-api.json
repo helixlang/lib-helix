@@ -1,0 +1,192 @@
+{
+  "namespace": "std::Memory",
+  "description": "Memory management utilities and operations for the Helix language",
+  "enums": [
+    {
+      "name": "AddressType",
+      "description": "Type of memory address for any pointer",
+      "values": [
+        {
+          "name": "ROTData",
+          "description": "Read-only data segment"
+        },
+        {
+          "name": "Stack",
+          "description": "Stack memory region"
+        },
+        {
+          "name": "Heap",
+          "description": "Heap memory region"
+        },
+        {
+          "name": "Unknown",
+          "description": "Unknown memory region"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "buffer<T, N>",
+      "description": "Creates a fixed-size buffer of type T with size N, same safety as C arrays (not very safe, use with caution)",
+      "signature": "buffer<T, N> == T[N]",
+      "template_parameters": ["T", "N"],
+      "example": {
+        "main": "fn main() -> void {\n    var buf: std::Memory::buffer<i32, 10>;\n    buf[0] = 42;\n    buf[1] = 24;\n    print(\"Buffer[0]:\", buf[0]);\n    print(\"Buffer[1]:\", buf[1]);\n}"
+      }
+    }
+  ],
+  "functions": [
+    {
+      "name": "address_type",
+      "description": "Returns the type of memory address for a pointer",
+      "signature": "address_type(ptr: *void) -> AddressType",
+      "example": {
+        "main": "fn main() -> void {\n    var stack_var: i32 = 42;\n    var heap_var: *i32 = std::Legacy::new<i32>(24);\n    \n    var stack_type: std::Memory::AddressType = std::Memory::address_type(&stack_var);\n    var heap_type: std::Memory::AddressType = std::Memory::address_type(heap_var);\n    \n    print(\"Stack variable type:\", stack_type);\n    print(\"Heap variable type:\", heap_type);\n}"
+      }
+    },
+    {
+      "name": "new_aligned<T>",
+      "description": "Allocates memory for a type with specified alignment (alignment of T) and arguments",
+      "signature": "new_aligned<T>(...args) -> *T",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var ptr: *i32 = std::Memory::new_aligned<i32>(42);\n    print(\"Aligned allocated value:\", *ptr);\n    std::Memory::delete_aligned(ptr);\n}"
+      }
+    },
+    {
+      "name": "delete_aligned<T>",
+      "description": "Deallocates memory for a type allocated with new_aligned",
+      "signature": "delete_aligned<T>(ptr: *T) -> void",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var ptr: *i32 = std::Memory::new_aligned<i32>(42);\n    print(\"Value:\", *ptr);\n    std::Memory::delete_aligned(ptr);\n    print(\"Memory deallocated\");\n}"
+      }
+    },
+    {
+      "name": "as_reference<T>",
+      "description": "Converts a pointer to an lvalue reference type",
+      "signature": "as_reference<T>(ptr: *T) -> &T",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var value: i32 = 42;\n    var ptr: *i32 = &value;\n    var ref: &i32 = std::Memory::as_reference(ptr);\n    print(\"Reference value:\", ref);\n}"
+      }
+    },
+    {
+      "name": "as_pointer<T>",
+      "description": "Converts a reference to a pointer type",
+      "signature": "as_pointer<T>(ref: &T) -> *T",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var value: i32 = 42;\n    var ref: &i32 = &value;\n    var ptr: *i32 = std::Memory::as_pointer(ref);\n    print(\"Pointer value:\", *ptr);\n}"
+      }
+    },
+    {
+      "name": "exchange<T>",
+      "description": "Atomically exchanges the value at the pointer with the specified value, returns the old value",
+      "signature": "exchange<T>(ptr: *T, value: T) -> &T",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var value: i32 = 42;\n    var old_value: &i32 = std::Memory::exchange(&value, 24);\n    print(\"Old value:\", old_value);\n    print(\"New value:\", value);\n}"
+      }
+    },
+    {
+      "name": "forward<T>",
+      "description": "Forwards a value as an rvalue reference, used for perfect forwarding in function templates",
+      "signature": "forward<T>(value: T) -> T",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    fn process<T>(value: T) -> void {\n        var forwarded: T = std::Memory::forward(value);\n        print(\"Forwarded value:\", forwarded);\n    }\n    process(42);\n}"
+      }
+    },
+    {
+      "name": "heap_start",
+      "description": "Returns the start address of the heap memory region",
+      "signature": "heap_start() -> *void",
+      "example": {
+        "main": "fn main() -> void {\n    var heap_addr: *void = std::Memory::heap_start();\n    print(\"Heap starts at:\", heap_addr);\n}"
+      }
+    },
+    {
+      "name": "copy",
+      "description": "Copies memory from source to destination",
+      "signature": "copy(dest: *void, src: *const void, size: usize) -> *void",
+      "example": {
+        "main": "fn main() -> void {\n    var src: i32[5] = {1, 2, 3, 4, 5};\n    var dest: i32[5];\n    std::Memory::copy(dest, src, 5 * sizeof(i32));\n    print(\"Copied values:\", dest[0], dest[1], dest[2]);\n}"
+      }
+    },
+    {
+      "name": "move",
+      "description": "Moves memory from source to destination",
+      "signature": "move(dest: *void, src: *const void, size: usize) -> *void",
+      "example": {
+        "main": "fn main() -> void {\n    var data: i32[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};\n    std::Memory::move(&data[2], &data[0], 3 * sizeof(i32));\n    print(\"Moved data:\", data[2], data[3], data[4]);\n}"
+      }
+    },
+    {
+      "name": "set",
+      "description": "Sets a block of memory to a specified value",
+      "signature": "set(dest: *void, value: i32, size: usize) -> *void",
+      "example": {
+        "main": "fn main() -> void {\n    var buffer: i32[10];\n    std::Memory::set(buffer, 0, 10 * sizeof(i32));\n    print(\"First element after set:\", buffer[0]);\n}"
+      }
+    },
+    {
+      "name": "find<T>",
+      "description": "Finds the first occurrence of a value in a block of memory",
+      "signature": "find<T>(ptr: *const void, value: i32, size: usize) -> *T?",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var data: i32[5] = {1, 2, 3, 4, 5};\n    var result: *i32? = std::Memory::find<i32>(data, 3, 5 * sizeof(i32));\n    if (result ?) {\n        print(\"Found value at:\", result as *i32);\n    }\n}"
+      }
+    },
+    {
+      "name": "compare",
+      "description": "Compares two blocks of memory for equality",
+      "signature": "compare(ptr1: *const void, ptr2: *const void, size: usize) -> i32",
+      "example": {
+        "main": "fn main() -> void {\n    var data1: i32[3] = {1, 2, 3};\n    var data2: i32[3] = {1, 2, 3};\n    var result: i32 = std::Memory::compare(data1, data2, 3 * sizeof(i32));\n    if (result == 0) {\n        print(\"Memory blocks are equal\");\n    }\n}"
+      }
+    },
+    {
+      "name": "in_rotdata",
+      "description": "Checks if a pointer is in the ROTData memory region",
+      "signature": "in_rotdata(ptr: *const void) -> bool",
+      "example": {
+        "main": "fn main() -> void {\n    var string_literal: const char* = \"Hello, World!\";\n    var is_rotdata: bool = std::Memory::in_rotdata(string_literal);\n    print(\"String literal in ROTData:\", is_rotdata);\n}"
+      }
+    },
+    {
+      "name": "stack_size",
+      "description": "Returns the size of the stack memory region",
+      "signature": "stack_size() -> usize",
+      "example": {
+        "main": "fn main() -> void {\n    var size: usize = std::Memory::stack_size();\n    print(\"Stack size:\", size, \"bytes\");\n}"
+      }
+    },
+    {
+      "name": "stack_start",
+      "description": "Returns the start address of the stack memory region",
+      "signature": "stack_start() -> *void",
+      "example": {
+        "main": "fn main() -> void {\n    var stack_addr: *void = std::Memory::stack_start();\n    print(\"Stack starts at:\", stack_addr);\n}"
+      }
+    },
+    {
+      "name": "stack_bounds",
+      "description": "Returns the bounds of the stack memory region as a pair of pointers",
+      "signature": "stack_bounds() -> libcxx::pair<*void, *void>",
+      "example": {
+        "main": "fn main() -> void {\n    var bounds: libcxx::pair<*void, *void> = std::Memory::stack_bounds();\n    print(\"Stack bounds: start =\", bounds.first, \", end =\", bounds.second);\n}"
+      }
+    },
+    {
+      "name": "in_stack",
+      "description": "Checks if a pointer is in the stack memory region",
+      "signature": "in_stack(ptr: *const void) -> bool",
+      "example": {
+        "main": "fn main() -> void {\n    var stack_var: i32 = 42;\n    var is_stack: bool = std::Memory::in_stack(&stack_var);\n    print(\"Variable in stack:\", is_stack);\n    \n    var heap_var: *i32 = std::Legacy::new<i32>(24);\n    var is_heap_in_stack: bool = std::Memory::in_stack(heap_var);\n    print(\"Heap variable in stack:\", is_heap_in_stack);\n}"
+      }
+    }
+  ]
+}

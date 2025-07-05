@@ -1,0 +1,402 @@
+HELIX API CROSS-REFERENCE REPORT
+============================================================
+
+Total lines in docs.md: 651
+Lines with matches: 370
+Lines without matches: 281
+
+MATCHES FOUND:
+----------------------------------------
+✓ string (primitive_type): lines [109, 142, 197, 198, 266, 267, 268, 269, 270, 271, 272, 291, 293, 294, 295, 299, 302, 303, 309, 319, 374, 398, 399, 400, 401, 402, 577, 588, 589, 591, 593, 628]
+✓ char (primitive_type): lines [197, 266, 292, 294, 300, 325, 328, 428, 461, 465, 543, 574, 629, 634, 638]
+✓ usize (primitive_type): lines [308, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 433, 442, 472, 484, 490, 518, 519, 520, 521, 522, 523, 525, 537, 538, 542, 558, 559, 560, 561, 564, 574, 577, 592, 630]
+✓ isize (primitive_type): lines [205, 211, 508, 631]
+✓ void (primitive_type): lines [199, 296, 339, 340, 341, 342, 343, 344, 346, 347, 470, 471, 472, 549, 551, 557, 558, 559, 560, 561, 562, 563, 565, 566, 567, 596, 608, 632]
+✓ bool (primitive_type): lines [208, 223, 224, 249, 250, 252, 254, 256, 257, 272, 348, 363, 364, 365, 366, 367, 368, 373, 387, 388, 389, 391, 392, 393, 394, 395, 396, 397, 480, 492, 493, 495, 496, 498, 499, 500, 501, 502, 503, 505, 506, 563, 567, 633]
+✓ i8 (primitive_type): lines [634]
+✓ i16 (primitive_type): lines [635]
+✓ i32 (primitive_type): lines [560, 561, 636]
+✓ i64 (primitive_type): lines [637]
+✓ u8 (primitive_type): lines [638]
+✓ u16 (primitive_type): lines [639]
+✓ u32 (primitive_type): lines [640]
+✓ u64 (primitive_type): lines [641]
+✓ f32 (primitive_type): lines [642]
+✓ f64 (primitive_type): lines [643]
+✓ f80 (primitive_type): lines [644]
+✓ null (primitive_type): lines [200, 645]
+✓ vec (container_type): lines [311, 312, 384, 385, 443, 444, 457, 458, 536, 646]
+✓ map (container_type): lines [91, 647]
+✓ array (container_type): lines [69, 646, 648]
+✓ list (container_type): lines [88, 649]
+✓ set (container_type): lines [102, 560, 650]
+✓ tuple (container_type): lines [113, 651]
+✓ print (function): lines [608]
+✗ reference(T) (macro): NOT FOUND
+✗ move_reference(T) (macro): NOT FOUND
+✓ finally block (language_feature): lines [622]
+✓ cast syntax (language_feature): lines [623]
+✓ lambda syntax (language_feature): lines [624]
+✓ nullable/panicable type syntax (language_feature): lines [625]
+✗ mangle (function): NOT FOUND
+✗ demangle (function): NOT FOUND
+✗ is_mangled (function): NOT FOUND
+✗ demangle_partial (function): NOT FOUND
+✗ ObjectType (enum): NOT FOUND
+✓ as_cast (function): lines [191]
+✓ as_const (function): lines [159, 192]
+✓ as_unsafe (function): lines [193]
+✓ next (function): lines [196]
+✓ endl (function): lines [197]
+✓ stringf (function): lines [198]
+✓ crash (function): lines [199]
+✓ erase_type (function): lines [202]
+✓ range (function): lines [203, 205, 206, 210, 211, 213, 214, 215, 216, 217]
+✓ to_string (function): lines [266, 267, 268, 269, 270, 271, 272, 291, 293, 294]
+✓ char_to_cchar (function): lines [292]
+✓ sstring_to_string (function): lines [293]
+✓ cstrptr_to_string (function): lines [294]
+✓ string_to_sstring (function): lines [295]
+✓ strptr_to_cstrptr (function): lines [296]
+✓ Function (class): lines [187, 194]
+✓ Generator (class): lines [195, 196]
+✓ null_t (class): lines [200, 232, 233, 249, 250]
+✓ TypeErasure (class): lines [201, 202]
+✗ destroy (method): NOT FOUND
+✓ operator* (method): lines [263]
+✗ type_info (method): NOT FOUND
+✗ clone (method): NOT FOUND
+✓ Range (class): lines [203, 205, 206, 210, 211, 213, 214, 215, 216, 217]
+✓ begin (method): lines [219, 403, 405, 407, 409, 411, 413]
+✓ end (method): lines [213, 220, 340, 341, 342, 404, 406, 408, 410, 412, 414, 566]
+✓ step (method): lines [205, 211, 213, 221]
+✓ contains (method): lines [208, 223, 256, 394, 395, 396, 397, 495, 496, 505, 506, 571]
+✓ is_empty (method): lines [224, 373, 478, 480]
+✗ operator in (operator): NOT FOUND
+✓ Questionable (class): lines [228, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 518, 519, 520, 521, 522, 523]
+✓ operator== (operator): lines [249, 252, 363, 498]
+✓ operator!= (operator): lines [250, 254, 364, 499]
+✗ operator? (operator): NOT FOUND
+✗ operator as (operator): NOT FOUND
+✓ operator* (operator): lines [263]
+✓ operator T (operator): lines [264]
+✓ BaseError (class): lines [614]
+✓ NullValueError (class): lines [615]
+✓ RuntimeError (class): lines [616]
+✓ StateMismatchError (class): lines [617]
+✓ TypeMismatchError (class): lines [618]
+✓ SupportsPointerCast (interface): lines [140]
+✓ Castable (interface): lines [141, 287, 288, 289, 290]
+✓ ConvertibleToString (interface): lines [142]
+✓ RangeCompliant (interface): lines [143]
+✓ SupportsOStream (interface): lines [144, 286]
+✓ ClassType (interface): lines [145]
+✓ ConstType (interface): lines [146]
+✓ ReferenceableType (interface): lines [147]
+✓ RValueReference (interface): lines [148]
+✓ LValueReference (interface): lines [149]
+✓ ReferenceType (interface): lines [150]
+✓ MoveConstructible (interface): lines [151]
+✓ NothrowAssignable (interface): lines [152]
+✓ CopyConstructible (interface): lines [153]
+✓ new (function): lines [36, 611]
+✓ address_type (function): lines [549]
+✓ new_aligned (function): lines [550]
+✓ delete_aligned (function): lines [551]
+✓ as_reference (function): lines [553]
+✓ as_pointer (function): lines [554]
+✓ exchange (function): lines [470, 555]
+✓ forward (function): lines [556]
+✓ heap_start (function): lines [557]
+✓ copy (function): lines [153, 243, 379, 530, 558]
+✓ move (function): lines [151, 240, 559]
+✓ set (function): lines [102, 560, 650]
+✓ find (function): lines [415, 416, 421, 422, 518, 519, 561]
+✓ compare (function): lines [508, 562, 647, 650]
+✓ in_rotdata (function): lines [563]
+✓ stack_size (function): lines [564]
+✓ stack_start (function): lines [565]
+✓ stack_bounds (function): lines [566]
+✓ in_stack (function): lines [567]
+✓ buffer (type): lines [552]
+✓ AddressType (enum): lines [548, 549]
+✓ const_removed (function): lines [156]
+✓ const_volatile_removed (function): lines [157]
+✓ cvref_removed (function): lines [158]
+✓ as_const_volatile (function): lines [160]
+✓ as_cvref (function): lines [161]
+✓ declval (function): lines [162]
+✓ enable_if (function): lines [163]
+✓ ref_as_ptr (function): lines [166]
+✓ as_rvalue_reference (function): lines [167]
+✓ as_lvalue_reference (function): lines [168]
+✓ reference_removed (function): lines [174]
+✓ all_extents_removed (function): lines [182]
+✓ true_t (type_trait): lines [164]
+✓ false_t (type_trait): lines [165]
+✓ is_lval_reference (type_trait): lines [169]
+✓ is_rval_reference (type_trait): lines [170]
+✓ is_reference (type_trait): lines [171]
+✓ is_pointer (type_trait): lines [172]
+✓ is_referenceable (type_trait): lines [173]
+✓ is_convertible (type_trait): lines [175, 279, 280, 281, 282, 283, 284]
+✓ same_as (type_trait): lines [176, 178, 285]
+✓ is_convertible_to (type_trait): lines [177, 354, 360]
+✓ is_same_as (type_trait): lines [178]
+✓ is_const (type_trait): lines [179]
+✓ is_derived_of (type_trait): lines [180]
+✓ is_class (type_trait): lines [181]
+✓ can_move_noexcept (type_trait): lines [183]
+✓ can_assign_noexcept (type_trait): lines [184]
+✓ can_copy_construct (type_trait): lines [185]
+✓ wellformed_destructor (type_trait): lines [186]
+✓ is_function (type_trait): lines [187]
+✓ is_destructible (type_trait): lines [188]
+✓ FrameContext (class): lines [570, 594]
+✓ crash (method): lines [199]
+✗ object (method): NOT FOUND
+✗ type_name (method): NOT FOUND
+✓ operator== (method): lines [249, 252, 363, 498]
+✓ Frame (class): lines [238, 239, 571, 574, 577, 579, 580, 582, 583, 585, 586, 588, 589]
+✓ file (method): lines [591]
+✓ line (method): lines [592]
+✓ reason (method): lines [593]
+✓ get_context (method): lines [594]
+✗ operator panic (operator): NOT FOUND
+✓ Panicking (interface): lines [260, 601]
+✓ PanickingStatic (interface): lines [602]
+✓ PanickingInstance (interface): lines [603]
+✓ basic (class): lines [300, 316, 317, 318, 319, 320, 321, 322, 323, 325, 328, 331, 332, 333, 334, 340, 350, 351, 352, 355, 356, 357, 358, 361, 363, 364, 365, 366, 367, 368, 369, 380, 381, 382, 383, 384, 385, 387, 391, 394, 421]
+✓ push_back (method): lines [339]
+✓ append (method): lines [340, 341, 342]
+✓ clear (method): lines [343]
+✓ replace (method): lines [344, 471, 472]
+✓ reserve (method): lines [346]
+✓ resize (method): lines [347]
+✓ empty (method): lines [224, 348, 373, 478, 480]
+✓ raw (method): lines [370, 474, 476]
+✓ size (method): lines [347, 371, 446, 448, 455, 472, 558, 559, 560, 561, 564, 630, 631, 648]
+✓ length (method): lines [372, 446, 490]
+✓ raw_string (method): lines [374]
+✓ subslice (method): lines [380, 482, 484]
+✓ l_strip (method): lines [381, 486]
+✓ r_strip (method): lines [382, 487]
+✓ strip (method): lines [381, 382, 383, 486, 487, 488]
+✓ split (method): lines [384, 514, 516]
+✓ split_lines (method): lines [385, 510, 512]
+✓ starts_with (method): lines [387, 388, 389, 492]
+✓ ends_with (method): lines [391, 392, 393, 493]
+✓ lfind (method): lines [415, 421, 518]
+✓ rfind (method): lines [416, 422, 519]
+✓ find_first_of (method): lines [417, 423, 520]
+✓ find_last_of (method): lines [418, 424, 521]
+✓ find_first_not_of (method): lines [419, 425, 522]
+✓ find_last_not_of (method): lines [420, 426, 523]
+✓ operator= (operator): lines [216, 217, 242, 245, 331, 332, 333, 334, 583, 586]
+✓ operator[] (operator): lines [336, 337, 525]
+✓ operator+= (operator): lines [350, 351, 352, 355]
+✓ operator+ (operator): lines [356, 357, 358, 361]
+✓ operator< (operator): lines [365, 500]
+✓ operator> (operator): lines [366, 501]
+✓ operator<= (operator): lines [367, 502]
+✓ operator>= (operator): lines [368, 503]
+✓ operator slice_t (operator): lines [376]
+✓ concat (function): lines [528, 529]
+✗ concat_n (function): NOT FOUND
+✓ copy_n (function): lines [531]
+✗ find_last (function): NOT FOUND
+✗ find_any (function): NOT FOUND
+✗ find_sub (function): NOT FOUND
+✓ split (function): lines [384, 514, 516]
+✓ length (function): lines [372, 446, 490]
+✗ prefix_length (function): NOT FOUND
+✗ compare_n (function): NOT FOUND
+✗ compare_locale (function): NOT FOUND
+✗ transform (function): NOT FOUND
+✓ error (function): lines [238, 239, 543, 613]
+✓ slice (class): lines [302, 303, 310, 375, 380, 389, 393, 396, 415, 416, 417, 418, 422, 423, 424, 428, 441, 451, 452, 453, 454, 455, 456, 457, 458, 461, 465, 470, 471, 482, 484, 486, 487, 488, 492, 493, 495, 498, 499, 500, 501, 502, 503, 505, 508, 516, 518, 519]
+✓ exchange (method): lines [470, 555]
+✓ compare (method): lines [508, 562, 647, 650]
+✓ operator view_t (operator): lines [468]
+
+UNCHECKED LINES:
+----------------------------------------
+Line   2: - Cross-Platform C++ Standard Library Headers:
+Line   3:   - <sys/utime.h>
+Line   4:   - <sys/locking.h>
+Line   5:   - <conio.h>
+Line   6:   - <corecrt.h>
+Line   7:   - <corecrt_io.h>
+Line   8:   - <corecrt_malloc.h>
+Line   9:   - <corecrt_math.h>
+Line  10:   - <corecrt_math_defines.h>
+Line  11:   - <corecrt_memcpy_s.h>
+Line  12:   - <corecrt_memory.h>
+Line  13:   - <corecrt_search.h>
+Line  14:   - <corecrt_share.h>
+Line  15:   - <corecrt_startup.h>
+Line  16:   - <corecrt_stdio_config.h>
+Line  17:   - <corecrt_terminate.h>
+Line  18:   - <corecrt_wconio.h>
+Line  19:   - <corecrt_wctype.h>
+Line  20:   - <corecrt_wdirect.h>
+Line  21:   - <corecrt_wio.h>
+Line  22:   - <corecrt_wprocess.h>
+Line  23:   - <corecrt_wstdio.h>
+Line  24:   - <corecrt_wstdlib.h>
+Line  25:   - <corecrt_wstring.h>
+Line  26:   - <corecrt_wtime.h>
+Line  27:   - <crtdbg.h>
+Line  28:   - <direct.h>
+Line  29:   - <dos.h>
+Line  30:   - <mbctype.h>
+Line  31:   - <io.h>
+Line  32:   - <fpieee.h>
+Line  33:   - <malloc.h>
+Line  34:   - <mbstring.h>
+Line  35:   - <minmax.h>
+Line  37:   - <process.h>
+Line  38:   - <safeint.h>
+Line  39:   - <safeint_internal.h>
+Line  40:   - <share.h>
+Line  41:   - <tchar.h>
+Line  42:   - <fcntl.h>
+Line  43:   - <sys/stat.h>
+Line  44:   - <sys/timeb.h>
+Line  45:   - <sys/types.h>
+Line  46:   - <memory.h>
+Line  47:   - <cstdlib>
+Line  48:   - <cstddef>
+Line  49:   - <cstdio>
+Line  50:   - <cassert>
+Line  51:   - <ccomplex>
+Line  52:   - <csignal>
+Line  53:   - <ctgmath>
+Line  54:   - <cmath>
+Line  55:   - <cerrno>
+Line  56:   - <cfenv>
+Line  57:   - <clocale>
+Line  58:   - <ctime>
+Line  59:   - <csetjmp>
+Line  60:   - <cstdarg>
+Line  61:   - <cuchar>
+Line  62:   - <cwchar>
+Line  63:   - <cstring>
+Line  64:   - <cwctype>
+Line  65:   - <cctype>
+Line  66:   - <cinttypes>
+Line  67:   - <cfloat>
+Line  68:   - <algorithm>
+Line  70:   - <atomic>
+Line  71:   - <bitset>
+Line  72:   - <chrono>
+Line  73:   - <complex>
+Line  74:   - <condition_variable>
+Line  75:   - <coroutine>
+Line  76:   - <deque>
+Line  77:   - <exception>
+Line  78:   - <fstream>
+Line  79:   - <functional>
+Line  80:   - <future>
+Line  81:   - <iomanip>
+Line  82:   - <ios>
+Line  83:   - <iosfwd>
+Line  84:   - <iostream>
+Line  85:   - <istream>
+Line  86:   - <iterator>
+Line  87:   - <limits>
+Line  89:   - <locale>
+Line  90:   - <codecvt>
+Line  92:   - <memory>
+Line  93:   - <mutex>
+Line  94:   - <numeric>
+Line  95:   - <optional>
+Line  96:   - <ostream>
+Line  97:   - <queue>
+Line  98:   - <random>
+Line  99:   - <ranges>
+Line 100:   - <regex>
+Line 101:   - <scoped_allocator>
+Line 103:   - <shared_mutex>
+Line 104:   - <span>
+Line 105:   - <sstream>
+Line 106:   - <stack>
+Line 107:   - <stdexcept>
+Line 108:   - <streambuf>
+Line 110:   - <string_view>
+Line 111:   - <system_error>
+Line 112:   - <thread>
+Line 114:   - <type_traits>
+Line 115:   - <typeindex>
+Line 116:   - <typeinfo>
+Line 117:   - <unordered_map>
+Line 118:   - <unordered_set>
+Line 119:   - <utility>
+Line 120:   - <valarray>
+Line 121:   - <variant>
+Line 122:   - <vector>
+Line 123: 
+Line 124: - Unix:
+Line 125:   - <unistd.h>
+Line 126:   - <cxxabi.h>
+Line 127:   - <pthread.h>
+Line 128:   - <sys/mman.h>
+Line 129:   - <sys/resource.h>
+Line 130:   - <unistd.h>
+Line 131:   - <cxxabi.h>
+Line 132:   - <fcntl.h>
+Line 133: 
+Line 134: - Windows:
+Line 135:   - <windows.h>
+Line 136:   - <processthreadsapi.h>
+Line 137:   - <tlhelp32.h>
+
+Line 207:     op in fn iter(self) -> yield T
+
+Line 226:     // Iteration support
+Line 227:     class iterator {
+Line 229:     ```cpp
+Line 230:     /// ------------------------------- Constructors (Null) -------------------------------
+Line 231:     $question() noexcept;
+Line 234:     /// ------------------------------- Constructors (Value) -------------------------------
+Line 235:     $question(const T &value);
+Line 236:     $question(T &&value);
+Line 237:     /// ------------------------------- Constructors (Error) -------------------------------
+Line 241:     $question($question &&other) noexcept;
+Line 244:     $question(const $question &other);
+Line 246:     /// ------------------------------- Destructor -------------------------------
+Line 247:     ~$question();
+Line 248:     /// ------------------------------- Operators -------------------------------
+Line 251:     template <typename E>
+Line 253:     template <typename E>
+Line 255:     template <typename E>
+Line 258:     /// ------------------------------- Casting -------------------------------
+Line 259:     template <typename E>
+Line 261:     E operator$cast(E * /*unused*/) const; // use `Questionable<T> as E` syntax
+Line 262:     T operator$cast(T * /*unused*/) const; // use `Questionable<T> as T` syntax
+
+Line 273: - template <typename Ty> requires std::Interface::SupportsOStream<std::Meta::all_extents_removed<Ty>> string to_string(Ty &&t)
+Line 274: - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, wchar_t *> inline string to_string(Ty &&t)
+Line 275: - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, char *> inline string to_string(Ty &&t)
+Line 276: - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, sstring> inline string to_string(Ty &&t)
+Line 277: - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, string> inline string to_string(Ty &&t)
+
+Line 306:     using char_traits = Traits;
+Line 307:     using char_t      = CharT;
+Line 313: 
+Line 314:     static constexpr size_t npos = string_t::npos;
+
+Line 377:     slice_t operator$cast(const slice_t * /* p */) const noexcept;
+Line 378:     const char_t *operator$cast(const char_t * /* p */) const noexcept;
+
+Line 437:         enum class Operation { Keep, Remove };
+Line 439:         using char_traits = Traits;
+Line 440:         using char_t      = CharT;
+
+Line 532: - template <typename T> constexpr inline std::Questionable<T *> find(const T *str, int c) noexcept
+Line 533: - template <typename T> constexpr inline std::Questionable<T *> find_last(const T *str, int c) noexcept
+Line 534: - template <typename T> constexpr inline std::Questionable<T *> find_any(const T *str, const T *accept) noexcept
+Line 535: - template <typename T> constexpr inline std::Questionable<T *> find_sub(const T *haystack, const T *needle) noexcept
+Line 539: - template <typename T> constexpr inline int compare(const T *a, const T *b) noexcept
+Line 540: - template <typename T> constexpr inline int compare_n(const T *a, const T *b, usize n) noexcept
+Line 541: - template <typename T> constexpr inline int compare_locale(const T *a, const T *b) noexcept

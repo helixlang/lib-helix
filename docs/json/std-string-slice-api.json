@@ -1,0 +1,472 @@
+{
+  "namespace": "std::String",
+  "description": "String slice type for efficient string operations without copying",
+  "classes": [
+    {
+      "name": "slice<Char, Traits>",
+      "description": "Represents a slice of a string with specified character type and traits, similar to std::string_view in C++",
+      "template_parameters": ["Char", "Traits"],
+      "private_members": [
+        {
+          "name": "len",
+          "type": "usize",
+          "description": "Length of the slice"
+        },
+        {
+          "name": "data",
+          "type": "view_t",
+          "description": "String view data",
+          "default": "{}"
+        }
+      ],
+      "type_aliases": [
+        "view_t = libcxx::basic_string_view<CharT>",
+        "char_traits = Traits",
+        "char_t = CharT",
+        "slice_t = slice<CharT>",
+        "size_t = usize",
+        "slice_vec = vec<slice_t>",
+        "char_vec = vec<CharT>"
+      ],
+      "enums": [
+        {
+          "name": "Operation",
+          "description": "Operation type for string operations",
+          "values": [
+            {
+              "name": "Keep",
+              "description": "Keep the delimiter in the result"
+            },
+            {
+              "name": "Remove",
+              "description": "Remove the delimiter from the result"
+            }
+          ]
+        }
+      ],
+      "constructors": [
+        {
+          "name": "slice",
+          "signature": "slice() noexcept",
+          "description": "Default constructor",
+          "specifiers": ["constexpr"]
+        },
+        {
+          "name": "slice",
+          "signature": "slice(const slice& other) noexcept",
+          "description": "Copy constructor",
+          "specifiers": ["constexpr"]
+        },
+        {
+          "name": "slice",
+          "signature": "slice(slice&& other) noexcept",
+          "description": "Move constructor",
+          "specifiers": ["constexpr"]
+        },
+        {
+          "name": "slice",
+          "signature": "slice(const CharT* str) noexcept",
+          "description": "Constructor from C-style string"
+        },
+        {
+          "name": "slice",
+          "signature": "slice(const CharT* str, size: size_t) noexcept",
+          "description": "Constructor from C-style string with size"
+        },
+        {
+          "name": "slice",
+          "signature": "slice(view: view_t) noexcept",
+          "description": "Constructor from string view"
+        },
+        {
+          "name": "slice",
+          "signature": "slice(vec: char_vec&) noexcept",
+          "description": "Constructor from character vector"
+        },
+        {
+          "name": "slice",
+          "signature": "slice(vec: char_vec&&) noexcept",
+          "description": "Constructor from character vector (move)"
+        }
+      ],
+      "operators": [
+        {
+          "name": "operator view_t",
+          "signature": "op view_t(self) -> view_t",
+          "description": "Conversion to string view",
+          "specifiers": ["constexpr", "const", "noexcept"]
+        },
+        {
+          "name": "operator==",
+          "signature": "op ==(self, const slice& other) -> bool",
+          "description": "Equality comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator!=",
+          "signature": "op !=(self, const slice& other) -> bool",
+          "description": "Inequality comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator<",
+          "signature": "op <(self, const slice& other) -> bool",
+          "description": "Less than comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator>",
+          "signature": "op >(self, const slice& other) -> bool",
+          "description": "Greater than comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator<=",
+          "signature": "op <=(self, const slice& other) -> bool",
+          "description": "Less than or equal comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator>=",
+          "signature": "op >=(self, const slice& other) -> bool",
+          "description": "Greater than or equal comparison",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator in",
+          "signature": "op in(self, needle: slice&) -> bool",
+          "description": "Contains operator for slice",
+          "specifiers": ["constexpr", "const"]
+        },
+        {
+          "name": "operator in",
+          "signature": "op in(self, chr: CharT&) -> bool",
+          "description": "Contains operator for character",
+          "specifiers": ["constexpr", "const"]
+        },
+        {
+          "name": "operator[]",
+          "signature": "op [](self, index: usize) -> CharT",
+          "description": "Access character at index",
+          "specifiers": ["const", "noexcept"]
+        }
+      ],
+      "methods": [
+        {
+          "name": "size",
+          "signature": "size(self) -> size_t",
+          "description": "Returns the length of the slice's data, essential for bounds checking and iteration",
+          "specifiers": ["constexpr", "const", "noexcept"],
+          "attributes": ["nodiscard"]
+        },
+        {
+          "name": "exchange",
+          "signature": "exchange(self, other: slice&) -> void",
+          "description": "Exchanges content with another slice",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "replace",
+          "signature": "replace(self, other: slice&) -> void",
+          "description": "Replaces content with another slice",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "replace",
+          "signature": "replace(self, str: CharT*, size: usize) -> void",
+          "description": "Replaces content with C-style string",
+          "specifiers": ["noexcept"]
+        },
+        {
+          "name": "raw",
+          "signature": "raw(self) -> const CharT*",
+          "description": "Returns a pointer to the slice's underlying data, essential for direct access",
+          "specifiers": ["constexpr", "const", "noexcept"],
+          "attributes": ["nodiscard"]
+        },
+        {
+          "name": "is_empty",
+          "signature": "is_empty(self) -> bool",
+          "description": "Indicates whether the slice has no data, crucial for control flow",
+          "specifiers": ["constexpr", "const", "noexcept"],
+          "attributes": ["nodiscard"]
+        },
+        {
+          "name": "subslice",
+          "signature": "subslice(self, pos: usize, len: usize) -> slice",
+          "description": "Creates a view into a portion of the slice, vital for safe substring operations",
+          "specifiers": ["const", "noexcept"],
+          "attributes": ["nodiscard"]
+        },
+        {
+          "name": "l_strip",
+          "signature": "l_strip(self, delim: char_vec& = {' ', '\\t', '\\n', '\\r'}) -> slice",
+          "description": "Strips whitespace from the left",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "r_strip",
+          "signature": "r_strip(self, delim: char_vec& = {' ', '\\t', '\\n', '\\r'}) -> slice",
+          "description": "Strips whitespace from the right",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "strip",
+          "signature": "strip(self, delim: char_vec& = {' ', '\\t', '\\n', '\\r'}) -> slice",
+          "description": "Strips whitespace from both ends",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "length",
+          "signature": "length(self) -> usize",
+          "description": "Returns the length of the slice",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "starts_with",
+          "signature": "starts_with(self, needle: slice&) -> bool",
+          "description": "Checks if slice starts with needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "ends_with",
+          "signature": "ends_with(self, needle: slice&) -> bool",
+          "description": "Checks if slice ends with needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "contains",
+          "signature": "contains(self, needle: slice&) -> bool",
+          "description": "Checks if slice contains needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "contains",
+          "signature": "contains(self, chr: CharT&) -> bool",
+          "description": "Checks if slice contains character",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "compare",
+          "signature": "compare(self, other: slice&) -> isize",
+          "description": "Compares two slices lexicographically",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "split_lines",
+          "signature": "split_lines(self) -> slice_vec",
+          "description": "Returns a vector of line views, necessary for line-based processing",
+          "specifiers": ["const"],
+          "attributes": ["nodiscard"]
+        },
+        {
+          "name": "split",
+          "signature": "split(self, delim: slice&, op: Operation = Operation::Remove) -> slice_vec",
+          "description": "Returns a vector of views, necessary for delimiter-based processing",
+          "specifiers": ["const"],
+          "attributes": ["nodiscard"]
+        },
+        {
+          "name": "lfind",
+          "signature": "lfind(self, needle: slice&) -> usize?",
+          "description": "Finds first occurrence of needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "rfind",
+          "signature": "rfind(self, needle: slice&) -> usize?",
+          "description": "Finds last occurrence of needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "find_first_of",
+          "signature": "find_first_of(self, needle: slice&) -> usize?",
+          "description": "Finds first occurrence of any character in needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "find_last_of",
+          "signature": "find_last_of(self, needle: slice&) -> usize?",
+          "description": "Finds last occurrence of any character in needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "find_first_not_of",
+          "signature": "find_first_not_of(self, needle: slice&) -> usize?",
+          "description": "Finds first character not in needle",
+          "specifiers": ["const"]
+        },
+        {
+          "name": "find_last_not_of",
+          "signature": "find_last_not_of(self, needle: slice&) -> usize?",
+          "description": "Finds last character not in needle",
+          "specifiers": ["const"]
+        }
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    var text: string = \"Hello, World! How are you?\";\n    var slice: std::String::slice<char> = std::String::slice(text.raw());\n    \n    print(\"Original:\", slice);\n    print(\"Size:\", slice.size());\n    print(\"Is empty:\", slice.is_empty());\n    \n    var sub: std::String::slice<char> = slice.subslice(0, 5);\n    print(\"Substring:\", sub);\n    \n    var lines: vec<std::String::slice<char>> = slice.split_lines();\n    for line in lines {\n        print(\"Line:\", line);\n    }\n    \n    var words: vec<std::String::slice<char>> = slice.split(\" \");\n    for word in words {\n        print(\"Word:\", word);\n    }\n    \n    var trimmed: std::String::slice<char> = slice.strip();\n    print(\"Trimmed:\", trimmed);\n    \n    if (\"World\" in slice) {\n        print(\"Contains 'World'\");\n    }\n}"
+      }
+    }
+  ],
+  "functions": [
+    {
+      "name": "concat<T>",
+      "description": "Concatenates two C-style strings",
+      "signature": "concat<T>(dest: *T, src: const *T) -> *T",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var buffer: char[100] = \"Hello \";\n    var result: *char = std::String::concat(buffer, \"World!\");\n    print(result);\n}"
+      }
+    },
+    {
+      "name": "concat_n<T>",
+      "description": "Concatenates two C-style strings with maximum count",
+      "signature": "concat_n<T>(dest: *T, src: const *T, n: usize) -> *T",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var buffer: char[100] = \"Hello \";\n    var result: *char = std::String::concat_n(buffer, \"World!\", 3);\n    print(result); // \"Hello Wor\"\n}"
+      }
+    },
+    {
+      "name": "copy<T>",
+      "description": "Copies a C-style string",
+      "signature": "copy<T>(dest: *T, src: const *T) -> *T",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var buffer: char[100];\n    var result: *char = std::String::copy(buffer, \"Hello World!\");\n    print(result);\n}"
+      }
+    },
+    {
+      "name": "copy_n<T>",
+      "description": "Copies a C-style string with maximum count",
+      "signature": "copy_n<T>(dest: *T, src: const *T, n: usize) -> *T",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var buffer: char[100];\n    var result: *char = std::String::copy_n(buffer, \"Hello World!\", 5);\n    print(result); // \"Hello\"\n}"
+      }
+    },
+    {
+      "name": "find<T>",
+      "description": "Finds the first occurrence of a character in a C-style string",
+      "signature": "find<T>(str: const *T, c: i32) -> *T?",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var text: const char* = \"Hello World!\";\n    var result: *char? = std::String::find(text, 'W');\n    if (result ?) {\n        print(\"Found 'W' at:\", result as *char);\n    }\n}"
+      }
+    },
+    {
+      "name": "find_last<T>",
+      "description": "Finds the last occurrence of a character in a C-style string",
+      "signature": "find_last<T>(str: const *T, c: i32) -> *T?",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var text: const char* = \"Hello World!\";\n    var result: *char? = std::String::find_last(text, 'l');\n    if (result ?) {\n        print(\"Found last 'l' at:\", result as *char);\n    }\n}"
+      }
+    },
+    {
+      "name": "find_any<T>",
+      "description": "Finds the first occurrence of any character from accept in str",
+      "signature": "find_any<T>(str: const *T, accept: const *T) -> *T?",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var text: const char* = \"Hello World!\";\n    var result: *char? = std::String::find_any(text, \"aeiou\");\n    if (result ?) {\n        print(\"Found vowel at:\", result as *char);\n    }\n}"
+      }
+    },
+    {
+      "name": "find_sub<T>",
+      "description": "Finds the first occurrence of needle in haystack",
+      "signature": "find_sub<T>(haystack: const *T, needle: const *T) -> *T?",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var text: const char* = \"Hello World!\";\n    var result: *char? = std::String::find_sub(text, \"World\");\n    if (result ?) {\n        print(\"Found 'World' at:\", result as *char);\n    }\n}"
+      }
+    },
+    {
+      "name": "split<T>",
+      "description": "Splits a string by delimiter",
+      "signature": "split<T>(str: *T, delim: const *T) -> vec<*T>",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var text: char[100] = \"Hello,World,How,Are,You\";\n    var parts: vec<*char> = std::String::split(text, \",\");\n    for part in parts {\n        print(\"Part:\", part);\n    }\n}"
+      }
+    },
+    {
+      "name": "length<T>",
+      "description": "Returns the length of a C-style string",
+      "signature": "length<T>(str: const *T) -> usize",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var text: const char* = \"Hello World!\";\n    var len: usize = std::String::length(text);\n    print(\"Length:\", len);\n}"
+      }
+    },
+    {
+      "name": "prefix_length<T>",
+      "description": "Returns the length of the initial segment of str consisting of characters in chars",
+      "signature": "prefix_length<T>(str: const *T, chars: const *T, exclude: bool = false) -> usize",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var text: const char* = \"Hello123World\";\n    var len: usize = std::String::prefix_length(text, \"Hello\");\n    print(\"Prefix length:\", len);\n}"
+      }
+    },
+    {
+      "name": "compare<T>",
+      "description": "Compares two C-style strings lexicographically",
+      "signature": "compare<T>(a: const *T, b: const *T) -> i32",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: i32 = std::String::compare(\"Hello\", \"World\");\n    if (result < 0) {\n        print(\"First string is less than second\");\n    } else if (result > 0) {\n        print(\"First string is greater than second\");\n    } else {\n        print(\"Strings are equal\");\n    }\n}"
+      }
+    },
+    {
+      "name": "compare_n<T>",
+      "description": "Compares two C-style strings lexicographically up to n characters",
+      "signature": "compare_n<T>(a: const *T, b: const *T, n: usize) -> i32",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: i32 = std::String::compare_n(\"Hello\", \"Help\", 3);\n    print(\"Compare result:\", result);\n}"
+      }
+    },
+    {
+      "name": "compare_locale<T>",
+      "description": "Compares two C-style strings according to the current locale",
+      "signature": "compare_locale<T>(a: const *T, b: const *T) -> i32",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: i32 = std::String::compare_locale(\"Hello\", \"World\");\n    print(\"Locale compare result:\", result);\n}"
+      }
+    },
+    {
+      "name": "transform<T>",
+      "description": "Transforms src string and stores result in dest",
+      "signature": "transform<T>(dest: *T, src: const *T, n: usize) -> usize",
+      "specifiers": ["constexpr", "inline"],
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var buffer: char[100];\n    var len: usize = std::String::transform(buffer, \"Hello\", 5);\n    print(\"Transformed:\", buffer);\n}"
+      }
+    },
+    {
+      "name": "error",
+      "description": "Returns a string describing the error number",
+      "signature": "error(errnum: i32) -> const char*",
+      "specifiers": ["inline"],
+      "example": {
+        "main": "fn main() -> void {\n    var error_msg: const char* = std::String::error(22);\n    print(\"Error:\", error_msg);\n}"
+      }
+    }
+  ]
+}

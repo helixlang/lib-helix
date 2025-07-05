@@ -1,0 +1,223 @@
+{
+  "namespace": "helix::builtin_types",
+  "description": "Built-in primitive and container types in the Helix programming language",
+  "primitive_types": [
+    {
+      "name": "string",
+      "description": "Represents a string type, compatible with std::wstring in C++",
+      "cpp_equivalent": "std::wstring",
+      "example": {
+        "main": "fn main() -> void {\n    var text: string = \"Hello, World!\";\n    print(\"String:\", text);\n    print(\"Length:\", text.length());\n    \n    var concatenated: string = text + \" How are you?\";\n    print(\"Concatenated:\", concatenated);\n}"
+      }
+    },
+    {
+      "name": "char",
+      "description": "Represents a character type directly compatible with wchar_t in C++",
+      "cpp_equivalent": "wchar_t",
+      "example": {
+        "main": "fn main() -> void {\n    var ch: char = 'H';\n    print(\"Character:\", ch);\n    \n    var unicode_char: char = '\\u0041'; // 'A' in Unicode\n    print(\"Unicode char:\", unicode_char);\n}"
+      }
+    },
+    {
+      "name": "usize",
+      "description": "Represents an unsigned size type, equivalent to size_t in C++",
+      "cpp_equivalent": "size_t",
+      "example": {
+        "main": "fn main() -> void {\n    var size: usize = 42;\n    var array: i32[size]; // Using usize for array sizing\n    print(\"Array size:\", size);\n}"
+      }
+    },
+    {
+      "name": "isize",
+      "description": "Represents a signed size type, equivalent to ssize_t in C++",
+      "cpp_equivalent": "ssize_t",
+      "example": {
+        "main": "fn main() -> void {\n    var signed_size: isize = -10;\n    var positive_size: isize = 20;\n    print(\"Signed size:\", signed_size);\n    print(\"Positive size:\", positive_size);\n}"
+      }
+    },
+    {
+      "name": "void",
+      "description": "Represents a void type, equivalent to void in C++",
+      "cpp_equivalent": "void",
+      "example": {
+        "main": "fn main() -> void {\n    fn no_return() -> void {\n        print(\"This function returns nothing\");\n    }\n    \n    no_return();\n}"
+      }
+    },
+    {
+      "name": "bool",
+      "description": "Represents a boolean type, equivalent to bool in C++",
+      "cpp_equivalent": "bool",
+      "example": {
+        "main": "fn main() -> void {\n    var flag: bool = true;\n    var condition: bool = false;\n    \n    print(\"Flag:\", flag);\n    print(\"Condition:\", condition);\n    \n    if (flag && !condition) {\n        print(\"Logic works!\");\n    }\n}"
+      }
+    },
+    {
+      "name": "i8",
+      "description": "8-bit signed integer",
+      "cpp_equivalent": "signed char",
+      "range": "-128 to 127",
+      "example": {
+        "main": "fn main() -> void {\n    var small_int: i8 = 127;\n    print(\"i8 value:\", small_int);\n}"
+      }
+    },
+    {
+      "name": "i16",
+      "description": "16-bit signed integer",
+      "cpp_equivalent": "signed short",
+      "range": "-32,768 to 32,767",
+      "example": {
+        "main": "fn main() -> void {\n    var short_int: i16 = 32767;\n    print(\"i16 value:\", short_int);\n}"
+      }
+    },
+    {
+      "name": "i32",
+      "description": "32-bit signed integer",
+      "cpp_equivalent": "signed int",
+      "range": "-2,147,483,648 to 2,147,483,647",
+      "example": {
+        "main": "fn main() -> void {\n    var int_val: i32 = 2147483647;\n    print(\"i32 value:\", int_val);\n}"
+      }
+    },
+    {
+      "name": "i64",
+      "description": "64-bit signed integer",
+      "cpp_equivalent": "signed long long",
+      "range": "-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807",
+      "example": {
+        "main": "fn main() -> void {\n    var long_int: i64 = 9223372036854775807;\n    print(\"i64 value:\", long_int);\n}"
+      }
+    },
+    {
+      "name": "u8",
+      "description": "8-bit unsigned integer",
+      "cpp_equivalent": "unsigned char",
+      "range": "0 to 255",
+      "example": {
+        "main": "fn main() -> void {\n    var byte: u8 = 255;\n    print(\"u8 value:\", byte);\n}"
+      }
+    },
+    {
+      "name": "u16",
+      "description": "16-bit unsigned integer",
+      "cpp_equivalent": "unsigned short",
+      "range": "0 to 65,535",
+      "example": {
+        "main": "fn main() -> void {\n    var short_uint: u16 = 65535;\n    print(\"u16 value:\", short_uint);\n}"
+      }
+    },
+    {
+      "name": "u32",
+      "description": "32-bit unsigned integer",
+      "cpp_equivalent": "unsigned int",
+      "range": "0 to 4,294,967,295",
+      "example": {
+        "main": "fn main() -> void {\n    var uint_val: u32 = 4294967295;\n    print(\"u32 value:\", uint_val);\n}"
+      }
+    },
+    {
+      "name": "u64",
+      "description": "64-bit unsigned integer",
+      "cpp_equivalent": "unsigned long long",
+      "range": "0 to 18,446,744,073,709,551,615",
+      "example": {
+        "main": "fn main() -> void {\n    var long_uint: u64 = 18446744073709551615;\n    print(\"u64 value:\", long_uint);\n}"
+      }
+    },
+    {
+      "name": "f32",
+      "description": "32-bit floating point number",
+      "cpp_equivalent": "float",
+      "example": {
+        "main": "fn main() -> void {\n    var float_val: f32 = 3.14159;\n    print(\"f32 value:\", float_val);\n}"
+      }
+    },
+    {
+      "name": "f64",
+      "description": "64-bit floating point number",
+      "cpp_equivalent": "double",
+      "example": {
+        "main": "fn main() -> void {\n    var double_val: f64 = 3.141592653589793;\n    print(\"f64 value:\", double_val);\n}"
+      }
+    },
+    {
+      "name": "f80",
+      "description": "80-bit extended precision floating point number",
+      "cpp_equivalent": "long double",
+      "example": {
+        "main": "fn main() -> void {\n    var extended_val: f80 = 3.1415926535897932384626;\n    print(\"f80 value:\", extended_val);\n}"
+      }
+    },
+    {
+      "name": "null",
+      "description": "A static instance of helix::std::null_t type, used for null values",
+      "cpp_equivalent": "helix::std::null_t",
+      "example": {
+        "main": "fn main() -> void {\n    var ptr: *i32 = null;\n    \n    if (ptr == null) {\n        print(\"Pointer is null\");\n    }\n    \n    ptr = std::Legacy::new<i32>(42);\n    if (ptr != null) {\n        print(\"Pointer is not null, value:\", *ptr);\n    }\n}"
+      }
+    }
+  ],
+  "container_types": [
+    {
+      "name": "vec<T>",
+      "description": "Represents a dynamic array type",
+      "cpp_equivalent": "std::vector<T>",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var numbers: vec<i32> = {1, 2, 3, 4, 5};\n    numbers.push_back(6);\n    \n    print(\"Vector size:\", numbers.size());\n    for num in numbers {\n        print(\"Number:\", num);\n    }\n}"
+      }
+    },
+    {
+      "name": "map<Key, Value, Compare, Alloc>",
+      "description": "Represents a map type",
+      "cpp_equivalent": "std::map<Key, Value, Compare, Alloc>",
+      "template_parameters": [
+        "Key",
+        "Value", 
+        "Compare = libcxx::less<Key>",
+        "Alloc = libcxx::allocator<std::pair<const Key, Value>>"
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    var scores: map<string, i32> = map<string, i32>();\n    scores[\"Alice\"] = 95;\n    scores[\"Bob\"] = 87;\n    scores[\"Charlie\"] = 92;\n    \n    print(\"Alice's score:\", scores[\"Alice\"]);\n    \n    for (key, value) in scores {\n        print(key, \":\", value);\n    }\n}"
+      }
+    },
+    {
+      "name": "array<T, N>",
+      "description": "Represents a fixed-size array type",
+      "cpp_equivalent": "std::array<T, N>",
+      "template_parameters": ["T", "N"],
+      "example": {
+        "main": "fn main() -> void {\n    var fixed_array: array<i32, 5> = {1, 2, 3, 4, 5};\n    \n    print(\"Array size:\", fixed_array.size());\n    for i in std::range(fixed_array.size()) {\n        print(\"Element\", i, \":\", fixed_array[i]);\n    }\n}"
+      }
+    },
+    {
+      "name": "list<T>",
+      "description": "Represents a doubly linked list type",
+      "cpp_equivalent": "std::list<T>",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    var linked_list: list<i32> = list<i32>();\n    linked_list.push_back(1);\n    linked_list.push_back(2);\n    linked_list.push_front(0);\n    \n    print(\"List size:\", linked_list.size());\n    for item in linked_list {\n        print(\"Item:\", item);\n    }\n}"
+      }
+    },
+    {
+      "name": "set<T, Compare, Alloc>",
+      "description": "Represents a set type",
+      "cpp_equivalent": "std::set<T, Compare, Alloc>",
+      "template_parameters": [
+        "T",
+        "Compare = libcxx::less<T>",
+        "Alloc = libcxx::allocator<T>"
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    var unique_numbers: set<i32> = set<i32>();\n    unique_numbers.insert(3);\n    unique_numbers.insert(1);\n    unique_numbers.insert(4);\n    unique_numbers.insert(1); // Duplicate, won't be added\n    \n    print(\"Set size:\", unique_numbers.size());\n    for num in unique_numbers {\n        print(\"Number:\", num); // Will print in sorted order: 1, 3, 4\n    }\n}"
+      }
+    },
+    {
+      "name": "tuple<T...>",
+      "description": "Represents a tuple type",
+      "cpp_equivalent": "std::tuple<T...>",
+      "template_parameters": ["T..."],
+      "example": {
+        "main": "fn main() -> void {\n    var person: tuple<string, i32, f32> = tuple(\"Alice\", 30, 65.5);\n    \n    var name: string = std::get<0>(person);\n    var age: i32 = std::get<1>(person);\n    var height: f32 = std::get<2>(person);\n    \n    print(\"Name:\", name);\n    print(\"Age:\", age);\n    print(\"Height:\", height);\n    \n    // Tuple unpacking\n    var (name2, age2, height2) = person;\n    print(\"Unpacked - Name:\", name2, \"Age:\", age2, \"Height:\", height2);\n}"
+      }
+    }
+  ]
+}

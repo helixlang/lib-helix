@@ -1,0 +1,35 @@
+{
+  "namespace": "global",
+  "description": "Global functions and macros available throughout the Helix language",
+  "macros": [
+    {
+      "name": "reference(T)",
+      "description": "Creates a reference to a type, same as &T in C++",
+      "signature": "reference(T) -> &T",
+      "usage": "Can be used as a type like '_: reference(i32)'",
+      "example": {
+        "main": "fn main() -> void {\n    fn take_reference(param: reference(i32)) -> void {\n        print(\"Reference value:\", param);\n    }\n    \n    var value: i32 = 42;\n    take_reference(value);\n}"
+      }
+    },
+    {
+      "name": "move_reference(T)",
+      "description": "Creates an rvalue reference to a type, same as &&T in C++",
+      "signature": "move_reference(T) -> &&T",
+      "usage": "Can be used as a type like '_: move_reference(i32)'",
+      "example": {
+        "main": "fn main() -> void {\n    fn take_move_reference(param: move_reference(i32)) -> void {\n        print(\"Move reference value:\", param);\n    }\n    \n    var value: i32 = 42;\n    take_move_reference(std::Memory::forward(value));\n}"
+      }
+    }
+  ],
+  "functions": [
+    {
+      "name": "print",
+      "description": "Prints formatted output to the console, supports multiple argument types all args must be castable to string or char and can be used with endl for custom endlines",
+      "signature": "print(...args) -> void",
+      "variadic": true,
+      "example": {
+        "main": "fn main() -> void {\n    print(\"Hello, World!\");\n    print(\"Number:\", 42);\n    print(\"Multiple values:\", 1, 2.5, \"text\", true);\n    \n    // Using custom endlines\n    print(\"Line 1\", std::endl(\"\\n\"));\n    print(\"Line 2\", std::endl(\"\\r\\n\"));\n    \n    // Mixed types\n    var name: string = \"Helix\";\n    var version: f32 = 1.0;\n    print(\"Welcome to\", name, \"version\", version);\n}"
+      }
+    }
+  ]
+}

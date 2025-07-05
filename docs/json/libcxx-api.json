@@ -1,0 +1,58 @@
+{
+  "namespace": "libcxx",
+  "description": "Cross-Platform C++ Standard Library Headers and compatibility layer",
+  "headers": [
+    {
+      "category": "System Headers",
+      "headers": [
+        "<sys/utime.h>", "<sys/locking.h>", "<conio.h>", "<corecrt.h>", "<corecrt_io.h>",
+        "<corecrt_malloc.h>", "<corecrt_math.h>", "<corecrt_math_defines.h>", "<corecrt_memcpy_s.h>",
+        "<corecrt_memory.h>", "<corecrt_search.h>", "<corecrt_share.h>", "<corecrt_startup.h>",
+        "<corecrt_stdio_config.h>", "<corecrt_terminate.h>", "<corecrt_wconio.h>", "<corecrt_wctype.h>",
+        "<corecrt_wdirect.h>", "<corecrt_wio.h>", "<corecrt_wprocess.h>", "<corecrt_wstdio.h>",
+        "<corecrt_wstdlib.h>", "<corecrt_wstring.h>", "<corecrt_wtime.h>", "<crtdbg.h>",
+        "<direct.h>", "<dos.h>", "<mbctype.h>", "<io.h>", "<fpieee.h>", "<malloc.h>",
+        "<mbstring.h>", "<minmax.h>", "<new.h>", "<process.h>", "<safeint.h>",
+        "<safeint_internal.h>", "<share.h>", "<tchar.h>", "<fcntl.h>", "<sys/stat.h>",
+        "<sys/timeb.h>", "<sys/types.h>", "<memory.h>"
+      ]
+    },
+    {
+      "category": "C Standard Library",
+      "headers": [
+        "<cstdlib>", "<cstddef>", "<cstdio>", "<cassert>", "<ccomplex>", "<csignal>",
+        "<ctgmath>", "<cmath>", "<cerrno>", "<cfenv>", "<clocale>", "<ctime>",
+        "<csetjmp>", "<cstdarg>", "<cuchar>", "<cwchar>", "<cstring>", "<cwctype>",
+        "<cctype>", "<cinttypes>", "<cfloat>"
+      ]
+    },
+    {
+      "category": "C++ Standard Library",
+      "headers": [
+        "<algorithm>", "<array>", "<atomic>", "<bitset>", "<chrono>", "<complex>",
+        "<condition_variable>", "<coroutine>", "<deque>", "<exception>", "<fstream>",
+        "<functional>", "<future>", "<iomanip>", "<ios>", "<iosfwd>", "<iostream>",
+        "<istream>", "<iterator>", "<limits>", "<list>", "<locale>", "<codecvt>",
+        "<map>", "<memory>", "<mutex>", "<numeric>", "<optional>", "<ostream>",
+        "<queue>", "<random>", "<ranges>", "<regex>", "<scoped_allocator>", "<set>",
+        "<shared_mutex>", "<span>", "<sstream>", "<stack>", "<stdexcept>", "<streambuf>",
+        "<string>", "<string_view>", "<system_error>", "<thread>", "<tuple>",
+        "<type_traits>", "<typeindex>", "<typeinfo>", "<unordered_map>", "<unordered_set>",
+        "<utility>", "<valarray>", "<variant>", "<vector>"
+      ]
+    },
+    {
+      "category": "Unix Platform",
+      "headers": [
+        "<unistd.h>", "<cxxabi.h>", "<pthread.h>", "<sys/mman.h>", "<sys/resource.h>",
+        "<fcntl.h>"
+      ]
+    },
+    {
+      "category": "Windows Platform",
+      "headers": [
+        "<windows.h>", "<processthreadsapi.h>", "<tlhelp32.h>"
+      ]
+    }
+  ]
+}

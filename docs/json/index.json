@@ -1,0 +1,126 @@
+{
+  "helix_api_documentation": {
+    "version": "1.0",
+    "description": "Comprehensive API documentation for the Helix programming language",
+    "last_updated": "2025-07-04",
+    "documentation_files": [
+      {
+        "file": "libcxx-api.json",
+        "namespace": "libcxx",
+        "description": "Cross-Platform C++ Standard Library Headers and compatibility layer",
+        "contains": ["System Headers", "C Standard Library", "C++ Standard Library", "Platform-specific headers"]
+      },
+      {
+        "file": "std-interfaces-api.json",
+        "namespace": "std::Interfaces",
+        "description": "Type interfaces and concept definitions for the Helix standard library",
+        "contains": ["Type constraints", "Concept definitions", "Interface requirements"]
+      },
+      {
+        "file": "std-meta-api.json",
+        "namespace": "std::Meta",
+        "description": "Template metaprogramming utilities for type manipulation and introspection",
+        "contains": ["Type manipulation", "Type traits", "Metaprogramming utilities"]
+      },
+      {
+        "file": "std-core-api.json",
+        "namespace": "std",
+        "description": "Core standard library functions and types for the Helix language",
+        "contains": ["Core functions", "Type casting", "Generators", "Range operations", "String conversion"]
+      },
+      {
+        "file": "std-string-basic-api.json",
+        "namespace": "std::String",
+        "description": "Basic string type with full string manipulation capabilities",
+        "contains": ["String class", "String operations", "String iterators", "String manipulation methods"]
+      },
+      {
+        "file": "std-string-slice-api.json",
+        "namespace": "std::String",
+        "description": "String slice type for efficient string operations without copying",
+        "contains": ["String slice class", "String utility functions", "C-style string operations"]
+      },
+      {
+        "file": "std-memory-api.json",
+        "namespace": "std::Memory",
+        "description": "Memory management utilities and operations for the Helix language",
+        "contains": ["Memory allocation", "Memory operations", "Address type checking", "Memory utilities"]
+      },
+      {
+        "file": "std-panic-api.json",
+        "namespace": "std::Panic",
+        "description": "Panic handling and error propagation system for the Helix language",
+        "contains": ["Panic frames", "Error context", "Panic operators"]
+      },
+      {
+        "file": "std-panic-interface-api.json",
+        "namespace": "std::Panic::Interface",
+        "description": "Interface definitions for panic-capable types in the Helix language",
+        "contains": ["Panic interfaces", "Panic requirements", "Panic implementations"]
+      },
+      {
+        "file": "std-legacy-api.json",
+        "namespace": "std::Legacy",
+        "description": "Legacy C++ style memory allocation functions for backward compatibility",
+        "contains": ["Legacy new operator", "C++ compatibility"]
+      },
+      {
+        "file": "std-error-api.json",
+        "namespace": "std::Error",
+        "description": "Standard error types for the Helix language",
+        "contains": ["Error base class", "Standard error types", "Error handling"]
+      },
+      {
+        "file": "std-abi-api.json",
+        "namespace": "std::abi",
+        "description": "Application Binary Interface utilities for symbol mangling and demangling",
+        "contains": ["Symbol mangling", "Symbol demangling", "ABI utilities"]
+      },
+      {
+        "file": "global-api.json",
+        "namespace": "global",
+        "description": "Global functions and macros available throughout the Helix language",
+        "contains": ["Global functions", "Macros", "Print functions"]
+      },
+      {
+        "file": "language-features-api.json",
+        "namespace": "helix::language_features",
+        "description": "Core language features and syntax elements of the Helix programming language",
+        "contains": ["Language syntax", "Control flow", "Type system features", "Special syntax"]
+      },
+      {
+        "file": "builtin-types-api.json",
+        "namespace": "helix::builtin_types",
+        "description": "Built-in primitive and container types in the Helix programming language",
+        "contains": ["Primitive types", "Container types", "Type system"]
+      }
+    ],
+    "usage": {
+      "format": "Each JSON file contains detailed documentation for a specific namespace or category",
+      "structure": {
+        "functions": "Array of function documentation with signatures, examples, and specifiers",
+        "classes": "Array of class documentation with methods, operators, and examples",
+        "types": "Array of type definitions and usage examples",
+        "interfaces": "Array of interface definitions and requirements",
+        "enums": "Array of enumeration definitions and values"
+      },
+      "examples": "Each entry includes a complete main function example showing usage"
+    },
+    "conventions": {
+      "helix_syntax": {
+        "questionable_types": "T? in Helix becomes Questionable<T> in C++",
+        "generators": "yield T in Helix becomes Generator<T> in C++",
+        "references": "reference(T) macro creates &T references",
+        "move_references": "move_reference(T) macro creates &&T rvalue references",
+        "casting": "T as U syntax for type conversion",
+        "nullable_syntax": "T? for nullable/panicable types"
+      },
+      "documentation_format": {
+        "functions": "Short description, Helix function signature, examples with main function, specifiers/modifiers",
+        "classes": "Short description, class name, function documentation for each method, usage examples",
+        "specifiers": "noexcept, const, constexpr, inline, static, etc.",
+        "attributes": "nodiscard, noreturn, etc."
+      }
+    }
+  }
+}

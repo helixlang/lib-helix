@@ -1,0 +1,59 @@
+{
+  "namespace": "std::Error",
+  "description": "Standard error types for the Helix language",
+  "classes": [
+    {
+      "name": "BaseError",
+      "description": "Base class for all Helix errors",
+      "requirements": "Must implement 'op as' and 'op panic' operators aside from constructors",
+      "note": "This is an abstract base class that all other error types inherit from",
+      "required_operators": [
+        {
+          "name": "operator as",
+          "description": "Cast operator for type conversion",
+          "signature": "op as<T>(self) -> T"
+        },
+        {
+          "name": "operator panic",
+          "description": "Panic operator for error propagation",
+          "signature": "op panic(self) -> std::Panic::Frame"
+        }
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    class CustomError : std::Error::BaseError {\n        message: string;\n        \n        fn CustomError(self, msg: string) {\n            self.message = msg;\n        }\n        \n        fn op as<T>(self) -> T {\n            // Implementation depends on target type\n            return self as T;\n        }\n        \n        fn op panic(self) -> std::Panic::Frame {\n            return std::Panic::Frame(self, __FILE__, __LINE__);\n        }\n    }\n    \n    var error: CustomError = CustomError(\"Custom error occurred\");\n    panic error;\n}"
+      }
+    },
+    {
+      "name": "NullValueError",
+      "description": "Error thrown when a null value is encountered where a valid value is expected",
+      "inherits": "BaseError",
+      "example": {
+        "main": "fn main() -> void {\n    fn process_pointer(ptr: *i32) -> i32 {\n        if (ptr == null) {\n            panic std::Error::NullValueError(\"Null pointer encountered\");\n        }\n        return *ptr;\n    }\n    \n    try {\n        var result: i32 = process_pointer(null);\n        print(\"Result:\", result);\n    } catch (error: std::Error::NullValueError) {\n        print(\"Caught NullValueError:\", error.message());\n    }\n}"
+      }
+    },
+    {
+      "name": "RuntimeError",
+      "description": "Error thrown for general runtime errors",
+      "inherits": "BaseError",
+      "example": {
+        "main": "fn main() -> void {\n    fn divide(a: i32, b: i32) -> i32 {\n        if (b == 0) {\n            panic std::Error::RuntimeError(\"Division by zero\");\n        }\n        return a / b;\n    }\n    \n    try {\n        var result: i32 = divide(10, 0);\n        print(\"Result:\", result);\n    } catch (error: std::Error::RuntimeError) {\n        print(\"Caught RuntimeError:\", error.message());\n    }\n}"
+      }
+    },
+    {
+      "name": "StateMismatchError",
+      "description": "Error thrown when an object is in an incorrect state for the requested operation",
+      "inherits": "BaseError",
+      "example": {
+        "main": "fn main() -> void {\n    class StateMachine {\n        state: string;\n        \n        fn StateMachine(self) {\n            self.state = \"initial\";\n        }\n        \n        fn start(self) -> void {\n            if (self.state != \"initial\") {\n                panic std::Error::StateMismatchError(\"Cannot start from state: \" + self.state);\n            }\n            self.state = \"running\";\n        }\n        \n        fn stop(self) -> void {\n            if (self.state != \"running\") {\n                panic std::Error::StateMismatchError(\"Cannot stop from state: \" + self.state);\n            }\n            self.state = \"stopped\";\n        }\n    }\n    \n    var machine: StateMachine = StateMachine();\n    machine.start();\n    \n    try {\n        machine.start(); // This will throw StateMismatchError\n    } catch (error: std::Error::StateMismatchError) {\n        print(\"Caught StateMismatchError:\", error.message());\n    }\n}"
+      }
+    },
+    {
+      "name": "TypeMismatchError",
+      "description": "Error thrown when a type mismatch occurs",
+      "inherits": "BaseError",
+      "example": {
+        "main": "fn main() -> void {\n    fn safe_cast<From, To>(value: From) -> To {\n        // Pseudo-code for type checking\n        if (!std::Meta::is_convertible<From, To>) {\n            panic std::Error::TypeMismatchError(\"Cannot convert from \" + \n                typeid(From).name() + \" to \" + typeid(To).name());\n        }\n        return value as To;\n    }\n    \n    try {\n        var result: string = safe_cast<i32, string>(42);\n        print(\"Result:\", result);\n    } catch (error: std::Error::TypeMismatchError) {\n        print(\"Caught TypeMismatchError:\", error.message());\n    }\n}"
+      }
+    }
+  ]
+}

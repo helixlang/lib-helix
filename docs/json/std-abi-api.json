@@ -1,0 +1,78 @@
+{
+  "namespace": "std::abi",
+  "description": "Application Binary Interface utilities for symbol mangling and demangling",
+  "enums": [
+    {
+      "name": "ObjectType",
+      "description": "Type of object for mangling purposes",
+      "values": [
+        {
+          "name": "Module",
+          "description": "Module type object"
+        },
+        {
+          "name": "Class",
+          "description": "Class type object"
+        },
+        {
+          "name": "Struct",
+          "description": "Struct type object"
+        },
+        {
+          "name": "Function",
+          "description": "Function type object"
+        },
+        {
+          "name": "Operator",
+          "description": "Operator type object"
+        },
+        {
+          "name": "Reserved",
+          "description": "Reserved type object"
+        },
+        {
+          "name": "Internal",
+          "description": "Internal type object"
+        },
+        {
+          "name": "None",
+          "description": "No specific type"
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "mangle",
+      "description": "Mangles a name according to the specified object type",
+      "signature": "mangle(input: const &string, ty: ObjectType) -> string?",
+      "example": {
+        "main": "fn main() -> void {\n    var function_name: string = \"calculate_sum\";\n    var mangled: string? = std::abi::mangle(function_name, std::abi::ObjectType::Function);\n    \n    if (mangled ?) {\n        print(\"Original:\", function_name);\n        print(\"Mangled:\", mangled as string);\n    } else {\n        print(\"Failed to mangle name\");\n    }\n}"
+      }
+    },
+    {
+      "name": "demangle",
+      "description": "Demangles a previously mangled name according to the specified object type",
+      "signature": "demangle(input: const &string, ty: ObjectType) -> string?",
+      "example": {
+        "main": "fn main() -> void {\n    var function_name: string = \"calculate_sum\";\n    var mangled: string? = std::abi::mangle(function_name, std::abi::ObjectType::Function);\n    \n    if (mangled ?) {\n        var demangled: string? = std::abi::demangle(mangled as string, std::abi::ObjectType::Function);\n        \n        if (demangled ?) {\n            print(\"Original:\", function_name);\n            print(\"Mangled:\", mangled as string);\n            print(\"Demangled:\", demangled as string);\n            print(\"Round-trip successful:\", function_name == (demangled as string));\n        }\n    }\n}"
+      }
+    },
+    {
+      "name": "is_mangled",
+      "description": "Checks if a string is a mangled name and returns the detected object type",
+      "signature": "is_mangled(input: const &string) -> ObjectType",
+      "example": {
+        "main": "fn main() -> void {\n    var test_names: vec<string> = {\n        \"regular_function_name\",\n        \"_$F_calculate_sum$L12_E$\",\n        \"_$C_MyClass$L7_E$\",\n        \"not_mangled\"\n    };\n    \n    for name in test_names {\n        var object_type: std::abi::ObjectType = std::abi::is_mangled(name);\n        \n        print(\"Name:\", name);\n        print(\"Type:\", object_type);\n        \n        if (object_type != std::abi::ObjectType::None) {\n            var demangled: string? = std::abi::demangle(name, object_type);\n            if (demangled ?) {\n                print(\"Demangled:\", demangled as string);\n            }\n        }\n        print(\"---\");\n    }\n}"
+      }
+    },
+    {
+      "name": "demangle_partial",
+      "description": "Demangles all mangled segments within a string, leaving non-mangled parts unchanged",
+      "signature": "demangle_partial(input: const &string) -> string",
+      "example": {
+        "main": "fn main() -> void {\n    var mixed_string: string = \"Error in _$F_calculate_sum$L12_E$ at line 42: invalid argument for _$C_MyClass$L7_E$\";\n    \n    print(\"Original:\", mixed_string);\n    \n    var demangled: string = std::abi::demangle_partial(mixed_string);\n    print(\"Partially demangled:\", demangled);\n    \n    // This function is useful for processing error messages, log files,\n    // or any text that may contain mangled symbols mixed with regular text\n}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "namespace": "std::Legacy",
+  "description": "Legacy C++ style memory allocation functions for backward compatibility",
+  "functions": [
+    {
+      "name": "new<T>",
+      "description": "Allocates memory for a type and calls its constructor with the specified arguments (equivalent to 'new T(args...)')",
+      "signature": "new<T>(...args) -> *T",
+      "template_parameters": ["T"],
+      "example": {
+        "main": "fn main() -> void {\n    // Basic allocation\n    var ptr: *i32 = std::Legacy::new<i32>(42);\n    print(\"Allocated value:\", *ptr);\n    \n    // Class allocation with constructor arguments\n    class Point {\n        x: i32;\n        y: i32;\n        \n        fn Point(self, x_val: i32, y_val: i32) {\n            self.x = x_val;\n            self.y = y_val;\n        }\n    }\n    \n    var point: *Point = std::Legacy::new<Point>(10, 20);\n    print(\"Point:\", point.x, point.y);\n    \n    // Don't forget to deallocate (use delete or modern RAII)\n    // delete ptr;\n    // delete point;\n}"
+      }
+    }
+  ]
+}

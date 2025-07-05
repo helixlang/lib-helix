@@ -1,0 +1,299 @@
+{
+  "namespace": "std::Meta",
+  "description": "Template metaprogramming utilities for type manipulation and introspection",
+  "functions": [
+    {
+      "name": "const_removed<T>",
+      "description": "Removes const qualifier from a type",
+      "signature": "const_removed<T> -> type",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type ConstInt = const i32;\n    type PlainInt = std::Meta::const_removed<ConstInt>; // PlainInt is i32\n}"
+      }
+    },
+    {
+      "name": "const_volatile_removed<T>",
+      "description": "Removes both const and volatile qualifiers from a type",
+      "signature": "const_volatile_removed<T> -> type",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type CVInt = const volatile i32;\n    type PlainInt = std::Meta::const_volatile_removed<CVInt>; // PlainInt is i32\n}"
+      }
+    },
+    {
+      "name": "cvref_removed<T>",
+      "description": "Removes const, volatile, and reference qualifiers from a type",
+      "signature": "cvref_removed<T> -> type",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type CVRefInt = const volatile &i32;\n    type PlainInt = std::Meta::cvref_removed<CVRefInt>; // PlainInt is i32\n}"
+      }
+    },
+    {
+      "name": "as_const<T>",
+      "description": "Converts a type to a const type",
+      "signature": "as_const<T> -> const T",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type PlainInt = i32;\n    type ConstInt = std::Meta::as_const<PlainInt>; // ConstInt is const i32\n}"
+      }
+    },
+    {
+      "name": "as_const_volatile<T>",
+      "description": "Converts a type to a const volatile type",
+      "signature": "as_const_volatile<T> -> const volatile T",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type PlainInt = i32;\n    type CVInt = std::Meta::as_const_volatile<PlainInt>; // CVInt is const volatile i32\n}"
+      }
+    },
+    {
+      "name": "as_cvref<T>",
+      "description": "Converts a type to a const volatile reference type",
+      "signature": "as_cvref<T> -> const volatile &T",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type PlainInt = i32;\n    type CVRefInt = std::Meta::as_cvref<PlainInt>; // CVRefInt is const volatile &i32\n}"
+      }
+    },
+    {
+      "name": "declval<T>",
+      "description": "Provides a type that can be used to simulate an rvalue of the specified type",
+      "signature": "declval<T> -> &&T",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    // Used in template metaprogramming to get rvalue references\n    // without constructing the object\n    type T = i32;\n    type RRef = decltype(std::Meta::declval<T>());\n}"
+      }
+    },
+    {
+      "name": "enable_if<Condition, T>",
+      "description": "Enables a type if the condition is true",
+      "signature": "enable_if<bool Condition, T> -> T | void",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    template<typename T>\n    fn test() -> std::Meta::enable_if<true, i32> {\n        return 42;\n    }\n}"
+      }
+    },
+    {
+      "name": "ref_as_ptr<T>",
+      "description": "Converts a reference type to a pointer type",
+      "signature": "ref_as_ptr<&T> -> *T",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type RefInt = &i32;\n    type PtrInt = std::Meta::ref_as_ptr<RefInt>; // PtrInt is *i32\n}"
+      }
+    },
+    {
+      "name": "as_rvalue_reference<T>",
+      "description": "Converts a type to an rvalue reference type",
+      "signature": "as_rvalue_reference<T> -> &&T",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type PlainInt = i32;\n    type RRefInt = std::Meta::as_rvalue_reference<PlainInt>; // RRefInt is &&i32\n}"
+      }
+    },
+    {
+      "name": "as_lvalue_reference<T>",
+      "description": "Converts a type to an lvalue reference type",
+      "signature": "as_lvalue_reference<T> -> &T",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type PlainInt = i32;\n    type LRefInt = std::Meta::as_lvalue_reference<PlainInt>; // LRefInt is &i32\n}"
+      }
+    },
+    {
+      "name": "reference_removed<T>",
+      "description": "Removes reference from a type",
+      "signature": "reference_removed<T> -> type",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type RefInt = &i32;\n    type PlainInt = std::Meta::reference_removed<RefInt>; // PlainInt is i32\n}"
+      }
+    },
+    {
+      "name": "all_extents_removed<T>",
+      "description": "Removes all extents from an array type",
+      "signature": "all_extents_removed<T> -> type",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    type ArrayInt = i32[10][20];\n    type PlainInt = std::Meta::all_extents_removed<ArrayInt>; // PlainInt is i32\n}"
+      }
+    }
+  ],
+  "type_traits": [
+    {
+      "name": "true_t",
+      "description": "Represents a true boolean value",
+      "signature": "true_t -> bool",
+      "value": true
+    },
+    {
+      "name": "false_t",
+      "description": "Represents a false boolean value",
+      "signature": "false_t -> bool",
+      "value": false
+    },
+    {
+      "name": "is_lval_reference<T>",
+      "description": "Checks if a type is an lvalue reference type",
+      "signature": "is_lval_reference<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::is_lval_reference<&i32>; // true\n    var result2: bool = std::Meta::is_lval_reference<i32>; // false\n}"
+      }
+    },
+    {
+      "name": "is_rval_reference<T>",
+      "description": "Checks if a type is an rvalue reference type",
+      "signature": "is_rval_reference<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::is_rval_reference<&&i32>; // true\n    var result2: bool = std::Meta::is_rval_reference<i32>; // false\n}"
+      }
+    },
+    {
+      "name": "is_reference<T>",
+      "description": "Checks if a type is a reference type",
+      "signature": "is_reference<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::is_reference<&i32>; // true\n    var result2: bool = std::Meta::is_reference<&&i32>; // true\n    var result3: bool = std::Meta::is_reference<i32>; // false\n}"
+      }
+    },
+    {
+      "name": "is_pointer<T>",
+      "description": "Checks if a type is a pointer type",
+      "signature": "is_pointer<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::is_pointer<*i32>; // true\n    var result2: bool = std::Meta::is_pointer<i32>; // false\n}"
+      }
+    },
+    {
+      "name": "is_referenceable<T>",
+      "description": "Checks if a type is referenceable",
+      "signature": "is_referenceable<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::is_referenceable<i32>; // true\n    var result2: bool = std::Meta::is_referenceable<void>; // false\n}"
+      }
+    },
+    {
+      "name": "is_convertible<From, To>",
+      "description": "Checks if a type can be converted to another type",
+      "signature": "is_convertible<From, To> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::is_convertible<i32, f32>; // true\n    var result2: bool = std::Meta::is_convertible<string, i32>; // false\n}"
+      }
+    },
+    {
+      "name": "same_as<From, To>",
+      "description": "Checks if two types are the same",
+      "signature": "same_as<From, To> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::same_as<i32, i32>; // true\n    var result2: bool = std::Meta::same_as<i32, f32>; // false\n}"
+      }
+    },
+    {
+      "name": "is_convertible_to<From, To>",
+      "description": "Checks if a type can be converted to another type",
+      "signature": "is_convertible_to<From, To> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::is_convertible_to<i32, f32>; // true\n}"
+      }
+    },
+    {
+      "name": "is_same_as<From, To>",
+      "description": "Checks if two types are the same",
+      "signature": "is_same_as<From, To> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::is_same_as<i32, i32>; // true\n}"
+      }
+    },
+    {
+      "name": "is_const<T>",
+      "description": "Checks if a type is const",
+      "signature": "is_const<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::is_const<const i32>; // true\n    var result2: bool = std::Meta::is_const<i32>; // false\n}"
+      }
+    },
+    {
+      "name": "is_derived_of<Base, Derived>",
+      "description": "Checks if a type is derived from another type",
+      "signature": "is_derived_of<Base, Derived> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    class Base {}\n    class Derived : Base {}\n    var result: bool = std::Meta::is_derived_of<Base, Derived>; // true\n}"
+      }
+    },
+    {
+      "name": "is_class<T>",
+      "description": "Checks if a type is a class type",
+      "signature": "is_class<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    class MyClass {}\n    var result: bool = std::Meta::is_class<MyClass>; // true\n    var result2: bool = std::Meta::is_class<i32>; // false\n}"
+      }
+    },
+    {
+      "name": "can_move_noexcept<T>",
+      "description": "Checks if a type can be moved without throwing exceptions",
+      "signature": "can_move_noexcept<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::can_move_noexcept<i32>; // true\n}"
+      }
+    },
+    {
+      "name": "can_assign_noexcept<T, Arg>",
+      "description": "Checks if a type can be assigned without throwing exceptions",
+      "signature": "can_assign_noexcept<T, Arg> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::can_assign_noexcept<i32, i32>; // true\n}"
+      }
+    },
+    {
+      "name": "can_copy_construct<T>",
+      "description": "Checks if a type can be copy constructed",
+      "signature": "can_copy_construct<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::can_copy_construct<i32>; // true\n}"
+      }
+    },
+    {
+      "name": "wellformed_destructor<T>",
+      "description": "Checks if a type has a well-formed destructor",
+      "signature": "wellformed_destructor<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::wellformed_destructor<i32>; // true\n}"
+      }
+    },
+    {
+      "name": "is_function<T>",
+      "description": "Checks if a type is a function type",
+      "signature": "is_function<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    fn test() -> void {}\n    var result: bool = std::Meta::is_function<decltype(test)>; // true\n}"
+      }
+    },
+    {
+      "name": "is_destructible<T>",
+      "description": "Checks if a type is destructible",
+      "signature": "is_destructible<T> -> bool",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var result: bool = std::Meta::is_destructible<i32>; // true\n}"
+      }
+    }
+  ]
+}

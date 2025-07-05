@@ -1,0 +1,359 @@
+{
+  "namespace": "std",
+  "description": "Core standard library functions and types for the Helix language",
+  "functions": [
+    {
+      "name": "as_cast<To, From>",
+      "description": "Performs a safe cast from one type to another",
+      "signature": "as_cast<To, From>(value: From) -> To",
+      "syntax": "T as U",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var num: i32 = 42;\n    var float_val: f32 = num as f32;\n    print(float_val);\n}"
+      }
+    },
+    {
+      "name": "as_const<To, From>",
+      "description": "Converts a type to a const type",
+      "signature": "as_const<To, From>(value: From) -> To",
+      "syntax": "T as const U",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var num: i32 = 42;\n    var const_num: const i32 = num as const i32;\n    print(const_num);\n}"
+      }
+    },
+    {
+      "name": "as_unsafe<To, From>",
+      "description": "Performs an unsafe cast from one type to another",
+      "signature": "as_unsafe<To, From>(value: From) -> To",
+      "syntax": "T as unsafe U",
+      "specifiers": ["constexpr"],
+      "example": {
+        "main": "fn main() -> void {\n    var ptr: *i32 = std::Legacy::new<i32>(42);\n    var void_ptr: *void = ptr as unsafe *void;\n    print(\"Unsafe cast performed\");\n}"
+      }
+    },
+    {
+      "name": "next",
+      "description": "Retrieves the next value from a generator",
+      "signature": "next(gen: Generator<T>) -> T",
+      "example": {
+        "main": "fn main() -> void {\n    fn counter() -> yield i32 {\n        for i in std::range(0, 10) {\n            yield i;\n        }\n    }\n    var gen: Generator<i32> = counter();\n    var value: i32 = std::next(gen);\n    print(value);\n}"
+      }
+    },
+    {
+      "name": "endl",
+      "description": "Represents an endline character for output streaming in print function call",
+      "signature": "endl(line_ending: string | char) -> endl",
+      "example": {
+        "main": "fn main() -> void {\n    print(\"Hello\", std::endl(\"\\n\"), \"World\");\n}"
+      }
+    },
+    {
+      "name": "stringf",
+      "description": "Formats a string using the specified format and arguments, similar to printf in C",
+      "signature": "stringf(format: string, ...args) -> string",
+      "example": {
+        "main": "fn main() -> void {\n    var name: string = \"Helix\";\n    var version: i32 = 1;\n    var formatted: string = std::stringf(\"Welcome to %s version %d\", name, version);\n    print(formatted);\n}"
+      }
+    },
+    {
+      "name": "crash<T>",
+      "description": "Crashes the program with a specified Panicable object",
+      "signature": "crash<T>(obj: T) -> void",
+      "specifiers": ["noreturn"],
+      "example": {
+        "main": "fn main() -> void {\n    var error: std::Error::RuntimeError = std::Error::RuntimeError(\"Critical error\");\n    std::crash(error); // Program terminates here\n}"
+      }
+    },
+    {
+      "name": "erase_type<T>",
+      "description": "Erases the type of an object and returns a TypeErasure object",
+      "signature": "erase_type<T>(obj: *T) -> *TypeErasure",
+      "example": {
+        "main": "fn main() -> void {\n    var num: i32 = 42;\n    var erased: *std::TypeErasure = std::erase_type(&num);\n    print(\"Type erased\");\n}"
+      }
+    },
+    {
+      "name": "range",
+      "description": "Creates a range from 0 to last with step 1",
+      "signature": "range(last: T) -> Range<T>",
+      "example": {
+        "main": "fn main() -> void {\n    var r: std::Range<i32> = std::range(10);\n    for i in r {\n        print(i);\n    }\n}"
+      }
+    },
+    {
+      "name": "range",
+      "description": "Creates a range from first to last with specified step",
+      "signature": "range(first: T, last: T, step: isize = 1) -> Range<T>",
+      "example": {
+        "main": "fn main() -> void {\n    var r: std::Range<i32> = std::range(0, 10, 2);\n    for i in r {\n        print(i); // Prints 0, 2, 4, 6, 8\n    }\n}"
+      }
+    },
+    {
+      "name": "to_string",
+      "description": "Converts various types to string representation",
+      "signature": "to_string(value: T) -> string",
+      "overloads": [
+        "to_string(t: const char*) -> string",
+        "to_string(t: const wchar_t*) -> string",
+        "to_string(t: const string&) -> string",
+        "to_string(t: const sstring&) -> string",
+        "to_string(t: const libcxx::string&) -> string",
+        "to_string(t: const libcxx::wstring&) -> string",
+        "to_string(t: bool) -> string"
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    var num: i32 = 42;\n    var str: string = std::to_string(num);\n    print(str);\n    \n    var flag: bool = true;\n    var bool_str: string = std::to_string(flag);\n    print(bool_str);\n}"
+      }
+    },
+    {
+      "name": "char_to_cchar",
+      "description": "Converts a wide character to a char (c-char)",
+      "signature": "char_to_cchar(wc: wchar_t) -> char",
+      "specifiers": ["inline"],
+      "example": {
+        "main": "fn main() -> void {\n    var wide_char: wchar_t = 'H';\n    var narrow_char: char = std::char_to_cchar(wide_char);\n    print(narrow_char);\n}"
+      }
+    },
+    {
+      "name": "sstring_to_string",
+      "description": "Converts a sstring to a string (sstring being helix::String::basic<char>)",
+      "signature": "sstring_to_string(cstr: const sstring&) -> string",
+      "specifiers": ["inline"],
+      "example": {
+        "main": "fn main() -> void {\n    var s_str: sstring = \"Hello\";\n    var w_str: string = std::sstring_to_string(s_str);\n    print(w_str);\n}"
+      }
+    },
+    {
+      "name": "cstrptr_to_string",
+      "description": "Converts a C-style string pointer to a string with specified size",
+      "signature": "cstrptr_to_string(cstr: const char*, size: size_t) -> string",
+      "specifiers": ["inline"],
+      "example": {
+        "main": "fn main() -> void {\n    var c_str: const char* = \"Hello\";\n    var str: string = std::cstrptr_to_string(c_str, 5);\n    print(str);\n}"
+      }
+    },
+    {
+      "name": "string_to_sstring",
+      "description": "Converts a string to a sstring",
+      "signature": "string_to_sstring(wstr: const string&) -> sstring",
+      "specifiers": ["inline"],
+      "example": {
+        "main": "fn main() -> void {\n    var w_str: string = \"Hello\";\n    var s_str: sstring = std::string_to_sstring(w_str);\n    print(s_str);\n}"
+      }
+    },
+    {
+      "name": "strptr_to_cstrptr",
+      "description": "Converts a wide string pointer to a C-style string pointer",
+      "signature": "strptr_to_cstrptr(wstr: const wchar_t*, buffer: char*, buffer_size: size_t) -> void",
+      "specifiers": ["inline"],
+      "example": {
+        "main": "fn main() -> void {\n    var w_str: const wchar_t* = L\"Hello\";\n    var buffer: char[100];\n    std::strptr_to_cstrptr(w_str, buffer, 100);\n    print(buffer);\n}"
+      }
+    }
+  ],
+  "classes": [
+    {
+      "name": "Function<ReturnType, Args...>",
+      "description": "Represents a function type with specified return type and argument types",
+      "constructor": "Function(fn_ptr: function_pointer | lambda)",
+      "example": {
+        "main": "fn main() -> void {\n    fn add(a: i32, b: i32) -> i32 {\n        return a + b;\n    }\n    var func: std::Function<i32, i32, i32> = std::Function(add);\n    var result: i32 = func(5, 3);\n    print(result);\n}"
+      }
+    },
+    {
+      "name": "Generator<YieldType>",
+      "description": "Represents a generator type that yields values of the specified type, C++ coroutines are used in the implementation",
+      "note": "In Helix syntax, use 'yield T' which becomes Generator<T>",
+      "example": {
+        "main": "fn main() -> void {\n    fn fibonacci() -> yield i32 {\n        var a: i32 = 0;\n        var b: i32 = 1;\n        while (true) {\n            yield a;\n            var temp: i32 = a + b;\n            a = b;\n            b = temp;\n        }\n    }\n    var gen: Generator<i32> = fibonacci();\n    print(std::next(gen));\n    print(std::next(gen));\n}"
+      }
+    },
+    {
+      "name": "null_t",
+      "description": "Represents a null value, used for null pointers or null values in containers",
+      "constructor": "null_t() // no argument constructor",
+      "note": "No other methods available",
+      "example": {
+        "main": "fn main() -> void {\n    var null_val: std::null_t = std::null_t();\n    var ptr: *i32 = null;\n    if (ptr == null) {\n        print(\"Pointer is null\");\n    }\n}"
+      }
+    },
+    {
+      "name": "TypeErasure",
+      "description": "A type erasure mechanism that allows for type removal",
+      "methods": [
+        {
+          "name": "destroy",
+          "description": "Destroys the type-erased object",
+          "signature": "destroy(self) -> void"
+        },
+        {
+          "name": "operator*",
+          "description": "Dereference operator to access the erased object",
+          "signature": "op *(self) -> *void"
+        },
+        {
+          "name": "type_info",
+          "description": "Returns type information about the erased object",
+          "signature": "type_info(self) -> libcxx::type_info"
+        },
+        {
+          "name": "clone",
+          "description": "Creates a copy of the type-erased object",
+          "signature": "clone(self) -> *TypeErasure"
+        }
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    var num: i32 = 42;\n    var erased: *std::TypeErasure = std::erase_type(&num);\n    var type_info: libcxx::type_info = erased.type_info();\n    var cloned: *std::TypeErasure = erased.clone();\n    erased.destroy();\n}"
+      }
+    },
+    {
+      "name": "Range<T>",
+      "description": "Represents a range of values of type T",
+      "constructors": [
+        {
+          "name": "Range",
+          "signature": "Range(self, first: T, last: T, step: isize = 1)",
+          "description": "Creates a range from first to last with specified step"
+        },
+        {
+          "name": "Range",
+          "signature": "Range(self, last: T)",
+          "description": "Creates a range from 0 to last with step 1"
+        }
+      ],
+      "operators": [
+        {
+          "name": "operator in",
+          "description": "Iterator operator for range-based loops",
+          "signature": "op in fn iter(self) -> yield T"
+        },
+        {
+          "name": "operator in",
+          "description": "Contains operator to check if value is in range",
+          "signature": "op in fn contains(self, value: T) -> bool"
+        }
+      ],
+      "methods": [
+        {
+          "name": "begin",
+          "description": "Returns the beginning value of the range",
+          "signature": "begin(self) -> T",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "end",
+          "description": "Returns the ending value of the range",
+          "signature": "end(self) -> T",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "step",
+          "description": "Returns the step value of the range",
+          "signature": "step(self) -> T",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "contains",
+          "description": "Checks if a value is within the range",
+          "signature": "contains(self, value: const T&) -> bool",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "is_empty",
+          "description": "Checks if the range is empty",
+          "signature": "is_empty(self) -> bool",
+          "specifiers": ["const", "noexcept"]
+        }
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    var r: std::Range<i32> = std::Range(0, 10, 2);\n    \n    for i in r {\n        print(i);\n    }\n    \n    if (5 in r) {\n        print(\"5 is not in range\");\n    }\n    \n    if (4 in r) {\n        print(\"4 is in range\");\n    }\n}"
+      }
+    },
+    {
+      "name": "Questionable<T>",
+      "description": "Represents a type that can be nullable or panicable",
+      "note": "In Helix syntax, use 'T?' which becomes Questionable<T>",
+      "constructors": [
+        {
+          "name": "Questionable",
+          "signature": "Questionable() noexcept",
+          "description": "Default constructor (null)"
+        },
+        {
+          "name": "Questionable",
+          "signature": "Questionable(const std::null_t&) noexcept",
+          "description": "Null constructor"
+        },
+        {
+          "name": "Questionable",
+          "signature": "Questionable(const T& value)",
+          "description": "Value constructor"
+        },
+        {
+          "name": "Questionable",
+          "signature": "Questionable(T&& value)",
+          "description": "Move value constructor"
+        },
+        {
+          "name": "Questionable",
+          "signature": "Questionable(const std::Panic::Frame& error)",
+          "description": "Error constructor"
+        }
+      ],
+      "operators": [
+        {
+          "name": "operator==",
+          "description": "Equality comparison with null",
+          "signature": "op ==(self, const std::null_t&) -> bool",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator!=",
+          "description": "Inequality comparison with null",
+          "signature": "op !=(self, const std::null_t&) -> bool",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator?",
+          "description": "Collapse operator to get T | null_t | Error",
+          "signature": "op ?(self) -> bool",
+          "syntax": "Questionable<T> ?",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator in",
+          "description": "Contains operator",
+          "signature": "op in(self, const E& other) -> bool",
+          "syntax": "E in Questionable<T>",
+          "specifiers": ["const", "noexcept"]
+        },
+        {
+          "name": "operator as",
+          "description": "Cast to error type",
+          "signature": "op as(self, E*) -> E",
+          "syntax": "Questionable<T> as E"
+        },
+        {
+          "name": "operator as",
+          "description": "Cast to value type",
+          "signature": "op as(self, T*) -> T",
+          "syntax": "Questionable<T> as T"
+        },
+        {
+          "name": "operator*",
+          "description": "Dereference operator",
+          "signature": "op *(self) -> &T"
+        },
+        {
+          "name": "operator T",
+          "description": "Implicit conversion to T",
+          "signature": "op T(self) -> T"
+        }
+      ],
+      "example": {
+        "main": "fn main() -> void {\n    fn divide(a: i32, b: i32) -> i32? {\n        if (b == 0) {\n            return std::Error::RuntimeError(\"Division by zero\");\n        }\n        return a / b;\n    }\n    \n    var result: i32? = divide(10, 2);\n    if (result ?) {\n        print(\"Result:\", result as i32);\n    } else {\n        print(\"Error occurred\");\n    }\n}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "namespace": "std::Interfaces",
+  "description": "Type interfaces and concept definitions for the Helix standard library",
+  "interfaces": [
+    {
+      "name": "SupportsPointerCast<T>",
+      "description": "Interface for types that support dynamic pointer casting",
+      "requirements": "Dynamic cast requirement",
+      "example": {
+        "main": "fn main() -> void {\n    var obj: *BaseClass = new DerivedClass();\n    var derived: *DerivedClass = obj as *DerivedClass;\n    // obj must satisfy SupportsPointerCast<DerivedClass>\n}"
+      }
+    },
+    {
+      "name": "Castable<From, To>",
+      "description": "Interface for types that can be cast from one type to another",
+      "requirements": "Has `fn op as(self) -> To` operator or C++ implicit cast operator",
+      "example": {
+        "main": "fn main() -> void {\n    var num: i32 = 42;\n    var str: string = num as string; // i32 must be Castable<i32, string>\n}"
+      }
+    },
+    {
+      "name": "ConvertibleToString<T>",
+      "description": "Interface for types that can be converted to string",
+      "requirements": "Has `fn op as(self) -> string` operator or supports C++ Ostream insertion or C++ implicit conversion to helix::string",
+      "example": {
+        "main": "fn main() -> void {\n    var num: i32 = 42;\n    var str: string = std::to_string(num); // i32 must be ConvertibleToString<i32>\n    print(str);\n}"
+      }
+    },
+    {
+      "name": "RangeCompliant<T>",
+      "description": "Interface for types that can be used in range-based iteration",
+      "requirements": "Has `op ++` and `op <` operators for range iteration",
+      "example": {
+        "main": "fn main() -> void {\n    var range: std::Range<i32> = std::range(0, 10);\n    for i in range {\n        print(i);\n    }\n}"
+      }
+    },
+    {
+      "name": "SupportsOStream<T>",
+      "description": "Interface for types that support output streaming",
+      "requirements": "Has `op <<` operator for output streaming or C++ Ostream insertion operator that returns `libcxx::ostream&`",
+      "example": {
+        "main": "fn main() -> void {\n    var num: i32 = 42;\n    print(num); // i32 must support SupportsOStream<i32>\n}"
+      }
+    },
+    {
+      "name": "ClassType<T>",
+      "description": "Interface constraint that requires T to be a class type",
+      "requirements": "Must be a class type",
+      "example": {
+        "main": "fn main() -> void {\n    class MyClass {}\n    // MyClass satisfies ClassType<MyClass>\n}"
+      }
+    },
+    {
+      "name": "ConstType<T>",
+      "description": "Interface constraint that requires T to be a const type",
+      "requirements": "Must be a const type",
+      "example": {
+        "main": "fn main() -> void {\n    var value: const i32 = 42;\n    // const i32 satisfies ConstType<const i32>\n}"
+      }
+    },
+    {
+      "name": "ReferenceableType<T>",
+      "description": "Interface constraint that requires T to be referenceable",
+      "requirements": "Must be referenceable",
+      "example": {
+        "main": "fn main() -> void {\n    var value: i32 = 42;\n    var ref: &i32 = &value; // i32 must be ReferenceableType<i32>\n}"
+      }
+    },
+    {
+      "name": "RValueReference<T>",
+      "description": "Interface constraint that requires T to be an rvalue reference type",
+      "requirements": "Must be an rvalue reference type",
+      "example": {
+        "main": "fn main() -> void {\n    var value: i32 = 42;\n    var rref: &&i32 = std::Memory::forward(value);\n}"
+      }
+    },
+    {
+      "name": "LValueReference<T>",
+      "description": "Interface constraint that requires T to be an lvalue reference type",
+      "requirements": "Must be an lvalue reference type",
+      "example": {
+        "main": "fn main() -> void {\n    var value: i32 = 42;\n    var lref: &i32 = &value;\n}"
+      }
+    },
+    {
+      "name": "ReferenceType<T>",
+      "description": "Interface constraint that requires T to be a reference type",
+      "requirements": "Must be a reference type (either lvalue or rvalue)",
+      "example": {
+        "main": "fn main() -> void {\n    var value: i32 = 42;\n    var ref: &i32 = &value; // &i32 satisfies ReferenceType<&i32>\n}"
+      }
+    },
+    {
+      "name": "MoveConstructible<T>",
+      "description": "Interface for types that have a move constructor",
+      "requirements": "Has move constructor",
+      "example": {
+        "main": "fn main() -> void {\n    var vec: vec<i32> = vec<i32>();\n    var moved: vec<i32> = std::Memory::forward(vec);\n}"
+      }
+    },
+    {
+      "name": "NothrowAssignable<T, Arg>",
+      "description": "Interface for types that have a non-throwing assignment operator",
+      "requirements": "Non-throwing assignment operator",
+      "specifiers": ["noexcept"],
+      "example": {
+        "main": "fn main() -> void {\n    var a: i32 = 42;\n    var b: i32 = 24;\n    a = b; // Assignment must be noexcept\n}"
+      }
+    },
+    {
+      "name": "CopyConstructible<T>",
+      "description": "Interface for types that have a copy constructor",
+      "requirements": "Has copy constructor",
+      "example": {
+        "main": "fn main() -> void {\n    var original: vec<i32> = vec<i32>();\n    var copy: vec<i32> = original; // vec<i32> must be CopyConstructible\n}"
+      }
+    }
+  ]
+}
