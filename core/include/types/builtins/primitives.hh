@@ -91,8 +91,8 @@ using array = helix::libcxx::array<T, S>;
 template <typename T>
 using list = helix::libcxx::list<T>;
 
-template <typename T>
-using set = helix::libcxx::set<T>;
+template <typename T, class C = helix::libcxx::less<T>, class A = helix::libcxx::allocator<T> >
+using set = helix::libcxx::set<T, C, A>;
 
 template <typename... T>
 using tuple = helix::libcxx::tuple<T...>;
