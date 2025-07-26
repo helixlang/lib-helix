@@ -25,7 +25,7 @@ H_STD_NAMESPACE_BEGIN
 
 namespace Memory {
 inline usize stack_size(usize *size = nullptr) {
-    static isize stack_size = 0;
+    static size_t stack_size = 0;
     static bool  called     = false;
 
     if (called) {

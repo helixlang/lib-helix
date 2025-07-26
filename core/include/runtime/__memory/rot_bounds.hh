@@ -26,7 +26,7 @@ H_STD_NAMESPACE_BEGIN
 namespace Memory {
 inline bool in_rotdata(const void *ptr) {
 #if defined(__linux__) || defined(__APPLE__)
-    char mincore_vec;  // NOLINT
+    unsigned char mincore_vec;  // NOLINT
     if (mincore(reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(ptr) &
                                          ~static_cast<uintptr_t>(4095)),
                 4096,

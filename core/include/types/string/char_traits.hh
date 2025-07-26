@@ -21,6 +21,7 @@
 #include <include/c++/libc++.hh>
 #include <include/meta/traits.hh>
 #include <include/types/builtins/primitives.hh>
+#include <type_traits>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
