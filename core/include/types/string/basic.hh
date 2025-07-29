@@ -82,6 +82,10 @@ class basic {
     basic &operator=(basic &&other) noexcept;
     basic &operator=(const CharT *str) noexcept;
     basic &operator=(const slice_t &s) noexcept;
+    basic &operator=(const string_t &str) noexcept {
+        data = str;
+        return *this;
+    }
 
     // Access Operators
     CharT       &operator[](size_t index) noexcept { return data[static_cast<size_t>(index)]; }
@@ -121,6 +125,9 @@ class basic {
     basic operator+(const CharT *str) const;
     basic operator+(const slice_t &s) const;
 
+    // implicit conversion to string_t
+    operator string_t() const noexcept { return data; }
+
     template <typename U = CharT>
         requires std::Meta::is_convertible_to<U, CharT>
     basic operator+(const U chr) const;
@@ -132,6 +139,14 @@ class basic {
     bool operator>(const basic &other) const noexcept { return data > other.data; }
     bool operator<=(const basic &other) const noexcept { return data <= other.data; }
     bool operator>=(const basic &other) const noexcept { return data >= other.data; }
+
+    bool operator==(const string_t &other) const noexcept { return data == other; }
+    bool operator!=(const string_t &other) const noexcept { return data != other; }
+    bool operator<(const string_t &other) const noexcept { return data < other; }
+    bool operator>(const string_t &other) const noexcept { return data > other; }
+    bool operator<=(const string_t &other) const noexcept { return data <= other; }
+    bool operator>=(const string_t &other) const noexcept { return data >= other; }
+
 
     // Basic Access
     const CharT *raw() const noexcept { return data.c_str(); }
