@@ -25,8 +25,13 @@ H_STD_NAMESPACE_BEGIN
 
 namespace Memory {
 inline bool in_rotdata(const void *ptr) {
+#if defined(__linux__)
+    /// this is because on linux mincore, excepts a unsigned char pointer
+    /// but on mac and other unix systems it expects a char pointer
+    unsigned
+#endif
 #if defined(__linux__) || defined(__APPLE__)
-    unsigned char mincore_vec;  // NOLINT
+    char mincore_vec;  // NOLINT
     if (mincore(reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(ptr) &
                                          ~static_cast<uintptr_t>(4095)),
                 4096,
