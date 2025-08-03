@@ -124,10 +124,10 @@ class Frame {
 
   public:
     template <typename T>
-    Frame(T obj, const char *filename, usize lineno);
+    inline Frame(T obj, const char *filename, usize lineno);
 
     template <typename T>
-    Frame(T obj, string filename, usize lineno);
+    inline Frame(T obj, string filename, usize lineno);
 
     constexpr Frame() = delete;
     ~Frame()          = default;
@@ -138,15 +138,15 @@ class Frame {
     Frame(Frame &&other) noexcept            = default;
     Frame &operator=(Frame &&other) noexcept = default;
 
-    [[noreturn]] Frame(Frame &obj, const string &, usize);
-    [[noreturn]] Frame(Frame &&obj, const string &, usize);
+    [[noreturn]] inline Frame(Frame &obj, const string &, usize);
+    [[noreturn]] inline Frame(Frame &&obj, const string &, usize);
 
-    [[nodiscard]] string        file() const;
-    [[nodiscard]] usize         line() const;
-    [[nodiscard]] string        reason() const;
-    [[nodiscard]] FrameContext *get_context() const;
+    [[nodiscard]] inline string        file() const;
+    [[nodiscard]] inline usize         line() const;
+    [[nodiscard]] inline string        reason() const;
+    [[nodiscard]] inline FrameContext *get_context() const;
 
-    [[noreturn]] void operator$panic() const;
+    [[noreturn]] inline void operator$panic() const;
 };
 }  // namespace Panic
 

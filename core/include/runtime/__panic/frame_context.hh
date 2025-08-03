@@ -85,22 +85,22 @@ class FrameContext {
     [[noreturn]] static constexpr void throw_object(std::TypeErasure *);
 
   public:
-    FrameContext();
-    FrameContext(const FrameContext &other);
-    FrameContext &operator=(const FrameContext &other);
-    FrameContext(FrameContext &&other) noexcept;
-    FrameContext &operator=(FrameContext &&other) noexcept;
-    ~FrameContext();
+    inline FrameContext();
+    inline FrameContext(const FrameContext &other);
+    inline FrameContext &operator=(const FrameContext &other);
+    inline FrameContext(FrameContext &&other) noexcept;
+    inline FrameContext &operator=(FrameContext &&other) noexcept;
+    inline ~FrameContext();
 
     template <typename T>
-    explicit FrameContext(T *obj);
+    inline explicit FrameContext(T *obj);
 
-    [[noreturn]] void    crash();
-    [[nodiscard]] void  *object() const;
-    [[nodiscard]] string type_name() const;
+    [[noreturn]]  inline void   crash();
+    [[nodiscard]] inline void  *object() const;
+    [[nodiscard]] inline string type_name() const;
 
-    bool operator!=(const libcxx::type_info *rhs) const;
-    bool operator==(const libcxx::type_info *rhs) const;
+    inline bool operator!=(const libcxx::type_info *rhs) const;
+    inline bool operator==(const libcxx::type_info *rhs) const;
 };
 };  // namespace Panic
 

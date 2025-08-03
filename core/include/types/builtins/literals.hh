@@ -80,7 +80,7 @@ constexpr i64 operator"" _i64(unsigned long long v) noexcept
     return static_cast<signed long long>(v);
 }
 
-u128 operator"" _u128(const char *str) noexcept {
+inline u128 operator"" _u128(const char *str) noexcept {
     u128 result(0);          // Integer part
     u128 fraction(0);        // Fractional part (before exponent)
     u128 fraction_place(1);  // Denominator for fractional part
@@ -169,7 +169,7 @@ u128 operator"" _u128(const char *str) noexcept {
     return result;  // Return truncated integer part
 }
 
-i128 operator"" _i128(const char *str) noexcept {
+inline i128 operator"" _i128(const char *str) noexcept {
     bool is_negative = (*str == '-');
     if (is_negative)
         ++str;  // Skip the '-' sign if present
