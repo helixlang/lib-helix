@@ -26,7 +26,7 @@ module std::abi {
         None
     }
 
-    fn mangle(const input: ref!(string), ty: ObjectType) -> string? {
+    inline fn mangle(const input: ref!(string), ty: ObjectType) -> string? {
         if (input.empty()) {
             panic std::Error::StateMismatchError("Input string cannot be empty");
         }
@@ -79,7 +79,7 @@ module std::abi {
         return output;
     }
 
-    fn demangle(const input: ref!(string), ty: ObjectType) -> string? {
+    inline fn demangle(const input: ref!(string), ty: ObjectType) -> string? {
         var expected_prefix: string;
 
         switch (ty) {
@@ -162,7 +162,7 @@ module std::abi {
         return output;
     }
 
-    fn is_mangled(const input: ref!(string)) -> ObjectType {
+    inline fn is_mangled(const input: ref!(string)) -> ObjectType {
         if (input.length() < 4 || input[0] != '_' || input[1] != '$') {
             return ObjectType::None;
         }
@@ -194,7 +194,7 @@ module std::abi {
         return ObjectType::None;
     }
 
-    fn demangle_parttial(const input: ref!(string)) -> string {
+    inline fn demangle_parttial(const input: ref!(string)) -> string {
         var output: string;
         var i: usize = 0;
 

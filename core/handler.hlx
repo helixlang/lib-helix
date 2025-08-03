@@ -51,7 +51,7 @@ ffi "c++" import "include/runtime/__panic/panic.hh";
 /// \note The `#[trivially_import(true)]` attribute ensures global visibility of the handler function.
 ///
 /// \see include/lang/panic.hh for C++ runtime definitions.
-fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const frame: *std::Panic::Frame) {
+inline fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(const frame: *std::Panic::Frame) {
     const file_path: string = (*frame).file();
     const message:   string = (*frame).reason();
     const line_no:   usize  = (*frame).line();
