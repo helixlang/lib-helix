@@ -40,5 +40,5 @@ class DefaultAllocator derives Allocator {
     }
 
     //===---- vars ----===//
-    priv eval let stats = AllocatorStats::new();
+    priv eval var stats = AllocatorStats::new();
 }

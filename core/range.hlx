@@ -81,8 +81,8 @@
 /// Generates values from `T()` (the default constructor) up to, but not including, `last`.
 ///
 /// ```Helix
-/// fn range(last: T) -> yield T
-///   requires <T> if T has RangeCompliant;
+/// fn <T> range(last: T) -> yield T
+///   requires  impl RangeCompliant;
 /// ```
 ///
 /// **Parameters:**
@@ -100,8 +100,8 @@
 /// Generates values from `first` to, but not including, `last`, with a customizable step value.
 ///
 /// ```Helix
-/// fn range(first: T, last: T, step: T = 1) -> yield T
-///   requires <T> if T has RangeCompliant;
+/// fn <T> range(first: T, last: T, step: T = 1) -> yield T
+///   requires impl RangeCompliant;
 /// ```
 ///
 /// **Parameters:**
@@ -133,8 +133,8 @@
 #[trivially_import(true)] // prevents wrapping IR in a `unwind` module, keeping the handler globally accessible
 
 module std {
-    class Range
-      requires <T> if T has std::Interface::RangeCompliant {
+    class <T> Range
+      requires T impl std::Interface::RangeCompliant {
         var first: T;
         var last:  T;
         var step:  isize;
@@ -175,13 +175,13 @@ module std {
     }
 }
 
-fn range(last: T) -> std::Range::<T>
-    requires <T> if T has std::Interface::RangeCompliant {
+fn <T> range(last: T) -> std::Range::<T>
+    requires T impl std::Interface::RangeCompliant {
     return std::Range::<T>(last);
 }
 
-fn range(first: T, last: T, step: isize = 1) -> std::Range::<T>
-    requires <T> if T has std::Interface::RangeCompliant {
+fn <T> range(first: T, last: T, step: isize = 1) -> std::Range::<T>
+    requires T impl std::Interface::RangeCompliant {
     return std::Range::<T>(first, last, step);
 }
 
