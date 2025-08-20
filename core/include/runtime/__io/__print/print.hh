@@ -49,7 +49,6 @@ H_NAMESPACE_BEGIN
 
 template <typename... Args>
 void print(Args &&...t) {
-    // Handle empty case
     if constexpr (sizeof...(t) == 0) {
         wprintf(L"\n");
         return;
@@ -71,6 +70,10 @@ void print(Args &&...t) {
     }
 }
 
+H_STD_NAMESPACE_BEGIN
+using ::H_NAMESPACE::print;
+
+H_STD_NAMESPACE_END
 H_NAMESPACE_END
 
 #endif  // _$_HX_CORE_M5PRINT

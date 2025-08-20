@@ -21,5 +21,6 @@
 #include <include/runtime/__io/__print/print.hh>
 #include <include/runtime/__io/__print/endl.hh>
 #include <include/runtime/__io/__print/stringf.hh>
+#include <include/runtime/__io/system.hh>
 
 #endif  // _$_HX_CORE_M2IO

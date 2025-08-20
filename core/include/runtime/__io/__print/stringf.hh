@@ -140,7 +140,7 @@ inline string stringf(string fmt, Ty &&...args) {
 
     }
 
-    if (fmt.raw_string().find(placeholder.raw(), pos, placeholder.length()) != string::string_t::npos) {
+    if (index < sizeof...(args)) {
         _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(Error::RuntimeError(L"[f-string rt]: too many format specifiers (\"{}\")"));
     }
 
