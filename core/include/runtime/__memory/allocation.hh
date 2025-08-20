@@ -30,6 +30,17 @@ constexpr _Tp *_H_RESERVED$new(_Ty &&...t) {          // NOLINT
 }
 }  // namespace Legacy
 
+template <typename _Tp, typename... _Ty>
+constexpr _Tp *create(_Ty &&...t) {          // NOLINT
+    return new _Tp(std::Memory::forward<_Ty>(t)...);  // NOLINT
+}
+
+// make a function called erase which calls c++ delete
+template <typename _Tp>
+constexpr void forget(_Tp *ptr) {  // NOLINT
+    delete ptr;  // NOLINT
+}
+
 H_NAMESPACE_END
 H_STD_NAMESPACE_END
 
