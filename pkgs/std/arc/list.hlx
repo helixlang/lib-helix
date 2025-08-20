@@ -42,17 +42,17 @@ module v1 { // already in the std module hence only v1 needed
 
         //==--- priv ---==//
         priv struct ListNode requires <T> if T derives string {
-            let next: *ListNode? = &null;
-            let data: T?         = null;
+            var next: *ListNode? = &null;
+            var data: T?         = null;
             eval define DISABLE_SAFETY: ... else {
-                let check: bool = true; // verify integrity of data if safety is on.
+                var check: bool = true; // verify integrity of data if safety is on.
             }
         } // size = T + 8 bytes
 
         //==--- vars ---==//
-        priv let head_ptr: *ListNode;
-        priv let len: usize = 1;
-        priv let cap: usize = 1;
-        priv let allocator: std::types::Allocator = std::alloc::DefaultAllocator;
+        priv var head_ptr: *ListNode;
+        priv var len: usize = 1;
+        priv var cap: usize = 1;
+        priv var allocator: std::types::Allocator = std::alloc::DefaultAllocator;
     }
 }

@@ -78,8 +78,8 @@ interface Allocator {
 
 // structure to hold memory statistics (optional feature)
 struct AllocatorStats {
-    let total_allocations:   usize;
-    let total_deallocations: usize;
-    let currently_allocated: usize;
-    let max_allocated:       usize;
+    var total_allocations:   usize;
+    var total_deallocations: usize;
+    var currently_allocated: usize;
+    var max_allocated:       usize;
 }

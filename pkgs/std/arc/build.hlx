@@ -28,8 +28,8 @@ class InvalidInput derives BaseError {
 }
 
 class BuildConfig {
-    let target: string;
-    let cxx_toolchain: string;
+    var target: string;
+    var cxx_toolchain: string;
     // ...
 
     fn BuildConfig(self) {}
@@ -37,7 +37,7 @@ class BuildConfig {
     fn set_target(self, target: string) -> &self {
         self.target = target;
 
-        let allowed_targets = (
+        var allowed_targets = (
             "x86_64-apple-darwin",
             "x86_64-windows-none",
             "x86_64-windows-msvc",
@@ -58,13 +58,13 @@ import git;
 import python_ffi;
 
 fn build() -> noreturn! {
-    let config = bt::BuildConfig()
+    var config = bt::BuildConfig()
         .set_target("x86_64-apple-darwin")
         .set_cxx_toolchain("clang++")
         .set_output_dir("build")
         .set_optimization_level(bt::optimization::RELEASE);
 
-    let builder = bt::Builder(config)
+    var builder = bt::Builder(config)
            .add_source("src/main.helix")
            .add_source("src/utils.helix")
            .add_ffi(python_ffi::FFI())
