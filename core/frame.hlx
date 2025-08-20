@@ -46,7 +46,7 @@ fn std::Panic::Frame::initialize(const obj: unsafe *T)
             self.context = Panic::FrameContext(object);
         }
     } catch {
-        delete object;
+        __inline_cpp("delete object");
         std::crash(std::Error::RuntimeError("Failed to initialize panic frame."));
     }
 }
