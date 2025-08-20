@@ -17,7 +17,7 @@
 
 ffi "c++" import "include/runtime/__panic/panic.hh";
 
-eval fn std::Panic::FrameContext::throw_object(error: unsafe *std::TypeErasure) requires <T> {
+eval fn <T> std::Panic::FrameContext::throw_object(error: unsafe *std::TypeErasure) {
     if error == (&null) {
         std::crash(std::Error::RuntimeError("Tried to crash with a null object."));
     }

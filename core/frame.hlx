@@ -16,8 +16,8 @@
 
 ffi "c++" import "include/runtime/__panic/panic.hh";
 
-fn std::Panic::Frame::initialize(const obj: unsafe *T)
-  requires <T> if T has std::Interface::ClassType {
+fn <T> std::Panic::Frame::initialize(const obj: unsafe *T)
+  requires T impl std::Interface::ClassType {
     eval if __inline_cpp("Panic::Interface::PanickingStatic<T>") {
         _reason = __inline_cpp("T::operator$panic()");
     } else if __inline_cpp("Panic::Interface::PanickingInstance<T>") {
