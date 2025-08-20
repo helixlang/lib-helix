@@ -23,13 +23,13 @@
 
 H_NAMESPACE_BEGIN
 
-constexpr u8 operator"" _u8(unsigned long long v) noexcept
+constexpr u8 operator""_u8(unsigned long long v) noexcept
     DIAGNOSE_IF(((__builtin_constant_p(v)) && ((v < 0) || (v > __NumData<unsigned char>::max)),
                  "Literal value too large for u8",
                  "warning")) {
     return static_cast<unsigned char>(v);
 }
-constexpr i8 operator"" _i8(unsigned long long v) noexcept
+constexpr i8 operator""_i8(unsigned long long v) noexcept
     DIAGNOSE_IF(((__builtin_constant_p(v)) &&
                      ((v > __NumData<signed char>::max) || (v < __NumData<signed char>::min)),
                  "Literal value too large for i8",
@@ -37,13 +37,13 @@ constexpr i8 operator"" _i8(unsigned long long v) noexcept
     return static_cast<signed char>(v);
 }
 
-constexpr u16 operator"" _u16(const unsigned long long v) noexcept
+constexpr u16 operator""_u16(const unsigned long long v) noexcept
     DIAGNOSE_IF(((__builtin_constant_p(v)) && ((v < 0) || (v > __NumData<unsigned short>::max)),
                  "Literal value too large for u16",
                  "warning")) {
     return static_cast<unsigned short>(v);
 }
-constexpr i16 operator"" _i16(unsigned long long v) noexcept
+constexpr i16 operator""_i16(unsigned long long v) noexcept
     DIAGNOSE_IF(((__builtin_constant_p(v)) &&
                      ((v > __NumData<signed short>::max) || (v < __NumData<signed short>::min)),
                  "Literal value too large for i16",
@@ -51,13 +51,13 @@ constexpr i16 operator"" _i16(unsigned long long v) noexcept
     return static_cast<signed short>(v);
 }
 
-constexpr u32 operator"" _u32(unsigned long long v) noexcept
+constexpr u32 operator""_u32(unsigned long long v) noexcept
     DIAGNOSE_IF(((__builtin_constant_p(v)) && ((v < 0) || (v > __NumData<unsigned int>::max)),
                  "Literal value too large for u32",
                  "warning")) {
     return static_cast<unsigned int>(v);
 }
-constexpr i32 operator"" _i32(unsigned long long v) noexcept
+constexpr i32 operator""_i32(unsigned long long v) noexcept
     DIAGNOSE_IF(((__builtin_constant_p(v)) &&
                      ((v > __NumData<signed int>::max) || (v < __NumData<signed int>::min)),
                  "Literal value too large for i32",
@@ -65,14 +65,14 @@ constexpr i32 operator"" _i32(unsigned long long v) noexcept
     return static_cast<signed int>(v);
 }
 
-constexpr u64 operator"" _u64(unsigned long long v) noexcept
+constexpr u64 operator""_u64(unsigned long long v) noexcept
     DIAGNOSE_IF(((__builtin_constant_p(v)) && ((v < 0) || (v > __NumData<unsigned long long>::max)),
                  "Literal value too large for u32",
                  "warning")) {
     return v;
 }
 
-constexpr i64 operator"" _i64(unsigned long long v) noexcept
+constexpr i64 operator""_i64(unsigned long long v) noexcept
     DIAGNOSE_IF(((__builtin_constant_p(v)) && ((v > __NumData<signed long long>::max) ||
                                                (v < __NumData<signed long long>::min)),
                  "Literal value too large for i32",
@@ -80,7 +80,7 @@ constexpr i64 operator"" _i64(unsigned long long v) noexcept
     return static_cast<signed long long>(v);
 }
 
-inline u128 operator"" _u128(const char *str) noexcept {
+inline u128 operator""_u128(const char *str) noexcept {
     u128 result(0);          // Integer part
     u128 fraction(0);        // Fractional part (before exponent)
     u128 fraction_place(1);  // Denominator for fractional part
@@ -169,7 +169,7 @@ inline u128 operator"" _u128(const char *str) noexcept {
     return result;  // Return truncated integer part
 }
 
-inline i128 operator"" _i128(const char *str) noexcept {
+inline i128 operator""_i128(const char *str) noexcept {
     bool is_negative = (*str == '-');
     if (is_negative)
         ++str;  // Skip the '-' sign if present
@@ -262,13 +262,13 @@ inline i128 operator"" _i128(const char *str) noexcept {
     return is_negative ? -result : result;  // Apply sign and return truncated integer part
 }
 
-constexpr f32 operator"" _f32(long double v) noexcept { return static_cast<float>(v); }
+constexpr f32 operator""_f32(long double v) noexcept { return static_cast<float>(v); }
 
-constexpr f64 operator"" _f64(long double v) noexcept { return static_cast<double>(v); }
+constexpr f64 operator""_f64(long double v) noexcept { return static_cast<double>(v); }
 
-constexpr f80 operator"" _f80(long double v) noexcept { return v; }
+constexpr f80 operator""_f80(long double v) noexcept { return v; }
 
-constexpr usize operator"" _usize(unsigned long long v) noexcept
+constexpr usize operator""_usize(unsigned long long v) noexcept
     DIAGNOSE_IF(((__builtin_constant_p(v)) &&
                      ((v > helix::__NumData<usize>::max) || (v < helix::__NumData<usize>::min)),
                  "Literal value too large for usize",
@@ -276,7 +276,7 @@ constexpr usize operator"" _usize(unsigned long long v) noexcept
     return static_cast<usize>(v);
 }
 
-constexpr isize operator"" _isize(unsigned long long v) noexcept
+constexpr isize operator""_isize(unsigned long long v) noexcept
     DIAGNOSE_IF(((__builtin_constant_p(v)) && ((v < 0) || (v > helix::__NumData<isize>::max)),
                  "Literal value too large for u32",
                  "warning")) {

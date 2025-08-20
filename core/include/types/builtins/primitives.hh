@@ -74,6 +74,8 @@ using _H_RESERVED$char = wchar_t;
 
 namespace helix::std::Legacy {
 using _H_RESERVED$char = char;
+template <typename T>
+using array = T[];
 }
 
 inline constexpr helix::std::null_t null;
