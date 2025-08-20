@@ -127,6 +127,9 @@ inline string sstring_to_string(const sstring &cstr) {
     if (cstr.is_empty()) {
         return string();
     }
+
+    #define cast(type) static_cast<type>
+
     const char *raw_data  = cstr.raw();
     size_t      cstr_size = cstr.size();
     string      result;
@@ -137,24 +140,24 @@ inline string sstring_to_string(const sstring &cstr) {
     for (size_t i = 0; i < cstr_size;) {
         uint32_t      codepoint = 0;
         int           bytes     = 0;
-        unsigned char c         = static_cast<unsigned char>(raw_data[i]);
+        auto c   = cast(unsigned char)(raw_data[i]);
 
         if (c <= 0x7F) {
             codepoint = c;
             bytes     = 1;
         } else if ((c & 0xE0) == 0xC0 && i + 1 < cstr_size) {
-            codepoint = ((c & 0x1F) << 6) | (static_cast<unsigned char>(raw_data[i + 1]) & 0x3F);
+            codepoint = ((c & 0x1F) << 6) | (cast(unsigned char)(raw_data[i + 1]) & 0x3F);
             bytes     = 2;
         } else if ((c & 0xF0) == 0xE0 && i + 2 < cstr_size) {
             codepoint = ((c & 0x0F) << 12) |
-                        ((static_cast<unsigned char>(raw_data[i + 1]) & 0x3F) << 6) |
-                        (static_cast<unsigned char>(raw_data[i + 2]) & 0x3F);
+                        ((cast(unsigned char)(raw_data[i + 1]) & 0x3F) << 6) |
+                        (cast(unsigned char)(raw_data[i + 2]) & 0x3F);
             bytes = 3;
         } else if ((c & 0xF8) == 0xF0 && i + 3 < cstr_size) {
             codepoint = ((c & 0x07) << 18) |
-                        ((static_cast<unsigned char>(raw_data[i + 1]) & 0x3F) << 12) |
-                        (static_cast<unsigned char>(raw_data[i + 2]) & 0x3F << 6) |
-                        (static_cast<unsigned char>(raw_data[i + 3]) & 0x3F);
+                        ((cast(unsigned char)(raw_data[i + 1]) & 0x3F) << 12) |
+                        (cast(unsigned char)(raw_data[i + 2]) & 0x3F << 6) |
+                        (cast(unsigned char)(raw_data[i + 3]) & 0x3F);
             bytes = 4;
         } else {
             codepoint = L'?';

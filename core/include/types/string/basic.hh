@@ -154,6 +154,7 @@ class basic {
     size_t       length() const noexcept { return data.length(); }
     bool         is_empty() const noexcept { return data.empty(); }
     string_t    &raw_string() noexcept { return data; }
+    const string_t &raw_string() const noexcept { return data; }
 
     // Slice Conversion
     operator slice_t() const noexcept { return slice_t(data.data(), data.size()); }
