@@ -26,13 +26,13 @@ panic -> compiler calls a panic_handle with a panic frame and the expr
 
 eval if macros::defined!(__LIB_UNWIND!) {
     class PanicFrame requires <T> {
-        let prev: *PanicFrame;
-        let next: *PanicFrame;
-        let data: *T;
+        var prev: *PanicFrame;
+        var next: *PanicFrame;
+        var data: *T;
     }
 } else {
     class PanicFrame requires <T> {
-        let data: *T;
+        var data: *T;
     }
 }
 

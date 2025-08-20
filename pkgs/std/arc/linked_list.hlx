@@ -14,8 +14,8 @@ import types::Allocator;
 import alloc::DefaultAllocator;
 
 class IntNode {
-    let data: int;
-    let link: *IntNode? = &null;
+    var data: int;
+    var link: *IntNode? = &null;
 
     fn IntNode(self, data: int, link: *IntNode?) {
         self.data = data;
@@ -39,15 +39,15 @@ class IntNode {
     }
 
     fn addNodeAfter(self, new_data: int) -> *IntNode {
-        let link = IntNode(new_data, self.link);
+        var link = IntNode(new_data, self.link);
         self.link = &link;
         return &link;
     }
 }
 
 fn listLength(head: &IntNode) -> int {
-    let count = 0;
-    let *current = head;
+    var count = 0;
+    var *current = head;
 
     while (*current).getLink() != &null {
         count  += 1;
@@ -58,7 +58,7 @@ fn listLength(head: &IntNode) -> int {
 }
 
 fn listSearch(head: *IntNode, target: int) -> *IntNode {
-    let *current = head;
+    var *current = head;
 
     while (*current).getLink() != &null {
         if (*current).getData() == target {
@@ -73,8 +73,8 @@ fn listSearch(head: *IntNode, target: int) -> *IntNode {
 fn listRemoveNode(head: *IntNode, target: int) {
     // remove and free
 
-    let *current = head;
-    let *previous = &null;
+    var *current = head;
+    var *previous = &null;
     
     finally:
         try:
@@ -98,15 +98,15 @@ fn listRemoveNode(head: *IntNode, target: int) {
 }
 
 fn main(a: const int,  a: int | float) {
-    let head: IntNode = IntNode(1, &null);
-    let  *tail = &head;
+    var head: IntNode = IntNode(1, &null);
+    var  *tail = &head;
 
     for i in 2..100 {
         tail = tail.addNodeAfter(i);
     }
 
-    let length:  int      = listLength(&head);
-    let target: *IntNode? = listSearch(&head, 50);
+    var length:  int      = listLength(&head);
+    var target: *IntNode? = listSearch(&head, 50);
 }
 
 
