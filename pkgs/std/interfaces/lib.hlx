@@ -13,15 +13,15 @@ module mem {
 
     /// A pointer without a reference count
     class Borrowed {
-       let ptr: *T;
+       var ptr: *T;
     }
     
     interface RawCopy {
 
     }
 
-    class slice requires <T,Alloc> if Alloc derives Allocator {
-        let ptr: Borrowed<T>, 
+    class <T,Alloc> slice requires Alloc derives Allocator{
+        var ptr: Borrowed<T>, 
             len: Alloc::Size;
     }
 
@@ -120,22 +120,22 @@ module sync::channel {
 module core::ptr {
 
     // A borrow checked pointer.
-    class Unique requires <T> {
+    class <T> Unique {
         ptr: *unsafe T;
     }
 
-    class Shared requires <T,Inc> if Inc derives Count {
+    class <T,Inc> Shared requires Inc derives Count{
         ptr:Unique<T>,
 
     }  
     
     
-    class Shared requires <T> {
+    class <T> Shared {
         ptr:Unique<T>,
     }  
 
 
-    class Cow requires <Then>
+    class <Then> Cow
 
 
 
@@ -143,12 +143,12 @@ module core::ptr {
 }
 /* end -------------------------- core/ptr.hlx -------------------------- end */
 
-class list   requires <T      >;
-class array  requires <T, Size>;
-class vec    requires <T      >;
+class <T      > list  ;
+class <T, Size> array ;
+class <T      > vec   ;
 
-class string requires <C = char, Container = collection::vec> derives String {
-    let container:Container<C>;
+class <C = char, Container = collection::vec> string derives String {
+    var container:Container<C>;
 
 
 
@@ -199,7 +199,7 @@ module core::prelude {
 module primitive {
     import ::char::Char;
 
-    class String requires <C> if C derives Char {
+    class <C> String requires C derives Char{
 
         type Char = Char;
         
@@ -253,7 +253,7 @@ module hash {
     
     interface Hasher {
         fn self(seed: int = 0);
-        fn write(self, val: T) requires <T> if T has As::<slice::<byte>>;
+        fn write(self, val: T) requires <T> if T impl As::<slice::<byte>>;
     }
     
     interface Hash {
@@ -261,13 +261,13 @@ module hash {
     }
 
     class StandardHasher extends Hasher {
-        let hash: int;
+        var hash: int;
 
         fn Hasher(seed: int = 0) {
             hash = seed;
         }
         
-        fn write(self, val: T) requires <T> if T has As::<slice::<byte>> {
+        fn write(self, val: T) requires <T> if T impl As::<slice::<byte>> {
             hash += (self.hash * 31) ^ (val as int);
         }
     }
@@ -298,7 +298,7 @@ extend T requires <T,U,E> derives Transform
 
 module collection::list {
     class list extend Map {
-        let data: list<int>;
+        var data: list<int>;
         fn map(self, f: fn (T) -> T) {
             for i in data {
                 data[i] = f(data[i]);
@@ -326,7 +326,7 @@ module math {
         fn ceil(self) -> self
     }
 
-    class Ratio requires <N,D=N> {
+    class <N,D=N> Ratio {
 
     }
 
@@ -335,7 +335,7 @@ module math {
 module binary {
 
     class bool<SIZE:size = 1> {
-        let inner: byte<SIZE>;
+        var inner: byte<SIZE>;
     }
 
 }
@@ -387,7 +387,7 @@ interface Span {
 
 
 
-interface Error if self has Debug {}
+interface Error if self impl Debug {}
 
 
 /// Guarantees that a T is stored sequentially 
@@ -401,7 +401,7 @@ interface Allocator {
 
 interface Collection 
     requires <Key, Val, Alloc> 
-    if Alloc has Allocator & self has Index<Key,Value>
+    if Alloc impl Allocator & self impl Index<Key,Value>
     {
 
     
@@ -443,10 +443,10 @@ interface Generator requires <T> {
 
 }
 
-extend with T if T has Contains {
+extend with T if T impl Contains {
 
     op in fn next (self) -> yield T {
-        let current = self.first;
+        var current = self.first;
 
         while current? {
             yield current;
@@ -474,7 +474,7 @@ struct Function requires <Args,Return> {
     type Args = Args;
     type Return = Return;
 
-    let ptr: fn (Args...) -> Return;
+    var ptr: fn (Args...) -> Return;
 
 }
 
@@ -550,14 +550,14 @@ interface Index requires <Idx>  {
     const op [] at(self, idx: *const Idx) -> *const Output?;
 
     fn index_of(value:Output) -> Idx::Size; 
-        if Idx has Size;
+        if Idx impl Size;
 
 
 
     /// Returns an owned value cloned from the reference 
-    const op [] at(self, idx:Idx) -> Output? if Output has Copy {
+    const op [] at(self, idx:Idx) -> Output? if Output impl Copy {
 
-        let out = self.index(index);
+        var out = self.index(index);
 
         // If the item exists at the index return the clone
         if out? {

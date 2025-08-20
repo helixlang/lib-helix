@@ -13,7 +13,7 @@
 ///                                                                                              ///
 ///-------------------------------------------------------------------------------- Lib-Helix ---///
 
-/// Error indicating that a requested feature or operation has not been implemented
+/// Error indicating that a requested feature or operation impl not been implemented
 default class NotImplementedError derives std::Error::BaseError {
     priv var msg: string;
 
