@@ -73,7 +73,7 @@ inline fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_R
     const light_green: string = "\033[92m";
 
     fn read_file(const file: *string) -> string? {
-        var content = libcxx::ifstream(std::string_to_sstring(*file).raw(), libcxx::ios::binary);
+        var content = libcxx::ifstream(std::string_to_nstring(*file).raw(), libcxx::ios::binary);
     
         if !content {
             return null;
