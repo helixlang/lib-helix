@@ -42,5 +42,5 @@ default class DeadlockError derives ConcurrencyError {
         ConcurrencyError.ConcurrencyError("Deadlock detected");
     }
 
-    override default op delete fn (self);
+    override default fn op delete (self);
 }

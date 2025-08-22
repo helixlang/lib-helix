@@ -41,5 +41,5 @@ default class HostNotFoundError derives NetworkError {
     default fn HostNotFoundError(self);
 
     /// Virtual destructor
-    override default op delete fn (self);
+    override default fn op delete (self);
 }

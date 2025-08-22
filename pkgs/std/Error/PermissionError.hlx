@@ -41,5 +41,5 @@ default class PermissionError derives std::Error::IOError {
     default fn PermissionError(self);
 
     /// Virtual destructor
-    override default op delete fn (self);
+    override default fn op delete (self);
 }

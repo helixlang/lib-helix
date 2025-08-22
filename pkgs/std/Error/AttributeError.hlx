@@ -22,13 +22,13 @@ default class AttributeError derives std::Error::BaseError {
     
     default fn AttributeError(self);
 
-    override default op delete fn (self);
+    override default fn op delete (self);
     
-    override const op panic fn (self) -> string {
+    override const fn op panic (self) -> string {
         return self.msg;
     }
     
-    override const op as fn (self) -> string {
+    override const fn op as (self) -> string {
         return msg;
     }
 }

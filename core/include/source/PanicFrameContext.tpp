@@ -80,7 +80,7 @@ FrameContext::FrameContext(T *obj)
         static_assert(Panic::Interface::Panicking<T>,
                       "Frame invoked with an object that does not have a panic method, add "
                       "`class ... impl Panic::Interface::Panicking` "
-                      "to the definition, and implement 'op panic fn(self) -> string' or the "
+                      "to the definition, and implement 'fn op panic (self) -> string' or the "
                       "static variant.");
     }
 

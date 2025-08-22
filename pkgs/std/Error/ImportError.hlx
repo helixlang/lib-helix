@@ -50,15 +50,15 @@ default class ImportError derives std::Error::BaseError {
     default fn ImportError(self);
 
     /// Virtual destructor
-    override default op delete fn (self);
+    override default fn op delete (self);
     
     /// Get a string representation for panic
-    override const op panic fn (self) -> string {
+    override const fn op panic (self) -> string {
         return self.msg;
     }
     
     /// Convert the error to a string
-    override const op as fn (self) -> string {
+    override const fn op as (self) -> string {
         return self.msg;
     }
     

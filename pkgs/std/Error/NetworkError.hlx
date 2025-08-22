@@ -34,7 +34,7 @@ default class NetworkError derives std::Error::BaseError {
     default fn NetworkError(self);
 
     /// Virtual destructor
-    override default op delete fn (self);
+    override default fn op delete (self);
 
     priv fn generate_string(self) -> string {
         if (self.error_code != 0) {
@@ -45,12 +45,12 @@ default class NetworkError derives std::Error::BaseError {
     }
     
     /// Get a string representation for panic
-    override const op panic fn (self) -> string {
+    override const fn op panic (self) -> string {
         return self.generate_string();
     }
     
     /// Convert the error to a string
-    override const op as fn (self) -> string {
+    override const fn op as (self) -> string {
         return self.generate_string();
     }
     

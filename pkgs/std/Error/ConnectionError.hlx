@@ -43,5 +43,5 @@ default class ConnectionError derives NetworkError {
     }
 
     /// Virtual destructor
-    override default op delete fn (self);
+    override default fn op delete (self);
 }

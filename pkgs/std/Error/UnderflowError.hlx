@@ -31,5 +31,5 @@ default class UnderflowError derives std::Error::ArithmeticError {
     }
 
     /// Virtual destructor
-    override default op delete fn (self);
+    override default fn op delete (self);
 }

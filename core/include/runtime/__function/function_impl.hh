@@ -60,7 +60,7 @@ class $function;
 ///     let x: fn (i32) -> void = some_function;
 ///     let y: fn () -> void = fn () -> void { print("Hello"); };
 ///     class Functor {
-///         op () fn call_op() -> void;
+///         fn op () ()[call_op] -> void;
 ///     }
 ///     let z: fn () -> void = Functor();
 ///     ```

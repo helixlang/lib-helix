@@ -33,5 +33,5 @@ default class OverflowError derives ArithmeticError {
     }
 
     /// Virtual destructor
-    override default op delete fn (self);
+    override default fn op delete (self);
 }

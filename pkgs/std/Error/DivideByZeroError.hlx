@@ -28,5 +28,5 @@ default class DivideByZeroError derives ArithmeticError {
     }
 
     /// Virtual destructor
-    override default op delete fn (self);
+    override default fn op delete (self);
 }

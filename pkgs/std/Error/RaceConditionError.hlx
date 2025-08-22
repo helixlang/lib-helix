@@ -37,5 +37,5 @@ default class RaceConditionError derives std::Error::ConcurrencyError {
     }
 
     /// Virtual destructor
-    override default op delete fn (self);
+    override default fn op delete (self);
 }
