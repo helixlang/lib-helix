@@ -54,10 +54,10 @@ MATCHES FOUND:
 ✓ range (function): lines [203, 205, 206, 210, 211, 213, 214, 215, 216, 217]
 ✓ to_string (function): lines [266, 267, 268, 269, 270, 271, 272, 291, 293, 294]
 ✓ char_to_cchar (function): lines [292]
-✓ sstring_to_string (function): lines [293]
-✓ cstrptr_to_string (function): lines [294]
-✓ string_to_sstring (function): lines [295]
-✓ strptr_to_cstrptr (function): lines [296]
+✓ nstring_to_string (function): lines [293]
+✓ nptr_to_string (function): lines [294]
+✓ string_to_nstring (function): lines [295]
+✓ wptr_to_nptr (function): lines [296]
 ✓ Function (class): lines [187, 194]
 ✓ Generator (class): lines [195, 196]
 ✓ null_t (class): lines [200, 232, 233, 249, 250]
@@ -351,7 +351,7 @@ Line 135:   - <windows.h>
 Line 136:   - <processthreadsapi.h>
 Line 137:   - <tlhelp32.h>
 
-Line 207:     op in fn iter(self) -> yield T
+Line 207:     fn op in (self)[iter] -> yield T
 
 Line 226:     // Iteration support
 Line 227:     class iterator {
@@ -378,7 +378,7 @@ Line 262:     T operator$cast(T * /*unused*/) const; // use `Questionable<T> as 
 Line 273: - template <typename Ty> requires std::Interface::SupportsOStream<std::Meta::all_extents_removed<Ty>> string to_string(Ty &&t)
 Line 274: - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, wchar_t *> inline string to_string(Ty &&t)
 Line 275: - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, char *> inline string to_string(Ty &&t)
-Line 276: - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, sstring> inline string to_string(Ty &&t)
+Line 276: - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, nstring> inline string to_string(Ty &&t)
 Line 277: - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, string> inline string to_string(Ty &&t)
 
 Line 306:     using char_traits = Traits;

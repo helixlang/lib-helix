@@ -248,7 +248,7 @@ module hash {
 module hash {
 
     interface CastableAsInt {
-        op as fn as_int(self) -> int;
+        fn op as (self)[as_int] -> int;
     }
     
     interface Hasher {
@@ -407,11 +407,11 @@ interface Collection
     
  
     
-    op in fn contains(key:Key) -> bool;
+    fn op in (key:Key)[contains] -> bool;
 
     
     /// Gets without checking
-    op [] unsafe fn get(self, key: Key) -> *Val;
+    fn op [] unsafe (self, key: Key)[get] -> *Val;
     
     /// Returns the value at the location if already found
     fn insert(self, key:Key, value:Val) -> Val?;
@@ -439,7 +439,7 @@ interface Record requires <Key, Val> extend Collection<Key, Val> {
 
 interface Generator requires <T> {
     
-    op ++ fn next(self) -> yield T
+    fn op ++ (self)[next] -> yield T
 
 }
 
@@ -481,7 +481,7 @@ struct Function requires <Args,Return> {
 interface Context requires <Fn> if Fn derives Function  {
 
 
-    op as fn (self, action: Action) -> Return;
+    fn op as (self, action: Action) -> Return;
 
 }
 
@@ -574,7 +574,7 @@ module core::collections {
 
     /// Represents a container that can check membership.
     interface Container<T> {
-        op in fn contains(self, item: T) -> bool;
+        fn op in (self, item: T)[contains] -> bool;
     }
 
     /// Represents a hashable object.
@@ -594,7 +594,7 @@ module core::collections {
 
     /// Represents an iterable object.
     interface Iterable<T> {
-        op for fn iter(self) -> yield T;
+        fn op for (self)[iter] -> yield T;
     }
 
     /// Represents an iterator object.

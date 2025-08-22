@@ -97,7 +97,7 @@
         "to_string(t: const char*) -> string",
         "to_string(t: const wchar_t*) -> string",
         "to_string(t: const string&) -> string",
-        "to_string(t: const sstring&) -> string",
+        "to_string(t: const nstring&) -> string",
         "to_string(t: const libcxx::string&) -> string",
         "to_string(t: const libcxx::wstring&) -> string",
         "to_string(t: bool) -> string"
@@ -116,39 +116,39 @@
       }
     },
     {
-      "name": "sstring_to_string",
-      "description": "Converts a sstring to a string (sstring being helix::String::basic<char>)",
-      "signature": "sstring_to_string(cstr: const sstring&) -> string",
+      "name": "nstring_to_string",
+      "description": "Converts a nstring to a string (nstring being helix::String::basic<char>)",
+      "signature": "nstring_to_string(cstr: const nstring&) -> string",
       "specifiers": ["inline"],
       "example": {
-        "main": "fn main() -> void {\n    var s_str: sstring = \"Hello\";\n    var w_str: string = std::sstring_to_string(s_str);\n    print(w_str);\n}"
+        "main": "fn main() -> void {\n    var s_str: nstring = \"Hello\";\n    var w_str: string = std::nstring_to_string(s_str);\n    print(w_str);\n}"
       }
     },
     {
-      "name": "cstrptr_to_string",
+      "name": "nptr_to_string",
       "description": "Converts a C-style string pointer to a string with specified size",
-      "signature": "cstrptr_to_string(cstr: const char*, size: size_t) -> string",
+      "signature": "nptr_to_string(cstr: const char*, size: size_t) -> string",
       "specifiers": ["inline"],
       "example": {
-        "main": "fn main() -> void {\n    var c_str: const char* = \"Hello\";\n    var str: string = std::cstrptr_to_string(c_str, 5);\n    print(str);\n}"
+        "main": "fn main() -> void {\n    var c_str: const char* = \"Hello\";\n    var str: string = std::nptr_to_string(c_str, 5);\n    print(str);\n}"
       }
     },
     {
-      "name": "string_to_sstring",
-      "description": "Converts a string to a sstring",
-      "signature": "string_to_sstring(wstr: const string&) -> sstring",
+      "name": "string_to_nstring",
+      "description": "Converts a string to a nstring",
+      "signature": "string_to_nstring(wstr: const string&) -> nstring",
       "specifiers": ["inline"],
       "example": {
-        "main": "fn main() -> void {\n    var w_str: string = \"Hello\";\n    var s_str: sstring = std::string_to_sstring(w_str);\n    print(s_str);\n}"
+        "main": "fn main() -> void {\n    var w_str: string = \"Hello\";\n    var s_str: nstring = std::string_to_nstring(w_str);\n    print(s_str);\n}"
       }
     },
     {
-      "name": "strptr_to_cstrptr",
+      "name": "wptr_to_nptr",
       "description": "Converts a wide string pointer to a C-style string pointer",
-      "signature": "strptr_to_cstrptr(wstr: const wchar_t*, buffer: char*, buffer_size: size_t) -> void",
+      "signature": "wptr_to_nptr(wstr: const wchar_t*, buffer: char*, buffer_size: size_t) -> void",
       "specifiers": ["inline"],
       "example": {
-        "main": "fn main() -> void {\n    var w_str: const wchar_t* = L\"Hello\";\n    var buffer: char[100];\n    std::strptr_to_cstrptr(w_str, buffer, 100);\n    print(buffer);\n}"
+        "main": "fn main() -> void {\n    var w_str: const wchar_t* = L\"Hello\";\n    var buffer: char[100];\n    std::wptr_to_nptr(w_str, buffer, 100);\n    print(buffer);\n}"
       }
     }
   ],
@@ -226,12 +226,12 @@
         {
           "name": "operator in",
           "description": "Iterator operator for range-based loops",
-          "signature": "op in fn iter(self) -> yield T"
+          "signature": "fn op in (self)[iter] -> yield T"
         },
         {
           "name": "operator in",
           "description": "Contains operator to check if value is in range",
-          "signature": "op in fn contains(self, value: T) -> bool"
+          "signature": "fn op in (self, value: T)[contains] -> bool"
         }
       ],
       "methods": [

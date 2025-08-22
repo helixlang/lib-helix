@@ -204,8 +204,8 @@
     ```helix
     fn Range(self, first: T, last: T, step: isize = 1)
     fn Range(self, last: T)
-    op in fn iter(self) -> yield T
-    op in fn contains(self, value: T) -> bool
+    fn op in (self)[iter] -> yield T
+    fn op in (self, value: T)[contains] -> bool
     ```
 - range(last: T) -> Range::<T> - creates a range from 0 to last with step 1
 - range(first: T, last: T, step: isize = 1) -> Range::<T> - creates a range from first to last with specified step
@@ -266,34 +266,34 @@
 - inline string to_string(const char *t);
 - inline string to_string(const wchar_t *t);
 - inline string to_string(const string &t);
-- inline string to_string(const sstring &t);
+- inline string to_string(const nstring &t);
 - inline string to_string(const libcxx::string &t);
 - inline string to_string(const libcxx::wstring &t);
 - inline string to_string(bool t);
 - template <typename Ty> requires std::Interface::SupportsOStream<std::Meta::all_extents_removed<Ty>> string to_string(Ty &&t)
 - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, wchar_t *> inline string to_string(Ty &&t)
 - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, char *> inline string to_string(Ty &&t)
-- template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, sstring> inline string to_string(Ty &&t)
+- template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, nstring> inline string to_string(Ty &&t)
 - template <typename Ty> requires std::Interface::Castable<std::Meta::all_extents_removed<Ty>, string> inline string to_string(Ty &&t)
 - template <typename Ty>
         requires(!std::Meta::is_convertible<std::Meta::all_extents_removed<Ty>, const char *>) &&
                 (!std::Meta::is_convertible<std::Meta::all_extents_removed<Ty>, const wchar_t *>) &&
                 (!std::Meta::is_convertible<std::Meta::all_extents_removed<Ty>, string>) &&
-                (!std::Meta::is_convertible<std::Meta::all_extents_removed<Ty>, sstring>) &&
+                (!std::Meta::is_convertible<std::Meta::all_extents_removed<Ty>, nstring>) &&
                 (!std::Meta::is_convertible<std::Meta::all_extents_removed<Ty>, libcxx::string>) &&
                 (!std::Meta::is_convertible<std::Meta::all_extents_removed<Ty>, libcxx::wstring>) &&
                 (!std::Meta::same_as<std::Meta::all_extents_removed<Ty>, bool>) &&
                 (!std::Interface::SupportsOStream<std::Meta::all_extents_removed<Ty>>) &&
                 (!std::Interface::Castable<std::Meta::all_extents_removed<Ty>, wchar_t *>) &&
                 (!std::Interface::Castable<std::Meta::all_extents_removed<Ty>, char *>) &&
-                (!std::Interface::Castable<std::Meta::all_extents_removed<Ty>, sstring>) &&
+                (!std::Interface::Castable<std::Meta::all_extents_removed<Ty>, nstring>) &&
                 (!std::Interface::Castable<std::Meta::all_extents_removed<Ty>, string>)
     inline string to_string(Ty &&t);
 - inline char char_to_cchar(wchar_t wc) - converts a wide character to a char (c-char)
-- inline string sstring_to_string(const sstring &cstr) - converts a sstring to a string (sstring being helix::String::basic<char> - c++ char not wchar_t)
-- inline string cstrptr_to_string(const char *cstr, size_t size)
-- inline sstring string_to_sstring(const string &wstr)
-- inline void strptr_to_cstrptr(const wchar_t *wstr, char *buffer, size_t buffer_size)
+- inline string nstring_to_string(const nstring &cstr) - converts a nstring to a string (nstring being helix::String::basic<char> - c++ char not wchar_t)
+- inline string nptr_to_string(const char *cstr, size_t size)
+- inline nstring string_to_nstring(const string &wstr)
+- inline void wptr_to_nptr(const wchar_t *wstr, char *buffer, size_t buffer_size)
 
 
 ## std::String::*

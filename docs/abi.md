@@ -254,19 +254,19 @@ Operators if they have an alias, get 2 encodings, one for the operator and one f
 #### Examples
 1. Binary operator:
    ```helix
-   op + fn (a: i32, b: i32) -> i32;
+   fn op + (a: i32, b: i32) -> i32;
    ```
    Mangled: `_HX_OP$sym_add$i32i32`
 
 2. Unary operator with alias:
    ```helix
-   op l- fn prefix_negate(a: i32) -> i32;
+   fn op l- (a: i32)[prefix_negate] -> i32;
    ```
    Mangled: `_HX_OP$sym_lsub$i32_Ri32`; `_HX_FN12prefix_negatei32`
 
 3. Assignment operator:
    ```helix
-   op = fn set(a: self) -> *self;
+   fn op = (a: self)[set] -> *self;
    ```
    Mangled: `_HX_OP$sym_eq$selfself`
 

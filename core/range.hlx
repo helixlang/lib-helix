@@ -68,8 +68,8 @@
 ///
 /// ```Helix
 /// interface RangeCompliant {
-///     op ++ fn (self)              -> self;  // Increment operation.
-///     op <  fn (self, other: self) -> bool;  // Less-than comparison.
+///     fn op ++ (self)              -> self;  // Increment operation.
+///     fn op <  (self, other: self) -> bool;  // Less-than comparison.
 /// }
 /// ```
 ///
@@ -151,7 +151,7 @@ module std {
             self.step  = 1;
         }
 
-        op in fn iter(self) -> yield T {
+        fn op in (self)[iter] -> yield T {
             var current = self.first;
 
             while current < self.last {
@@ -169,7 +169,7 @@ module std {
             }
         }
 
-        op in fn contains(self, value: T) -> bool {
+        fn op in (self, value: T)[contains] -> bool {
             return value >= self.first && value < self.last;
         }
     }
