@@ -226,7 +226,7 @@ class basic {
 
 H_STD_NAMESPACE_END
 
-using sstring = std::String::basic<char>;
+using nstring = std::String::basic<char>;
 using string  = std::String::basic<wchar_t>;
 
 H_NAMESPACE_END
@@ -240,8 +240,8 @@ struct hash<helix::string> {
 };
 
 template <>
-struct hash<helix::sstring> {
-    size_t operator()(const helix::sstring &s) const noexcept {
+struct hash<helix::nstring> {
+    size_t operator()(const helix::nstring &s) const noexcept {
         return std::hash<std::string>{}(std::string(s.raw(), s.size()));
     }
 };
@@ -254,8 +254,8 @@ struct hash<helix::string::slice> {
 };
 
 template <>
-struct hash<helix::sstring::slice> {
-    size_t operator()(const helix::sstring::slice &s) const noexcept {
+struct hash<helix::nstring::slice> {
+    size_t operator()(const helix::nstring::slice &s) const noexcept {
         return std::hash<std::string>{}(std::string(s.raw(), s.size()));
     }
 };

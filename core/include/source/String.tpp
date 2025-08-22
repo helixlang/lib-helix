@@ -142,7 +142,7 @@ inline basic<CharT, Traits>::basic(
         return;
     }
     usize size = LIBCXX_NAMESPACE::char_traits<char>::length(str);
-    data       = sstring_to_string(sstring(str, size)).data;
+    data       = nstring_to_string(nstring(str, size)).data;
 }
 
 template <typename CharT, typename Traits>
@@ -156,7 +156,7 @@ inline basic<CharT, Traits>::basic(
         data = L"";
         return;
     }
-    data = sstring_to_string(sstring(str, size)).data;
+    data = nstring_to_string(nstring(str, size)).data;
 }
 
 //////////////////////////////////// SUBSTRING //////////////////////////////////////
