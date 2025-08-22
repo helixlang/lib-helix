@@ -38,22 +38,6 @@
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
-inline string s2ws(const libcxx::string &str) {  // TODO: move to string.hh within the corelib
-                                                 // replacing sstring_to_string()
-    using convert_typeX = libcxx::codecvt_utf8<wchar_t>;
-    libcxx::wstring_convert<convert_typeX, wchar_t> converterX;
-
-    return converterX.from_bytes(str);
-}
-
-inline libcxx::string ws2s(const string &wstr) {  // TODO: move to string.hh within the corelib
-                                                  // replacing string_to_sstring()
-    using convert_typeX = libcxx::codecvt_utf8<wchar_t>;
-    libcxx::wstring_convert<convert_typeX, wchar_t> converterX;
-
-    return converterX.to_bytes(wstr);
-}
-
 struct ProcessOutput {
     string stdout_data;
     string stderr_data;
@@ -75,36 +59,36 @@ struct ProcessOutput {
     ProcessOutput(const ProcessOutput &other) noexcept
         : stdout_data(other.stdout_data)
         , stderr_data(other.stderr_data)
-        , on_stdout(other.on_stdout)
-        , on_stderr(other.on_stderr)
         , return_code(other.return_code)
         , pid(other.pid)
         , start_time(other.start_time)
         , end_time(other.end_time)
+        , on_stdout(other.on_stdout)
+        , on_stderr(other.on_stderr)
         , timed_out(other.timed_out)
         , terminated(other.terminated) {}
 
     ProcessOutput(ProcessOutput &&other) noexcept
         : stdout_data(std::Memory::move(other.stdout_data))
         , stderr_data(std::Memory::move(other.stderr_data))
-        , on_stdout(std::Memory::move(other.on_stdout))
-        , on_stderr(std::Memory::move(other.on_stderr))
         , return_code(other.return_code)
         , pid(other.pid)
         , start_time(other.start_time)
         , end_time(other.end_time)
+        , on_stdout(std::Memory::move(other.on_stdout))
+        , on_stderr(std::Memory::move(other.on_stderr))
         , timed_out(other.timed_out)
         , terminated(other.terminated) {}
 
     ProcessOutput &operator=(const ProcessOutput &other) noexcept {
         stdout_data = other.stdout_data;
         stderr_data = other.stderr_data;
-        on_stdout   = other.on_stdout;
-        on_stderr   = other.on_stderr;
         return_code = other.return_code;
         pid         = other.pid;
         start_time  = other.start_time;
         end_time    = other.end_time;
+        on_stdout   = other.on_stdout;
+        on_stderr   = other.on_stderr;
         timed_out   = other.timed_out;
         terminated  = other.terminated;
         return *this;
@@ -113,12 +97,12 @@ struct ProcessOutput {
     ProcessOutput &operator=(ProcessOutput &&other) noexcept {
         stdout_data = std::Memory::move(other.stdout_data);
         stderr_data = std::Memory::move(other.stderr_data);
-        on_stdout   = std::Memory::move(other.on_stdout);
-        on_stderr   = std::Memory::move(other.on_stderr);
         return_code = other.return_code;
         pid         = other.pid;
         start_time  = other.start_time;
         end_time    = other.end_time;
+        on_stdout   = std::Memory::move(other.on_stdout);
+        on_stderr   = std::Memory::move(other.on_stderr);
         timed_out   = other.timed_out;
         terminated  = other.terminated;
         return *this;
@@ -188,7 +172,7 @@ struct ProcessOutput {
 
     void append_stdout(const char *data, size_t n) {
         libcxx::lock_guard<libcxx::mutex> lg(stdout_mutex);
-        auto                              str = s2ws(libcxx::string(data, n));
+        auto                              str = cstring_to_string(libcxx::string(data, n));
         stdout_data.append(str);
         if (on_stdout) {
             on_stdout(stdout_data.subslice(stdout_data.size() - n, n));
@@ -197,7 +181,7 @@ struct ProcessOutput {
 
     void append_stderr(const char *data, size_t n) {
         libcxx::lock_guard<libcxx::mutex> lg(stderr_mutex);
-        auto                              str = s2ws(libcxx::string(data, n));
+        auto                              str = cstring_to_string(libcxx::string(data, n));
         stderr_data.append(str);
         if (on_stderr) {
             on_stderr(stderr_data.subslice(stderr_data.size() - n, n));
@@ -525,8 +509,8 @@ class Subprocess {
         // convert command to wide.
         std::wstring wcmd_w(
             wcmd.raw_string());  // wcmd is "libcxx::string" but contains wide-logic; your helpers
-                                 // are named s2ws/ws2s; here we assume wcmd already logical wide.
-        // if wcmd actually contains wide characters stored in narrow string, replace with your s2ws
+                                 // are named cstring_to_string/string_to_cstring; here we assume wcmd already logical wide.
+        // if wcmd actually contains wide characters stored in narrow string, replace with your cstring_to_string
         // appropriately.
 
         // working directory
@@ -646,14 +630,14 @@ class Subprocess {
 
             // optional working dir
             if ((working_dir != nullptr) && !working_dir->empty()) {
-                if (chdir(ws2s(*working_dir).c_str()) != 0) {
+                if (chdir(string_to_cstring(*working_dir).c_str()) != 0) {
                     _exit(127);
                 }
             }
 
             // build command for /bin/sh -c to keep parity with shell command interpretation,
             // or exec directly if you want no shell. Here we mimic your original system() usage.
-            libcxx::string cmd = ws2s(wcmd);
+            libcxx::string cmd = string_to_cstring(wcmd);
 
             // environment setup
             if (!env.empty()) {
@@ -662,8 +646,8 @@ class Subprocess {
                 for (const auto &e : env) {
                     auto pos = e.lfind(L"=");
                     if (pos != libcxx::string::npos) {
-                        auto key = ws2s(e.raw_string().substr(0, pos));
-                        auto val = ws2s(e.raw_string().substr(pos + 1));
+                        auto key = string_to_cstring(e.raw_string().substr(0, pos));
+                        auto val = string_to_cstring(e.raw_string().substr(pos + 1));
                         setenv(key.c_str(), val.c_str(), 1);
                     }
                 }
