@@ -72,13 +72,13 @@ Complete overview of the entire core library, including all modules, functions, 
 
 #### RangeCompliant
 For types to work with range functions:
-- `op ++ fn (self) -> self` - Increment
-- `op < fn (self, other: self) -> bool` - Comparison
+- `fn op ++ (self) -> self` - Increment
+- `fn op < (self, other: self) -> bool` - Comparison
 
 #### Panic::Panicking
 For types to work with panic system:
-- `op panic fn(self) -> string` - Instance panic
-- OR `static op panic fn() -> string` - Static panic
+- `fn op panic (self) -> string` - Instance panic
+- OR `static fn op panic () -> string` - Static panic
 
 ## Usage Guidelines
 
