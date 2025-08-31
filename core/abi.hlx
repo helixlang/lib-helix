@@ -194,7 +194,7 @@ module std::abi {
         return ObjectType::None;
     }
 
-    inline fn demangle_parttial(const input: ref!(string)) -> string {
+    inline fn demangle_partial(const input: ref!(string)) -> string {
         var output: string;
         var i: usize = 0;
 
