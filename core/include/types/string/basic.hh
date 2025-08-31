@@ -140,13 +140,6 @@ class basic {
     bool operator<=(const basic &other) const noexcept { return data <= other.data; }
     bool operator>=(const basic &other) const noexcept { return data >= other.data; }
 
-    bool operator==(const string_t &other) const noexcept { return data == other; }
-    bool operator!=(const string_t &other) const noexcept { return data != other; }
-    bool operator<(const string_t &other) const noexcept { return data < other; }
-    bool operator>(const string_t &other) const noexcept { return data > other; }
-    bool operator<=(const string_t &other) const noexcept { return data <= other; }
-    bool operator>=(const string_t &other) const noexcept { return data >= other; }
-
 
     // Basic Access
     const CharT *raw() const noexcept { return data.c_str(); }
