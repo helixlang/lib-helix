@@ -22,5 +22,6 @@
 #include <include/meta/meta.hh>
 #include <include/runtime/runtime.hh>
 #include <include/types/types.hh>
+#include <include/abi/abi.hh>
 
 #endif  // _$_HX_CORE_M4CORE
