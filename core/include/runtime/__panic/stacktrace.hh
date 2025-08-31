@@ -1,11 +1,25 @@
-
+///--- The Helix Project ------------------------------------------------------------------------///
+///                                                                                              ///
+///   Part of the Helix Project, under the Attribution 4.0 International license (CC BY 4.0).    ///
+///   You are allowed to use, modify, redistribute, and create derivative works, even for        ///
+///   commercial purposes, provided that you give appropriate credit, and indicate if changes    ///
+///   were made.                                                                                 ///
+///                                                                                              ///
+///   For more information on the license terms and requirements, please visit:                  ///
+///     https://creativecommons.org/licenses/by/4.0/                                             ///
+///                                                                                              ///
+///   SPDX-License-Identifier: CC-BY-4.0                                                         ///
+///   Copyright (c) 2024 The Helix Project (CC BY 4.0)                                           ///
+///                                                                                              ///
+///-------------------------------------------------------------------------------- Lib-Helix ---///
 
 #ifndef _$_HX_CORE_M10STACKTRACE
 #define _$_HX_CORE_M10STACKTRACE
 
-#include <cstddef>
-#include <cstdint>
+#include <include/abi/abi.hh>
 #include <include/c++/libc++.hh>
+#include <include/runtime/__io/__print/print.hh>
+#include <include/runtime/__io/__print/stringf.hh>
 #include <include/types/types.hh>
 
 #ifdef _WIN32
@@ -26,336 +40,408 @@
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
-namespace Backtrace {
+namespace Stacktrace {
 
 #if defined(_MSC_VER)
-#define HX_FUNCNAME __FUNCSIG__
+#define __HELIX_FUNCNAME__ __FUNCSIG__
 #elif defined(__GNUC__) || defined(__clang__)
-#define HX_FUNCNAME __PRETTY_FUNCTION__
+#define __HELIX_FUNCNAME__ __PRETTY_FUNCTION__
 #else
-#define HX_FUNCNAME __func__
+#define __HELIX_FUNCNAME__ __func__
 #endif
 
 enum class FrameKind : uint8_t {
     Helix  = 0,
-    Native = 1,
+    Hybrid = 1,
+    Native = 2,
+};
+struct Location {
+    const wchar_t *file;
+    const wchar_t *func;
+    uint32_t       line;
+
+    wchar_t file_buf[1024];
+    wchar_t func_buf[1024];
+
+    static void char_to_wchar(const char *src, wchar_t *dst, size_t dst_cap) {
+        if (!src || !dst || dst_cap == 0) {
+            return;
+        }
+
+        size_t converted = mbstowcs(dst, src, dst_cap - 1);
+        if (converted == (size_t)-1) {
+            dst[0] = L'\0';
+        } else {
+            dst[converted] = L'\0';
+        }
+    }
+
+    Location(const char *f, const char *fn, uint32_t l)
+        : file(file_buf)
+        , func(func_buf)
+        , line(l) {
+        char_to_wchar(f, file_buf, sizeof(file_buf) / sizeof(wchar_t));
+        char_to_wchar(fn, func_buf, sizeof(func_buf) / sizeof(wchar_t));
+    }
+
+    Location()
+        : file(L"")
+        , func(L"")
+        , line(0) {
+        file_buf[0] = L'\0';
+        func_buf[0] = L'\0';
+    }
 };
 
-struct SrcLoc {
-    const char *file;
-    const char *func;
-    uint32_t    line;
-};
-
-struct HelixFrame {
-    const SrcLoc     *loc;
-    const HelixFrame *prev;
+struct alignas(16) FrameSummary {  // exactly 32 bytes on 64-bit and 16 bytes on 32-bit
+    Location     *loc;
+    FrameSummary *prev;
+    FrameKind     kind;
 };
 
 #if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
-inline thread_local const HelixFrame *g_tls_helix_head = nullptr;
+inline thread_local FrameSummary *g_tls_helix_head = nullptr;
 #else
-inline const HelixFrame *g_tls_helix_head = nullptr;
+inline const FrameSummary *g_tls_helix_head = nullptr;
 #endif
 
-struct HelixFrameScope {
-    HelixFrame frame;
-    explicit HelixFrameScope(const SrcLoc *loc) noexcept {
-        frame.loc        = loc;
+struct RegisterFrame {
+    FrameSummary frame{};
+
+    explicit RegisterFrame(const Location *loc, const FrameKind kind = FrameKind::Hybrid) noexcept {
+        frame.loc        = const_cast<Location *>(loc);
         frame.prev       = g_tls_helix_head;
+        frame.kind       = kind;
         g_tls_helix_head = &frame;
     }
-    ~HelixFrameScope() noexcept { g_tls_helix_head = frame.prev; }
 
-    HelixFrameScope(const HelixFrameScope &)            = delete;
-    HelixFrameScope &operator=(const HelixFrameScope &) = delete;
-    HelixFrameScope(HelixFrameScope &&)                 = delete;
-    HelixFrameScope &operator=(HelixFrameScope &&)      = delete;
+    ~RegisterFrame() noexcept { g_tls_helix_head = frame.prev; }
+
+    RegisterFrame(const RegisterFrame &)            = delete;
+    RegisterFrame &operator=(const RegisterFrame &) = delete;
+    RegisterFrame(RegisterFrame &&)                 = delete;
+    RegisterFrame &operator=(RegisterFrame &&)      = delete;
 };
 
-#define HX_FUNC_SCOPE(file_cstr, line_num, func_cstr)               \
-    static constexpr ::hx::SrcLoc _hx_loc{                          \
+#define __REGISTER_TRACE_BLOCK__(file_cstr, line_num)                      \
+    static ::helix::std::Stacktrace::Location _hx_loc{                      \
+        (file_cstr), __HELIX_FUNCNAME__, static_cast<uint32_t>(line_num)}; \
+    ::helix::std::Stacktrace::RegisterFrame _hx_scope(&_hx_loc, std::Stacktrace::FrameKind::Helix);
+
+#define __REGISTER_HELIX_TRACE_BLOCK__(file_cstr, line_num, func_cstr)    \
+    static ::helix::std::Stacktrace::Location _hx_loc{               \
         (file_cstr), (func_cstr), static_cast<uint32_t>(line_num)}; \
-    ::hx::HelixFrameScope _hx_scope(&_hx_loc)
+    ::helix::std::Stacktrace::RegisterFrame _hx_scope(&_hx_loc, std::Stacktrace::FrameKind::Helix);
 
-#define HX_TRACE_CPP()                                           \
-    static constexpr ::hx::SrcLoc _hx_cpp_loc{                   \
-        __FILE__, HX_FUNCNAME, static_cast<uint32_t>(__LINE__)}; \
-    ::hx::HelixFrameScope _hx_cpp_scope(&_hx_cpp_loc)
+#define __REGISTER_HYBRID_TRACE_BLOCK__()                                      \
+    static ::helix::std::Stacktrace::Location _hx_cpp_loc{               \
+        __FILE__, __HELIX_FUNCNAME__, (static_cast<uint32_t>(__LINE__))}; \
+    ::helix::std::Stacktrace::RegisterFrame _hx_cpp_scope(&_hx_cpp_loc);
 
-struct MergedEntry {
-    const char *func;
-    const char *file;
-    uint32_t    line;
-    FrameKind   kind;
-};
+#define MAX_STACK_FRAME_DEPTH 1024
 
-inline const HelixFrame *helix_tls_head() noexcept { return g_tls_helix_head; }
+// when getting back trace frames we also need to capture native frames
+// so we can get a complete picture of the call stack.
+FrameSummary *capture(int max_depth = MAX_STACK_FRAME_DEPTH);
 
-inline uint32_t helix_tls_depth() noexcept {
-    uint32_t          n = 0;
-    const HelixFrame *p = g_tls_helix_head;
-    while (p) {
-        ++n;
-        p = p->prev;
-    }
-    return n;
-}
+#ifdef _WIN32
 
+inline FrameSummary *capture(int max_depth) {
+    static thread_local FrameSummary s_nodes[MAX_STACK_FRAME_DEPTH];
+    static thread_local Location     s_native_locs[MAX_STACK_FRAME_DEPTH];
+    static thread_local wchar_t      s_fn_bufs[MAX_STACK_FRAME_DEPTH][MAX_SYM_NAME];
+    static thread_local wchar_t      s_file_bufs[MAX_STACK_FRAME_DEPTH][1024];
 
+    auto clamp_limit = [](int v) {
+        if (v <= 0)
+            return MAX_STACK_FRAME_DEPTH;
+        if (v > MAX_STACK_FRAME_DEPTH)
+            return MAX_STACK_FRAME_DEPTH;
+        return v;
+    };
 
-struct NativeCapture {
-
-    void       **pcs;
-    const char **names;
-    uint32_t     count;
-};
-
-#if defined(_WIN32)
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <dbghelp.h>
-#include <windows.h>
-
-namespace detail {
-
-
-    constexpr uint32_t           kRing   = 128;
-    constexpr uint32_t           kSymMax = 1024;
-    inline thread_local char     g_sym_ring[kRing][kSymMax];
-    inline thread_local uint32_t g_ring_idx = 0;
-
-    inline char *next_ring_buf() noexcept {
-        uint32_t i = g_ring_idx;
-        g_ring_idx = (g_ring_idx + 1u) &
-                     (kRing - 1u);
-        return g_sym_ring[i];
-    }
-
-    inline bool dbghelp_init_once() noexcept {
-        static thread_local bool inited = false;
-        if (inited)
-            return true;
-        HANDLE proc = GetCurrentProcess();
-        SymSetOptions(SYMOPT_UNDNAME | SYMOPT_NO_PROMPTS);
-        if (!SymInitialize(proc, NULL, TRUE)) {
-
-            inited = true;
-            return false;
+    auto copy_wstr = [](wchar_t *dst, size_t cap, const char *src) {
+        if (!dst || cap == 0)
+            return;
+        if (!src) {
+            dst[0] = L'\0';
+            return;
         }
-        inited = true;
-        return true;
+
+        size_t out_len = 0;
+        mbstowcs_s(&out_len, dst, cap, src, _TRUNCATE);
+    };
+
+    const int limit = clamp_limit(max_depth);
+    int       idx   = 0;
+
+    for (const FrameSummary *cur = g_tls_helix_head; cur && idx < limit; cur = cur->prev) {
+        s_nodes[idx].loc  = cur->loc;
+        s_nodes[idx].kind = cur->kind;
+        s_nodes[idx].prev = (idx > 0) ? &s_nodes[idx - 1] : nullptr;
+        ++idx;
     }
 
-}
+    static const bool sym_ready = []() -> bool {
+        HANDLE proc = GetCurrentProcess();
+        SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
+        return SymInitialize(proc, nullptr, TRUE) != FALSE;
+    }();
 
-inline uint32_t native_capture_pcs(void **pcs, uint32_t max, uint32_t skip) noexcept {
-    if (!pcs || max == 0)
-        return 0;
+    if (!sym_ready || idx >= limit) {
+        return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
+    }
 
-    USHORT n =
-        RtlCaptureStackBackTrace(static_cast<DWORD>(skip), static_cast<DWORD>(max), pcs, nullptr);
-    return static_cast<uint32_t>(n);
-}
-
-inline uint32_t
-native_resolve_symbols(void **pcs, uint32_t count, const char **names_out) noexcept {
-    if (!pcs || !names_out)
-        return 0;
-    detail::dbghelp_init_once();
-
+    void  *stack[MAX_STACK_FRAME_DEPTH];
     HANDLE proc = GetCurrentProcess();
 
-    alignas(SYMBOL_INFO) static thread_local unsigned char
-                 sym_buf[sizeof(SYMBOL_INFO) + detail::kSymMax];
-    PSYMBOL_INFO pSym  = reinterpret_cast<PSYMBOL_INFO>(sym_buf);
-    pSym->MaxNameLen   = detail::kSymMax - 1;
-    pSym->SizeOfStruct = sizeof(SYMBOL_INFO);
-
-    uint32_t wrote = 0;
-    for (uint32_t i = 0; i < count; ++i) {
-        DWORD64     addr = (DWORD64)pcs[i];
-        const char *name = nullptr;
-        if (SymFromAddr(proc, addr, 0, pSym)) {
-
-            char *dst = detail::next_ring_buf();
-
-            char       *d   = dst;
-            const char *s   = pSym->Name;
-            size_t      cap = detail::kSymMax - 1;
-            while (*s && cap) {
-                *d++ = *s++;
-                --cap;
-            }
-            *d   = '\0';
-            name = dst;
-        }
-        names_out[i] = name;
-        ++wrote;
+    const int space_left = limit - idx;
+    if (space_left <= 0) {
+        return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
     }
-    return wrote;
-}
 
-#elif defined(__APPLE__) || defined(__linux__)
+    USHORT to_capture = static_cast<USHORT>(
+        space_left > MAX_STACK_FRAME_DEPTH ? MAX_STACK_FRAME_DEPTH : space_left);
+    USHORT captured = CaptureStackBackTrace(0, to_capture, stack, nullptr);
 
-#include <dlfcn.h>
-#include <execinfo.h>
-
-inline uint32_t native_capture_pcs(void **pcs, uint32_t max, uint32_t skip) noexcept {
-    if (!pcs || max == 0)
-        return 0;
-
-    int n = ::backtrace(pcs, static_cast<int>(max + skip));
-    if (n <= 0)
-        return 0;
-
-    int out = n - static_cast<int>(skip);
-    if (out <= 0)
-        return 0;
-
-    for (int i = 0; i < out; ++i)
-        pcs[i] = pcs[i + skip];
-    return static_cast<uint32_t>(out);
-}
-
-inline uint32_t
-native_resolve_symbols(void **pcs, uint32_t count, const char **names_out) noexcept {
-    if (!pcs || !names_out)
-        return 0;
-    for (uint32_t i = 0; i < count; ++i) {
-        Dl_info     info{};
-        const char *name = nullptr;
-        if (dladdr(pcs[i], &info) && info.dli_sname) {
-            name = info.dli_sname;
-        }
-        names_out[i] = name;
+    if (captured == 0) {
+        return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
     }
-    return count;
+
+    alignas(16) char sym_buf[sizeof(SYMBOL_INFO) + MAX_SYM_NAME];
+    PSYMBOL_INFO     sym = reinterpret_cast<PSYMBOL_INFO>(sym_buf);
+    sym->SizeOfStruct    = sizeof(SYMBOL_INFO);
+    sym->MaxNameLen      = MAX_SYM_NAME;
+
+    IMAGEHLP_LINE64 line_info{};
+    line_info.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+
+    const USHORT skip     = (captured > 2) ? 2 : 0;
+    int          native_i = 0;
+
+    for (USHORT i = skip; i < captured && idx < limit && native_i < MAX_STACK_FRAME_DEPTH;
+         ++i, ++native_i) {
+        DWORD64     addr = reinterpret_cast<DWORD64>(stack[i]);
+        const char *fn   = "???";
+        const char *file = "???";
+        uint32_t    line = 0;
+
+        if (SymFromAddr(proc, addr, nullptr, sym) && sym->Name && sym->Name[0] != '\0') {
+            fn = sym->Name;
+        }
+
+        DWORD disp = 0;
+        if (SymGetLineFromAddr64(proc, addr, &disp, &line_info) && line_info.FileName) {
+            file = line_info.FileName;
+            line = static_cast<uint32_t>(line_info.LineNumber);
+        }
+
+        copy_wstr(s_fn_bufs[native_i], MAX_SYM_NAME, fn);
+        copy_wstr(s_file_bufs[native_i], sizeof(s_file_bufs[0]) / sizeof(wchar_t), file);
+
+        s_native_locs[native_i].func = s_fn_bufs[native_i];
+        s_native_locs[native_i].file = s_file_bufs[native_i];
+        s_native_locs[native_i].line = line;
+
+        s_nodes[idx].loc  = &s_native_locs[native_i];
+        s_nodes[idx].kind = FrameKind::Native;
+        s_nodes[idx].prev = (idx > 0) ? &s_nodes[idx - 1] : nullptr;
+        ++idx;
+    }
+
+    return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
 }
 
 #else
-inline uint32_t native_capture_pcs(void **, uint32_t, uint32_t) noexcept { return 0; }
-inline uint32_t native_resolve_symbols(void **, uint32_t, const char **) noexcept { return 0; }
-#endif
 
+inline FrameSummary *capture(int max_depth) {
+    static thread_local FrameSummary s_nodes[MAX_STACK_FRAME_DEPTH];
+    static thread_local Location     s_native_locs[MAX_STACK_FRAME_DEPTH];
+    static thread_local wchar_t      s_fn_bufs[MAX_STACK_FRAME_DEPTH][1024];
+    static thread_local wchar_t      s_file_bufs[MAX_STACK_FRAME_DEPTH][1024];
 
-inline uint32_t helix_snapshot_locs(const SrcLoc **dst, uint32_t max) noexcept {
-    if (!dst || max == 0)
-        return 0;
-    uint32_t          n = 0;
-    const HelixFrame *p = g_tls_helix_head;
-    while (p && n < max) {
-        dst[n++] = p->loc;
-        p        = p->prev;
-    }
-    return n;
-}
-
-inline uint32_t merge_helix_and_native(const SrcLoc *const *helix_locs,
-                                       uint32_t             hcount,
-                                       const char *const   *native_names,
-                                       uint32_t             ncount,
-                                       MergedEntry         *out,
-                                       uint32_t             max_out,
-                                       bool                 emit_trailing_native = true) noexcept {
-    if (!out || max_out == 0)
-        return 0;
-
-    uint32_t oi = 0;
-    uint32_t ni = 0;
-
-
-
-    auto same_func = [](const char *a, const char *b) noexcept -> bool {
-        if (a == b)
-            return a != nullptr;
-        if (!a || !b)
-            return false;
-
-        while (*a && *b) {
-            if (*a != *b)
-                return false;
-            ++a;
-            ++b;
+    auto clamp_limit = [](int v) {
+        if (v <= 0) {
+            return MAX_STACK_FRAME_DEPTH;
         }
-        return *a == *b;
+
+        if (v > MAX_STACK_FRAME_DEPTH) {
+            return MAX_STACK_FRAME_DEPTH;
+        }
+
+        return v;
     };
 
-    for (uint32_t hi = 0; hi < hcount; ++hi) {
-        const SrcLoc *hl    = helix_locs[hi];
-        const char   *hname = hl ? hl->func : nullptr;
-
-
-        uint32_t consumed = 0;
-        while (ni < ncount) {
-            const char *nname = native_names[ni];
-            if (hname && nname && same_func(hname, nname)) {
-
-                break;
-            }
-            ++ni;
-            ++consumed;
-        }
-        if (consumed > 0) {
-            if (oi < max_out)
-                out[oi++] = MergedEntry{nullptr, nullptr, 0U, FrameKind::Native};
+    auto copy_wstr = [](wchar_t *dst, size_t cap, const char *src) {
+        if (!dst || cap == 0) {
+            return;
         }
 
-
-        if (oi < max_out) {
-            out[oi].func = hname;
-            out[oi].file = hl ? hl->file : nullptr;
-            out[oi].line = hl ? hl->line : 0U;
-            out[oi].kind = FrameKind::Helix;
-            ++oi;
+        if (!src) {
+            dst[0] = L'\0';
+            return;
         }
 
+        size_t out_len = 0;
+        mbstowcs(dst, src, cap - 1);
+        dst[cap - 1] = L'\0';
+    };
 
-        if (ni < ncount) {
-            const char *nname = native_names[ni];
-            if (hname && nname && same_func(hname, nname)) {
-                ++ni;
-            }
-        }
+    const int limit = clamp_limit(max_depth);
+    int       idx   = 0;
+
+    for (const FrameSummary *cur = g_tls_helix_head; (cur != nullptr) && idx < limit;
+         cur                     = cur->prev) {
+        s_nodes[idx].loc  = cur->loc;
+        s_nodes[idx].kind = cur->kind;
+        s_nodes[idx].prev = (idx > 0) ? &s_nodes[idx - 1] : nullptr;
+        ++idx;
     }
 
-
-    if (emit_trailing_native && ni < ncount) {
-        if (oi < max_out)
-            out[oi++] = MergedEntry{
-                .func = nullptr, .file = nullptr, .line = 0U, .kind = FrameKind::Native};
-        while (ni < ncount && oi < max_out) {
-            out[oi++] = MergedEntry{
-                .func = native_names[ni], .file = nullptr, .line = 0U, .kind = FrameKind::Native};
-            ++ni;
-        }
+    const int space_left = limit - idx;
+    if (space_left <= 0) {
+        return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
     }
 
-    return oi;
+    void *stack[MAX_STACK_FRAME_DEPTH];
+    int   to_capture = (space_left > MAX_STACK_FRAME_DEPTH) ? MAX_STACK_FRAME_DEPTH : space_left;
+    if (to_capture <= 0) {
+        return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
+    }
+
+    int captured = backtrace(stack, to_capture);
+    if (captured <= 0) {
+        return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
+    }
+
+    char **symbols = backtrace_symbols(stack, captured);
+
+    const int skip     = (captured > 2) ? 2 : 0;
+    int       native_i = 0;
+
+    for (int i = skip; i < captured && idx < limit && native_i < MAX_STACK_FRAME_DEPTH;
+         ++i, ++native_i) {
+        const char *fn   = "???";
+        const char *file = "???";
+        uint32_t    line = 0;
+
+        Dl_info info{};
+        if (dladdr(stack[i], &info)) {
+            if (info.dli_sname && info.dli_sname[0] != '\0') {
+                int   status    = 0;
+                char *demangled = abi::__cxa_demangle(info.dli_sname, nullptr, nullptr, &status);
+
+                if (status == 0 && demangled) {
+                    fn = demangled;
+                } else {
+                    fn = info.dli_sname;
+                }
+
+                if (fn == nullptr || fn[0] == '\0') {
+                    continue;
+                }
+
+                ::free(demangled);
+            }
+            if (info.dli_fname && info.dli_fname[0] != '\0') {
+                file = info.dli_fname;
+            }
+        }
+
+        if ((file == nullptr || file[0] == '\0' || file == (const char *)"???") &&
+            (symbols != nullptr) && symbols[i]) {
+            const char *sym = symbols[i];
+            const char *p   = sym;
+            const char *end = sym;
+
+            while (*end && *end != ' ' && *end != '(') {
+                ++end;
+            }
+
+            if (end > p) {
+                thread_local wchar_t tmp_path[1024];
+                size_t               len = static_cast<size_t>(end - p);
+                if (len >= (sizeof(tmp_path) / sizeof(wchar_t))) {
+                    len = (sizeof(tmp_path) / sizeof(wchar_t)) - 1;
+                }
+
+                char narrow_buf[1024];
+
+                if (len >= sizeof(narrow_buf)) {
+                    len = sizeof(narrow_buf) - 1;
+                }
+
+                for (size_t k = 0; k < len; ++k) {
+                    narrow_buf[k] = p[k];
+                }
+
+                narrow_buf[len] = '\0';
+
+                mbstowcs(tmp_path, narrow_buf, sizeof(tmp_path) / sizeof(wchar_t));
+                tmp_path[(sizeof(tmp_path) / sizeof(wchar_t)) - 1] = L'\0';
+                file                                               = narrow_buf;
+
+                copy_wstr(
+                    s_file_bufs[native_i], sizeof(s_file_bufs[0]) / sizeof(wchar_t), narrow_buf);
+            }
+        }
+
+        copy_wstr(s_fn_bufs[native_i], sizeof(s_fn_bufs[0]) / sizeof(wchar_t), fn);
+        copy_wstr(s_file_bufs[native_i], sizeof(s_file_bufs[0]) / sizeof(wchar_t), file);
+
+        if (s_fn_bufs[native_i] == nullptr || s_fn_bufs[native_i][0] == L'\0') {
+            // skip empty function names
+            --native_i;
+            continue;
+        }
+
+        s_native_locs[native_i].func = s_fn_bufs[native_i];
+        s_native_locs[native_i].file = s_file_bufs[native_i];
+        s_native_locs[native_i].line = line;
+
+        s_nodes[idx].loc  = &s_native_locs[native_i];
+        s_nodes[idx].kind = FrameKind::Native;
+        s_nodes[idx].prev = (idx > 0) ? &s_nodes[idx - 1] : nullptr;
+        ++idx;
+    }
+
+    if (symbols != nullptr) {
+        ::free(symbols);
+    }
+
+    return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
 }
 
-inline uint32_t helix_merge_backtrace_symbols(void         **pcs_buf,
-                                              const char   **names_buf,
-                                              const SrcLoc **helix_ptrs_buf,
-                                              MergedEntry   *merged_out,
-                                              uint32_t       max_frames,
-                                              uint32_t       skip_native          = 0,
-                                              bool           emit_trailing_native = true) noexcept {
-    if (!pcs_buf || !names_buf || !helix_ptrs_buf || !merged_out || max_frames == 0)
-        return 0;
+#endif  // POSIX/Linux
 
-    uint32_t ncount = native_capture_pcs(pcs_buf, max_frames, skip_native);
-    native_resolve_symbols(pcs_buf, ncount, names_buf);
+void backtrace(const FrameSummary *cur = capture()) {
+    int idx = 0;
 
-    uint32_t hcount = helix_snapshot_locs(helix_ptrs_buf, max_frames);
+    while (cur != nullptr && idx < MAX_STACK_FRAME_DEPTH) {
+        if (cur->loc != nullptr) {
+            if (cur->loc->file && cur->loc->func && cur->loc->line != 0) {
+                std::print(std::stringf(L"\x1b[31m{}\x1b[0m (\x1b[33m{}:{})",
+                                        std::ABI::strip_helix_prefix(std::ABI::demangle_partial(cur->loc->func)),
+                                        cur->loc->file,
+                                        cur->loc->line));
+            } else if (cur->loc->file && cur->loc->func) {
+                std::print(std::stringf(L"\x1b[31m{}\x1b[0m (\x1b[33m{}\x1b[0m)",
+                                        std::ABI::strip_helix_prefix(std::ABI::demangle_partial(cur->loc->func)),
+                                        cur->loc->file));
+            } else if (cur->loc->func) {
+                std::print(std::stringf(L"\x1b[31m{}\x1b[0m", cur->loc->func));
+            } else {
+                std::print(L"<unknown>");
+            }
+        } else {
+            std::print(L"<unknown>");
+        }
 
-    return merge_helix_and_native(
-        helix_ptrs_buf, hcount, names_buf, ncount, merged_out, max_frames, emit_trailing_native);
+        cur = cur->prev;
+        ++idx;
+    }
 }
-
-}
+}  // namespace Stacktrace
 
 H_STD_NAMESPACE_END
 H_NAMESPACE_END

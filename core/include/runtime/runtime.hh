@@ -18,6 +18,7 @@
 
 #include <include/runtime/__casting/as_cast.hh>
 #include <include/runtime/__panic/panic.hh>
+#include <include/runtime/__panic/stacktrace.hh>
 #include <include/runtime/__memory/memory.hh>
 #include <include/runtime/__io/io.hh>
 #include <include/runtime/__generator/generator.hh>
