@@ -260,11 +260,29 @@ T $question<T>::operator$cast(T * /*unused*/) const {
     _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(std::Error::NullValueError(L"Invalid Decay: value is null."));
 }
 
+///
+/// \brief Dereference operator that returns a reference to the contained value.
+///
+/// This function provides access to the underlying value when the state
+/// is \c $State::Value. If the state is \c $State::Error, the associated
+/// error is propagated by invoking its panic handler. If neither a value
+/// nor error is present, a fatal panic is triggered.
+///
+/// \tparam T The type of the contained value.
+/// \return T& Reference to the contained value.
+///
+/// \warning The returned reference is a direct reference to internal state
+///          and is not thread-safe. Concurrent access to the same object
+///          from multiple threads results in undefined behavior. Use external
+///          synchronization if thread safety is required.
+///
+/// \throws std::Error::NullValueError If the state does not contain a value
+///         or error (invalid decay).
+///
 template <class T>
 [[nodiscard]] T &$question<T>::operator*() {
     if (state == $State::Value) {
-        thread_local static T &result = data.value;
-        return result;
+        return data.value;
     }
 
     if (state == $State::Error) {
@@ -273,11 +291,32 @@ template <class T>
 
     _HX_MC_Q7_INTERNAL_CRASH_PANIC_M(std::Error::NullValueError(L"Invalid Decay: value is null."));
 }
+
+///
+/// \brief Implicit conversion operator to the contained value.
+///
+/// This operator allows a \c $question<T> to be used in contexts where
+/// a value of type \c T is expected. If the state is \c $State::Value,
+/// the contained value is returned by copy. If the state is \c $State::Error,
+/// the associated error's panic handler is invoked. If neither a value nor
+/// error is present, a fatal panic is triggered.
+///
+/// \tparam T The type of the contained value.
+/// \return T A copy of the contained value.
+///
+/// \warning This operator returns a copy rather than a reference.
+///          Modifications to the returned object do not affect the internal
+///          state of \c $question. No thread-safety is provided: accessing
+///          the same object concurrently without synchronization results
+///          in undefined behavior.
+///
+/// \throws std::Error::NullValueError If the state does not contain a value
+///         or error (invalid decay).
+///
 template <class T>
 [[nodiscard]] $question<T>::operator T() {
     if (state == $State::Value) {
-        thread_local static T &result = data.value;
-        return result;
+        return data.value;
     }
 
     if (state == $State::Error) {
