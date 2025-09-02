@@ -133,8 +133,7 @@
 #[trivially_import(true)] // prevents wrapping IR in a `unwind` module, keeping the handler globally accessible
 
 module std {
-    class <T> Range
-      requires T impl std::Interface::RangeCompliant {
+    class <T impl std::Interface::RangeCompliant> Range {
         var first: T;
         var last:  T;
         var step:  isize;
@@ -175,13 +174,11 @@ module std {
     }
 }
 
-fn <T> range(last: T) -> std::Range::<T>
-    requires T impl std::Interface::RangeCompliant {
+fn <T impl std::Interface::RangeCompliant> range(last: T) -> std::Range::<T> {
     return std::Range::<T>(last);
 }
 
-fn <T> range(first: T, last: T, step: isize = 1) -> std::Range::<T>
-    requires T impl std::Interface::RangeCompliant {
+fn <T impl std::Interface::RangeCompliant> range(first: T, last: T, step: isize = 1) -> std::Range::<T> {
     return std::Range::<T>(first, last, step);
 }
 
