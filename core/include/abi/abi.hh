@@ -199,7 +199,7 @@ inline string demangle(const string &input, ObjectType type) {
                     i = j;
 
                     continue;
-                } catch (...) { [[fallthough]]; }
+                } catch (...) { ; }
             }
         }
 
