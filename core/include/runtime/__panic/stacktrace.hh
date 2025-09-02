@@ -282,7 +282,6 @@ inline FrameSummary *capture(int max_depth) {
             return;
         }
 
-        size_t out_len = 0;
         mbstowcs(dst, src, cap - 1);
         dst[cap - 1] = L'\0';
     };
@@ -348,7 +347,7 @@ inline FrameSummary *capture(int max_depth) {
             }
         }
 
-        if ((file == nullptr || file[0] == '\0' || file == (const char *)"???") &&
+        if ((file == nullptr || file[0] == '\0' || libcxx::string(file) == "???") &&
             (symbols != nullptr) && symbols[i]) {
             const char *sym = symbols[i];
             const char *p   = sym;
