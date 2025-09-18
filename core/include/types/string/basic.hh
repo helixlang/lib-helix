@@ -90,7 +90,7 @@ class basic {
     // Access Operators
     CharT       &operator[](size_t index) noexcept { return data[static_cast<size_t>(index)]; }
     const CharT &operator[](size_t index) const noexcept {
-        return data[static_cast<size_t>(index)];
+        return data[index];
     }
 
     // Mutable Methods
@@ -104,7 +104,59 @@ class basic {
                      static_cast<size_t>(len),
                      libcxx::basic_string_view<CharT>(other));
     }
-    
+
+    basic &replace(const basic &old_str, const basic &new_str, size_t count = npos) noexcept {
+        if (old_str.empty()) {
+            return *this;
+        }
+
+        string_t result;
+        size_t   pos          = 0;
+        size_t   replacements = 0;
+
+        while (pos < data.size() && (count == npos || replacements < count)) {
+            size_t next = data.find(old_str.data, pos);
+
+            if (next == npos) {
+                result.append(data, pos, data.size() - pos);
+                break;
+            }
+
+            result.append(data, pos, next - pos);
+            result.append(new_str.data);
+            pos = next + old_str.size();
+            replacements++;
+        }
+
+        if (pos < data.size() && (count == npos || replacements < count)) {
+            result.append(data, pos, data.size() - pos);
+        }
+
+        data = std::Memory::move(result);
+        return *this;
+    }
+
+    basic &replace(const slice_t &old_str, const slice_t &new_str, size_t count = npos) noexcept {
+        return replace(basic(old_str), basic(new_str), count);
+    }
+
+    basic &replace(const CharT *old_str, const CharT *new_str, size_t count = npos) noexcept {
+        return replace(basic(old_str), basic(new_str), count);
+    }
+
+    basic &replace(CharT old_char, CharT new_char, size_t count = npos) noexcept {
+        size_t replacements = 0;
+
+        for (size_t i = 0; i < data.size() && (count == npos || replacements < count); ++i) {
+            if (data[i] == old_char) {
+                data[i] = new_char;
+                replacements++;
+            }
+        }
+
+        return *this;
+    }
+
     void reserve(size_t new_cap) noexcept { data.reserve(static_cast<size_t>(new_cap)); }
     void resize(size_t new_size, CharT c = CharT()) noexcept {
         data.resize(static_cast<size_t>(new_size), c);
@@ -140,13 +192,12 @@ class basic {
     bool operator<=(const basic &other) const noexcept { return data <= other.data; }
     bool operator>=(const basic &other) const noexcept { return data >= other.data; }
 
-
     // Basic Access
-    const CharT *raw() const noexcept { return data.c_str(); }
-    size_t       size() const noexcept { return data.size(); }
-    size_t       length() const noexcept { return data.length(); }
-    bool         is_empty() const noexcept { return data.empty(); }
-    string_t    &raw_string() noexcept { return data; }
+    const CharT    *raw() const noexcept { return data.c_str(); }
+    size_t          size() const noexcept { return data.size(); }
+    size_t          length() const noexcept { return data.length(); }
+    bool            is_empty() const noexcept { return data.empty(); }
+    string_t       &raw_string() noexcept { return data; }
     const string_t &raw_string() const noexcept { return data; }
 
     // Slice Conversion
@@ -168,7 +219,7 @@ class basic {
     bool starts_with(const basic &needle) const noexcept { return data.starts_with(needle.data); }
     bool starts_with(CharT c) const noexcept { return data.starts_with(c); }
     bool starts_with(slice needle) const noexcept { return data.starts_with(needle.raw()); }
-    
+
     bool ends_with(const basic &needle) const noexcept { return data.ends_with(needle.data); }
     bool ends_with(CharT c) const noexcept { return data.ends_with(c); }
     bool ends_with(slice needle) const noexcept { return data.ends_with(needle.raw()); }

@@ -81,6 +81,13 @@ using array = T[];
 inline constexpr helix::std::null_t null;
 
 // FIXME: remove later
+// template <class T, class A = helix::libcxx::allocator<T>>
+// class vec : public helix::libcxx::vector<T> {};
+
+/*
+[" hi ", "wsg"]
+*/
+
 template <typename T>
 using vec = helix::libcxx::vector<T>;
 
