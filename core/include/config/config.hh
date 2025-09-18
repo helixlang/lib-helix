@@ -79,6 +79,10 @@ namespace libcxx = ::std;
 #   define __builtin_constant_p(x) 0
 #endif
 
+#if defined (_MSC_VER)
+#    define _ALLOW_RTCc_IN_STL
+#endif
+
 #if defined(__has_attribute)
 #   if __has_attribute(diagnose_if)
 #       define DIAGNOSE_IF(args) __attribute__((diagnose_if args))

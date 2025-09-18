@@ -271,37 +271,35 @@ inline string demangle_partial(const string &input) {
     return output;
 }
 
+
 // --- Utility: remove leading "helix::" (and the "::helix::" variant)
 inline string strip_helix_prefix(const string &input) {
-    const libcxx::wstring raw = input.raw_string();
-    const libcxx::wstring p1  = L"helix::";
-    const libcxx::wstring p2  = L"::helix::";
+    const libcxx::wstring raw    = input.raw_string();
+    const libcxx::wstring prefix = L"helix::";
+    const libcxx::wstring midfix = L"::helix::";
+    
+    libcxx::wstring result;
+    result.reserve(raw.size());
 
-    auto pos2 = raw.find(p2);
-    auto pos1 = raw.find(p1);
+    usize i = 0;
+    while (i < raw.size()) {
+        if (i + midfix.size() <= raw.size() && raw.compare(i, midfix.size(), midfix) == 0) {
+            result.append(midfix);
+            i += midfix.size();
+            continue;
+        }
 
-    if (pos2 == libcxx::wstring::npos && pos1 == libcxx::wstring::npos) {
-        return input;
+        if (i + prefix.size() <= raw.size() && raw.compare(i, prefix.size(), prefix) == 0 &&
+            (i < 2 || raw.compare(i - 2, 2, L"::") != 0)) {
+            i += prefix.size();  // skip it
+            continue;
+        }
+
+        result.push_back(raw[i]);
+        i++;
     }
 
-    usize chosen_pos;
-    usize chosen_len;
-    if (pos2 != libcxx::wstring::npos && (pos1 == libcxx::wstring::npos || pos2 < pos1)) {
-        chosen_pos = pos2;
-        chosen_len = p2.length();
-    } else {
-        chosen_pos = pos1;
-        chosen_len = p1.length();
-    }
-
-    auto start = static_cast<usize>(chosen_pos);
-    auto len   = static_cast<usize>(chosen_len);
-
-    usize total = input.length();
-
-    string left  = input.subslice(0, start);
-    string right = input.subslice(start + len, total - (start + len));
-    return left + right;
+    return string(result.data()).replace(L" __cdecl", L"");
 }
 
 }  // namespace ABI
