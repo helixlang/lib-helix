@@ -123,20 +123,20 @@ struct RegisterFrame {
     RegisterFrame &operator=(RegisterFrame &&)      = delete;
 };
 
-#define __REGISTER_TRACE_BLOCK__(file_cstr, line_num)                      \
-    static ::helix::std::Stacktrace::Location _hx_loc{                      \
+#define __REGISTER_TRACE_BLOCK__(file_cstr, line_num, var_n)               \
+    static ::helix::std::Stacktrace::Location var_n{                       \
         (file_cstr), __HELIX_FUNCNAME__, static_cast<uint32_t>(line_num)}; \
-    ::helix::std::Stacktrace::RegisterFrame _hx_scope(&_hx_loc, std::Stacktrace::FrameKind::Helix);
+    ::helix::std::Stacktrace::RegisterFrame _hx_scope(&var_n, std::Stacktrace::FrameKind::Helix);
 
-#define __REGISTER_HELIX_TRACE_BLOCK__(file_cstr, line_num, func_cstr)    \
-    static ::helix::std::Stacktrace::Location _hx_loc{               \
-        (file_cstr), (func_cstr), static_cast<uint32_t>(line_num)}; \
-    ::helix::std::Stacktrace::RegisterFrame _hx_scope(&_hx_loc, std::Stacktrace::FrameKind::Helix);
+#define __REGISTER_HELIX_TRACE_BLOCK__(file_cstr, line_num, func_cstr, var_n) \
+    static ::helix::std::Stacktrace::Location var_n{                          \
+        (file_cstr), (func_cstr), static_cast<uint32_t>(line_num)};           \
+    ::helix::std::Stacktrace::RegisterFrame _hx_scope(&var_n, std::Stacktrace::FrameKind::Helix);
 
-#define __REGISTER_HYBRID_TRACE_BLOCK__()                                      \
-    static ::helix::std::Stacktrace::Location _hx_cpp_loc{               \
+#define __REGISTER_HYBRID_TRACE_BLOCK__(var_n)                            \
+    static ::helix::std::Stacktrace::Location var_n{                      \
         __FILE__, __HELIX_FUNCNAME__, (static_cast<uint32_t>(__LINE__))}; \
-    ::helix::std::Stacktrace::RegisterFrame _hx_cpp_scope(&_hx_cpp_loc);
+    ::helix::std::Stacktrace::RegisterFrame _hx_cpp_scope(&var_n);
 
 #define MAX_STACK_FRAME_DEPTH 1024
 
@@ -148,11 +148,8 @@ FrameSummary *capture(int max_depth = MAX_STACK_FRAME_DEPTH);
 
 inline FrameSummary *capture(int max_depth) {
     static thread_local FrameSummary s_nodes[MAX_STACK_FRAME_DEPTH];
-    static thread_local Location     s_native_locs[MAX_STACK_FRAME_DEPTH];
-    static thread_local wchar_t      s_fn_bufs[MAX_STACK_FRAME_DEPTH][MAX_SYM_NAME];
-    static thread_local wchar_t      s_file_bufs[MAX_STACK_FRAME_DEPTH][1024];
 
-    auto clamp_limit = [](int v) {
+    auto clamp_limit = [](int v) -> int {
         if (v <= 0)
             return MAX_STACK_FRAME_DEPTH;
         if (v > MAX_STACK_FRAME_DEPTH)
@@ -160,96 +157,26 @@ inline FrameSummary *capture(int max_depth) {
         return v;
     };
 
-    auto copy_wstr = [](wchar_t *dst, size_t cap, const char *src) {
-        if (!dst || cap == 0)
-            return;
-        if (!src) {
-            dst[0] = L'\0';
-            return;
-        }
-
-        size_t out_len = 0;
-        mbstowcs_s(&out_len, dst, cap, src, _TRUNCATE);
-    };
-
     const int limit = clamp_limit(max_depth);
     int       idx   = 0;
 
-    for (const FrameSummary *cur = g_tls_helix_head; cur && idx < limit; cur = cur->prev) {
+    // Walk the thread-local Helix frame chain and snapshot into s_nodes.
+    // Preserve kind/loc and rebuild prev pointers to point into the snapshot.
+    for (const FrameSummary *cur = g_tls_helix_head; cur != nullptr && idx < limit;
+         cur                     = cur->prev) {
         s_nodes[idx].loc  = cur->loc;
         s_nodes[idx].kind = cur->kind;
         s_nodes[idx].prev = (idx > 0) ? &s_nodes[idx - 1] : nullptr;
         ++idx;
     }
 
-    static const bool sym_ready = []() -> bool {
-        HANDLE proc = GetCurrentProcess();
-        SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
-        return SymInitialize(proc, nullptr, TRUE) != FALSE;
-    }();
-
-    if (!sym_ready || idx >= limit) {
-        return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
+    // If nothing captured, return nullptr (caller expects nullptr when empty).
+    if (idx == 0) {
+        return nullptr;
     }
 
-    void  *stack[MAX_STACK_FRAME_DEPTH];
-    HANDLE proc = GetCurrentProcess();
-
-    const int space_left = limit - idx;
-    if (space_left <= 0) {
-        return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
-    }
-
-    USHORT to_capture = static_cast<USHORT>(
-        space_left > MAX_STACK_FRAME_DEPTH ? MAX_STACK_FRAME_DEPTH : space_left);
-    USHORT captured = CaptureStackBackTrace(0, to_capture, stack, nullptr);
-
-    if (captured == 0) {
-        return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
-    }
-
-    alignas(16) char sym_buf[sizeof(SYMBOL_INFO) + MAX_SYM_NAME];
-    PSYMBOL_INFO     sym = reinterpret_cast<PSYMBOL_INFO>(sym_buf);
-    sym->SizeOfStruct    = sizeof(SYMBOL_INFO);
-    sym->MaxNameLen      = MAX_SYM_NAME;
-
-    IMAGEHLP_LINE64 line_info{};
-    line_info.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
-
-    const USHORT skip     = (captured > 2) ? 2 : 0;
-    int          native_i = 0;
-
-    for (USHORT i = skip; i < captured && idx < limit && native_i < MAX_STACK_FRAME_DEPTH;
-         ++i, ++native_i) {
-        DWORD64     addr = reinterpret_cast<DWORD64>(stack[i]);
-        const char *fn   = "???";
-        const char *file = "???";
-        uint32_t    line = 0;
-
-        if (SymFromAddr(proc, addr, nullptr, sym) && sym->Name && sym->Name[0] != '\0') {
-            fn = sym->Name;
-        }
-
-        DWORD disp = 0;
-        if (SymGetLineFromAddr64(proc, addr, &disp, &line_info) && line_info.FileName) {
-            file = line_info.FileName;
-            line = static_cast<uint32_t>(line_info.LineNumber);
-        }
-
-        copy_wstr(s_fn_bufs[native_i], MAX_SYM_NAME, fn);
-        copy_wstr(s_file_bufs[native_i], sizeof(s_file_bufs[0]) / sizeof(wchar_t), file);
-
-        s_native_locs[native_i].func = s_fn_bufs[native_i];
-        s_native_locs[native_i].file = s_file_bufs[native_i];
-        s_native_locs[native_i].line = line;
-
-        s_nodes[idx].loc  = &s_native_locs[native_i];
-        s_nodes[idx].kind = FrameKind::Native;
-        s_nodes[idx].prev = (idx > 0) ? &s_nodes[idx - 1] : nullptr;
-        ++idx;
-    }
-
-    return (idx > 0) ? &s_nodes[idx - 1] : nullptr;
+    // Return pointer to the most-recently-captured frame (tail of our snapshot).
+    return &s_nodes[idx - 1];
 }
 
 #else
@@ -413,20 +340,22 @@ inline FrameSummary *capture(int max_depth) {
 
 #endif  // POSIX/Linux
 
-void backtrace(const FrameSummary *cur = capture()) {
+inline void backtrace(const FrameSummary *cur = capture()) {
     int idx = 0;
 
     while (cur != nullptr && idx < MAX_STACK_FRAME_DEPTH) {
         if (cur->loc != nullptr) {
             if (cur->loc->file && cur->loc->func && cur->loc->line != 0) {
-                std::print(std::stringf(L"\x1b[31m{}\x1b[0m (\x1b[33m{}:{})",
-                                        std::ABI::strip_helix_prefix(std::ABI::demangle_partial(cur->loc->func)),
-                                        cur->loc->file,
-                                        cur->loc->line));
+                std::print(std::stringf(
+                    L"\x1b[31m{}\x1b[0m (\x1b[33m{}:{})",
+                    std::ABI::strip_helix_prefix(std::ABI::demangle_partial(cur->loc->func)),
+                    cur->loc->file,
+                    cur->loc->line));
             } else if (cur->loc->file && cur->loc->func) {
-                std::print(std::stringf(L"\x1b[31m{}\x1b[0m (\x1b[33m{}\x1b[0m)",
-                                        std::ABI::strip_helix_prefix(std::ABI::demangle_partial(cur->loc->func)),
-                                        cur->loc->file));
+                std::print(std::stringf(
+                    L"\x1b[31m{}\x1b[0m (\x1b[33m{}\x1b[0m)",
+                    std::ABI::strip_helix_prefix(std::ABI::demangle_partial(cur->loc->func)),
+                    cur->loc->file));
             } else if (cur->loc->func) {
                 std::print(std::stringf(L"\x1b[31m{}\x1b[0m", cur->loc->func));
             } else {

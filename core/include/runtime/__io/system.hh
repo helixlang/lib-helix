@@ -145,8 +145,8 @@ struct ProcessOutput {
     libcxx::mutex stderr_mutex;
 
     libcxx::pair<bool, $function<void()>> on_fail_;
-    $function<void()> on_timeout_;
-    $function<void()> on_success_;
+    $function<void()>                     on_timeout_;
+    $function<void()>                     on_success_;
 
     void call_backs() {
         if (((terminated && return_code != 0) || (timed_out && libcxx::get<0>(on_fail_)))) {
@@ -162,13 +162,9 @@ struct ProcessOutput {
         }
     }
 
-    void terminate(bool st) {
-        this->terminated = st;
-    }
+    void terminate(bool st) { this->terminated = st; }
 
-    void timeout(bool st) {
-        this->timed_out = st;
-    }
+    void timeout(bool st) { this->timed_out = st; }
 
     void append_stdout(const char *data, size_t n) {
         libcxx::lock_guard<libcxx::mutex> lg(stdout_mutex);
@@ -450,8 +446,8 @@ class Subprocess {
     }
 
     void mark_finished() {
-        running_           = false;
-        end_time_          = libcxx::chrono::steady_clock::now();
+        running_  = false;
+        end_time_ = libcxx::chrono::steady_clock::now();
         output_.terminate(was_terminated_);
     }
 
@@ -507,30 +503,31 @@ class Subprocess {
         // note: If you need stdin, add a pipe and set si.hStdInput.
         PROCESS_INFORMATION pi{};
         // convert command to wide.
-        std::wstring wcmd_w(
+        const libcxx::wstring& wcmd_w(
             wcmd.raw_string());  // wcmd is "libcxx::string" but contains wide-logic; your helpers
-                                 // are named cstring_to_string/string_to_cstring; here we assume wcmd already logical wide.
-        // if wcmd actually contains wide characters stored in narrow string, replace with your cstring_to_string
-        // appropriately.
+                                 // are named cstring_to_string/string_to_cstring; here we assume
+                                 // wcmd already logical wide.
+        // if wcmd actually contains wide characters stored in narrow string, replace with your
+        // cstring_to_string appropriately.
 
         // working directory
-        std::wstring wdir_w;
-        LPCWSTR      lpCurrentDirectory = nullptr;
-        if (working_dir && !working_dir->empty()) {
+        libcxx::wstring wdir_w;
+        LPCWSTR         lpCurrentDirectory = nullptr;
+        if ((working_dir != nullptr) && !working_dir->empty()) {
             wdir_w.assign(working_dir->begin(), working_dir->end());
             lpCurrentDirectory = wdir_w.c_str();
         }
 
         // environment block (optional). If env empty, inherit.
         // windows expects a double-null-terminated block of WCHAR pairs "Var=Value\0... \0\0"
-        std::wstring              env_block;
-        LPWSTR                    lpEnvironment = nullptr;
-        std::vector<std::wstring> env_entries;
+        libcxx::wstring                 env_block;
+        LPWSTR                          lpEnvironment = nullptr;
+        libcxx::vector<libcxx::wstring> env_entries;
 
         if (!env.empty()) {
             for (auto &e : env) {
                 // expect "KEY=VALUE" in UTF-8ish container; convert.
-                std::wstring we(e.raw_string());
+                libcxx::wstring we(e.raw_string());
                 env_entries.push_back(std::Memory::move(we));
             }
 
@@ -551,15 +548,15 @@ class Subprocess {
         }
 
         // CreateProcessW requires writable command buffer
-        std::wstring cmdline = wcmd_w;
+        libcxx::wstring cmdline = wcmd_w;
         if (!CreateProcessW(
                 /*lpApplicationName*/ nullptr,
-                /*lpCommandLine*/ cmdline.empty() ? nullptr : &cmdline[0],
+                /*lpCommandLine*/ cmdline.empty() ? nullptr : cmdline.data(),
                 /*lpProcessAttributes*/ nullptr,
                 /*lpThreadAttributes*/ nullptr,
                 /*bInheritHandles*/ TRUE,
                 /*dwCreationFlags*/ CREATE_NO_WINDOW |
-                    (lpEnvironment ? CREATE_UNICODE_ENVIRONMENT : 0),
+                    ((lpEnvironment != nullptr) ? CREATE_UNICODE_ENVIRONMENT : 0),
                 /*lpEnvironment*/ lpEnvironment,
                 /*lpCurrentDirectory*/ lpCurrentDirectory,
                 /*lpStartupInfo*/ &si,
@@ -786,8 +783,8 @@ class Subprocess {
     }
 #else
     void read_pipe_windows(HANDLE hPipe, bool is_stdout, bool capture_output) {
-        std::array<char, 4096> buf{};
-        DWORD                  bytesRead = 0;
+        array<char, 4096> buf{};
+        DWORD             bytesRead = 0;
         for (;;) {
             BOOL ok =
                 ReadFile(hPipe, buf.data(), static_cast<DWORD>(buf.size()), &bytesRead, nullptr);
