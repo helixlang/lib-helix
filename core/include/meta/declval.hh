@@ -28,12 +28,7 @@ template <class T>
 T __declval(long);  // NOLINT
 
 template <class T>
-decltype(__declval<T>(0)) declval() noexcept {
-    static_assert(
-        !__is_same(T, T),
-        "H_STD_NAMESPACE::declval can only be used in an unevaluated context. "
-        "It's likely that your current usage is trying to extract a value from the function.");
-}
+decltype(__declval<T>(0)) declval() noexcept;  // NOLINT
 }  // namespace Meta
 
 H_STD_NAMESPACE_END

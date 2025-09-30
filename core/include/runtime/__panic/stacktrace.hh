@@ -123,20 +123,32 @@ struct RegisterFrame {
     RegisterFrame &operator=(RegisterFrame &&)      = delete;
 };
 
-#define __REGISTER_TRACE_BLOCK__(file_cstr, line_num, var_n)               \
-    static ::helix::std::Stacktrace::Location var_n{                       \
-        (file_cstr), __HELIX_FUNCNAME__, static_cast<uint32_t>(line_num)}; \
-    ::helix::std::Stacktrace::RegisterFrame _hx_scope(&var_n, std::Stacktrace::FrameKind::Helix);
+#if defined(_MSC_VER) && _MSC_VER < 1940
+#  error "Helix requires MSVC 19.14 (VS 2017 15.7) or newer for constexpr tracing support."
+#endif
 
-#define __REGISTER_HELIX_TRACE_BLOCK__(file_cstr, line_num, func_cstr, var_n) \
-    static ::helix::std::Stacktrace::Location var_n{                          \
-        (file_cstr), (func_cstr), static_cast<uint32_t>(line_num)};           \
-    ::helix::std::Stacktrace::RegisterFrame _hx_scope(&var_n, std::Stacktrace::FrameKind::Helix);
+#define __REGISTER_TRACE_BLOCK__(file_cstr, line_num, var_n)                   \
+    if !consteval {                                                            \
+      static ::helix::std::Stacktrace::Location var_n{                         \
+          (file_cstr), __HELIX_FUNCNAME__, static_cast<uint32_t>(line_num)};   \
+      ::helix::std::Stacktrace::RegisterFrame _hx_scope(                       \
+          &var_n, std::Stacktrace::FrameKind::Helix);                          \
+    }
 
-#define __REGISTER_HYBRID_TRACE_BLOCK__(var_n)                            \
-    static ::helix::std::Stacktrace::Location var_n{                      \
-        __FILE__, __HELIX_FUNCNAME__, (static_cast<uint32_t>(__LINE__))}; \
-    ::helix::std::Stacktrace::RegisterFrame _hx_cpp_scope(&var_n);
+#define __REGISTER_HELIX_TRACE_BLOCK__(file_cstr, line_num, func_cstr, var_n)  \
+    if !consteval {                                                            \
+      static ::helix::std::Stacktrace::Location var_n{                         \
+          (file_cstr), (func_cstr), static_cast<uint32_t>(line_num)};          \
+      ::helix::std::Stacktrace::RegisterFrame _hx_scope(                       \
+          &var_n, std::Stacktrace::FrameKind::Helix);                          \
+    }
+
+#define __REGISTER_HYBRID_TRACE_BLOCK__(var_n)                                 \
+    if !consteval {                                                            \
+      static ::helix::std::Stacktrace::Location var_n{                         \
+          __FILE__, __HELIX_FUNCNAME__, (static_cast<uint32_t>(__LINE__))};    \
+      ::helix::std::Stacktrace::RegisterFrame _hx_cpp_scope(&var_n);           \
+    }
 
 #define MAX_STACK_FRAME_DEPTH 1024
 
