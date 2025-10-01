@@ -93,11 +93,21 @@ struct Location {
     }
 };
 
+#if defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable : 4324) // structure was padded due to alignment specifier
+#endif
+
 struct alignas(16) FrameSummary {  // exactly 32 bytes on 64-bit and 16 bytes on 32-bit
     Location     *loc;
     FrameSummary *prev;
     FrameKind     kind;
 };
+
+
+#if defined(_MSC_VER)
+#  pragma warning(pop)
+#endif
 
 #if defined(__GNUC__) || defined(__clang__) || defined(_MSC_VER)
 inline thread_local FrameSummary *g_tls_helix_head = nullptr;
