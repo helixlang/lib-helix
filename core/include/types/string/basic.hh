@@ -270,8 +270,9 @@ class basic {
 
 H_STD_NAMESPACE_END
 
-using nstring = std::String::basic<char>;
-using string  = std::String::basic<wchar_t>;
+using nstring  = std::String::basic<char>;
+using string   = std::String::basic<wchar_t>;
+using string32 = std::String::basic<char32_t>;
 
 H_NAMESPACE_END
 

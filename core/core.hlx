@@ -56,4 +56,6 @@ inline fn _HX_FN_Vi_Q5_7_helixrt_init_Rv() -> void {
     // this is the first function call in main always.
     // anything here runs first.
     HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv = HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv;
+    
+    enable_utf8_output(); // enable UTF-8 output for console
 }

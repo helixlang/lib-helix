@@ -27,25 +27,14 @@
 
 H_NAMESPACE_BEGIN
 
-// template <typename... Args>
-// constexpr void print(Args &&...t) {
-//     if constexpr (sizeof...(t) == 0) {
-//         wprintf(L"\n");
-//         return;
-//     }
-
-//     ((wprintf(L"%s", std::to_string(std::Memory::forward<Args>(t)).raw())), ...);
-
-//     if constexpr (sizeof...(t) > 0) {
-//         if constexpr (!std::Meta::same_as<
-//                           std::Meta::const_volatile_removed<std::Meta::reference_removed<
-//                               decltype(LIBCXX_NAMESPACE::get<sizeof...(t) - 1>(
-//                                   tuple<Args...>(t...)))>>,
-//                           std::endl>) {
-//             wprintf(L"\n");
-//         }
-//     }
-// }
+inline void enable_utf8_output() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#else
+    setlocale(LC_ALL, "");
+#endif
+}
 
 template <typename... Args>
 void print(Args &&...t) {

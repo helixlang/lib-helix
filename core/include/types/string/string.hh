@@ -83,13 +83,13 @@ template <typename Ty>
             (!std::Interface::Castable<std::Meta::all_extents_removed<Ty>, nstring>) &&
             (!std::Interface::Castable<std::Meta::all_extents_removed<Ty>, string>)
 inline string to_string(Ty &&t) {
-    LIBCXX_NAMESPACE::stringstream ss;
+    LIBCXX_NAMESPACE::wstringstream ss;
 #ifdef _MSC_VER
-    ss << "[" << typeid(t).name() << " at " << LIBCXX_NAMESPACE::hex << &t << "]";
+    ss << L"[" << typeid(t).name() << L" at " << LIBCXX_NAMESPACE::hex << &t << L"]";
 #else
     int   st;
     char *rn = __cxxabiv1::__cxa_demangle(typeid(t).name(), 0, 0, &st);
-    ss << "[" << rn << " at " << LIBCXX_NAMESPACE::hex << &t << "]";
+    ss << L"[" << rn << L" at " << LIBCXX_NAMESPACE::hex << &t << L"]";
     free(rn);
 #endif
     return {ss.str().data(), ss.str().size()};
