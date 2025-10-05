@@ -403,7 +403,7 @@ Stack trace (most recent call last):
    at: i32 test::main()
     -->  [in /Volumes/Development/Projects/Helix/helix-lang/test.hlx:42]
   42 | demo line
-   at: bool test::Basic::operator==(i32)
+   at: bool test::Core::operator==(i32)
     -->  [in /Volumes/Development/Projects/Helix/helix-lang/test.hlx:19]
   19 | demo lin
    at: i32 test::other_foo()
@@ -419,7 +419,7 @@ Stack trace (most recent call last):
    at: i32 test::main()
     -->  (in /Volumes/Development/Projects/Helix/helix-lang/test.hlx:42)
   42 | demo line
-   at: bool test::Basic::operator==(i32)
+   at: bool test::Core::operator==(i32)
     -->  (in /Volumes/Development/Projects/Helix/helix-lang/test.hlx:19)
   19 | demo lin
    at: i32 test::other_foo()
