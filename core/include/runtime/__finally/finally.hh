@@ -77,7 +77,8 @@ H_NAMESPACE_BEGIN
 /// ### Notes
 /// - This construct is unique to Helix and designed for maximum flexibility and simplicity.
 /// - When combined with `try-catch`, it ensures code in the `finally` block executes regardless
-///   of whether an error occurred in the `try` block.
+///   of whether an error occurred in the `try` block. Or can be used standalone for scope-based
+///   cleanup.
 ///
 /// ### Design
 /// - `$finally` objects are non-copyable and non-movable to ensure that their associated callable

@@ -1,26 +1,29 @@
-///--- The Helix Project ------------------------------------------------------------------------///
+///--- The Helix Project
+///------------------------------------------------------------------------///
 ///                                                                                              ///
-///   Part of the Helix Project, under the Attribution 4.0 International license (CC BY 4.0).    ///
-///   You are allowed to use, modify, redistribute, and create derivative works, even for        ///
-///   commercial purposes, provided that you give appropriate credit, and indicate if changes    ///
-///   were made.                                                                                 ///
+///   Part of the Helix Project, under the Attribution 4.0 International license
+///   (CC BY 4.0).    /// You are allowed to use, modify, redistribute, and
+///   create derivative works, even for        /// commercial purposes, provided
+///   that you give appropriate credit, and indicate if changes    /// were
+///   made. ///
 ///                                                                                              ///
-///   For more information on the license terms and requirements, please visit:                  ///
-///     https://creativecommons.org/licenses/by/4.0/                                             ///
+///   For more information on the license terms and requirements, please visit:
+///   ///
+///     https://creativecommons.org/licenses/by/4.0/ ///
 ///                                                                                              ///
-///   SPDX-License-Identifier: CC-BY-4.0                                                         ///
-///   Copyright (c) 2024 The Helix Project (CC BY 4.0)                                           ///
+///   SPDX-License-Identifier: CC-BY-4.0 /// Copyright (c) 2024 The Helix
+///   Project (CC BY 4.0)                                           ///
 ///                                                                                              ///
-///-------------------------------------------------------------------------------- Lib-Helix ---///
+///--------------------------------------------------------------------------------
+///Lib-Helix ---///
 
 #ifndef _$_HX_CORE_M10PRIMITIVES
 #define _$_HX_CORE_M10PRIMITIVES
 
-#include <include/config/config.hh>
-
 #include <include/c++/libc++.hh>
-#include <include/meta/traits.hh>
+#include <include/config/config.hh>
 #include <include/meta/enable_if.hh>
+#include <include/meta/traits.hh>
 
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
@@ -29,35 +32,40 @@ class null_t {};
 H_STD_NAMESPACE_END
 H_NAMESPACE_END
 
-using u8 = unsigned char;
-using i8 = signed char;
+using char32 = char32_t;
 
-using u16 = unsigned short;
-using i16 = signed short;
+using u8 = uint8_t;
+using i8 = int8_t;
 
-using u32 = unsigned int;
-using i32 = signed int;
+using u16 = uint16_t;
+using i16 = int16_t;
 
-using u64 = unsigned long long;
-using i64 = signed long long;
+using u32 = uint32_t;
+using i32 = int32_t;
+
+using u64 = uint64_t;
+using i64 = int64_t;
 
 using f32 = float;
 using f64 = double;
 using f80 = long double;
 
-#if defined(__LP64__) || defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) ||      \
-    defined(__aarch64__) || defined(__arm64__) || defined(__mips64__) || defined(__mips64) || \
-    defined(__mips64el__) || defined(__mips64el) || defined(__s390x__) || defined(__HELIX_64BIT__)
+#if defined(__LP64__) || defined(_WIN64) || defined(__x86_64__) ||       \
+    defined(__ppc64__) || defined(__aarch64__) || defined(__arm64__) ||  \
+    defined(__mips64__) || defined(__mips64) || defined(__mips64el__) || \
+    defined(__mips64el) || defined(__s390x__) || defined(__HELIX_64BIT__)
 #define __HELIX_64BIT__
 using usize = u64;
 using isize = i64;
-#elif defined(__ILP32__) || defined(_WIN32) || defined(__i386__) || defined(__arm__) || \
-    defined(__mips__) || defined(__mips) || defined(__mipsel__) || defined(__mipsel) || \
-    defined(__s390__) || defined(__HELIX_32BIT__)
+#elif defined(__ILP32__) || defined(_WIN32) || defined(__i386__) ||  \
+    defined(__arm__) || defined(__mips__) || defined(__mips) ||      \
+    defined(__mipsel__) || defined(__mipsel) || defined(__s390__) || \
+    defined(__HELIX_32BIT__)
 #define __HELIX_32BIT__
 using usize = u32;
 using isize = i32;
-#elif defined(__16BIT__) || defined(__MSP430__) || defined(__AVR__) || defined(__HELIX_16BIT__)
+#elif defined(__16BIT__) || defined(__MSP430__) || defined(__AVR__) || \
+    defined(__HELIX_16BIT__)
 #define __HELIX_16BIT__
 using usize = u16;
 using isize = i16;
@@ -73,10 +81,10 @@ using isize = i8;
 using _H_RESERVED$char = wchar_t;
 
 namespace helix::std::Legacy {
-using _H_RESERVED$char = char;
-template <typename T>
-using array = T[];
-}
+    using _H_RESERVED$char = char;
+    template <typename T>
+    using array = T[];
+}  // namespace helix::std::Legacy
 
 inline constexpr helix::std::null_t null;
 
@@ -91,7 +99,10 @@ inline constexpr helix::std::null_t null;
 template <typename T>
 using vec = helix::libcxx::vector<T>;
 
-template <typename K, typename V, class C = helix::libcxx::less<K>, class A = helix::libcxx::allocator<helix::libcxx::pair<const K, V> > >
+template <typename K,
+          typename V,
+          class C = helix::libcxx::less<K>,
+          class A = helix::libcxx::allocator<helix::libcxx::pair<const K, V>>>
 using map = helix::libcxx::map<K, V, C, A>;
 
 template <typename T, usize S>
@@ -100,7 +111,9 @@ using array = helix::libcxx::array<T, S>;
 template <typename T>
 using list = helix::libcxx::list<T>;
 
-template <typename T, class C = helix::libcxx::less<T>, class A = helix::libcxx::allocator<T> >
+template <typename T,
+          class C = helix::libcxx::less<T>,
+          class A = helix::libcxx::allocator<T>>
 using set = helix::libcxx::set<T, C, A>;
 
 template <typename... T>
