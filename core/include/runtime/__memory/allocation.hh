@@ -35,9 +35,15 @@ constexpr _Tp *create(_Ty &&...t) {          // NOLINT
     return new _Tp(std::Memory::forward<_Ty>(t)...);  // NOLINT
 }
 
+template <typename _Tp, typename... _Ty>
+constexpr _Tp *create(void* dest, _Ty &&...t) {          // NOLINT
+    return new (dest) _Tp(std::Memory::forward<_Ty>(t)...);  // NOLINT
+}
+
+
 // make a function called erase which calls c++ delete
 template <typename _Tp>
-constexpr void forget(_Tp *ptr) {  // NOLINT
+constexpr void destroy(_Tp *ptr) {  // NOLINT
     delete ptr;  // NOLINT
 }
 
