@@ -16,6 +16,7 @@
 #ifndef _$_HX_CORE_M5PANIC
 #define _$_HX_CORE_M5PANIC
 
+#include <source_location>
 #include <include/config/config.hh>
 
 #include <include/runtime/__panic/panic_fwd.hh>
@@ -27,9 +28,20 @@
 H_NAMESPACE_BEGIN
 H_STD_NAMESPACE_BEGIN
 
-// std::crash - taks anything throw would and throws it as an exception
 template <typename T>
-[[noreturn]] static constexpr void crash(T error) {
+[[noreturn]] static constexpr void crash(
+    const T& error,
+    const libcxx::source_location& location = libcxx::source_location::current()
+) {
+    if constexpr (Panic::Interface::Panicking<T>) {
+        auto frame = std::Panic::Frame(error, location.file_name(), location.line());
+        frame.show_trace = false;
+        HX_FN_Vi_Q5_13_helixpanic_handler_Q3_5_5_stdPanicFrame_C_PK_Rv(&frame);
+        throw error; // Ensure the program terminates after the panic handler is executed
+    } else {
+        throw error;
+    }
+
     throw error;
 }
 

@@ -269,6 +269,12 @@ inline fn HX_FN_Vi_Q5_32_helix_default_panic_handler_Q3_5_5_stdPanicFrame_C_PK_R
     //     return pad + num + " ";
     // }
 
+    if !(frame->show_trace) {
+        print(f"{red}{bold}panic{reset}: {light_red}{bold}{error_t}{reset}({light_green}\"{message}\"{reset})");
+        // (*((*frame).get_context())).crash();
+        libcxx::abort(); // Ensure the program terminates after the panic handler is executed
+    }
+
     var frames: *std::Stacktrace::FrameSummary = std::Stacktrace::capture();
 
     /// also cannot forget to do std::ABI::strip_helix_prefix(std::ABI::demangle_partial(loc.func))

@@ -45,32 +45,6 @@ namespace Panic {
 class Frame;
 
 namespace Interface {
-    /// \concept Panicking
-    ///
-    /// A concept to determine whether a type `T` can invoke the panic operator.
-    /// A type satisfies the `Panicking` concept if it implements either:
-    /// - A static panic operator (`T::operator$panic`).
-    /// - An instance panic operator (`T.operator$panic`).
-    ///
-    /// ### Details
-    /// - The panic operator must return a `string` or a type convertible to `string`.
-    ///
-    /// ### Example
-    /// ```cpp
-    /// class Error {
-    /// public:
-    ///     string operator$panic() { return "Error occurred"; }
-    /// };
-    ///
-    /// static_assert(Panic::Interface::Panicking<Error>);
-    /// ```
-    template <typename T>
-    concept Panicking = requires(T obj) {
-        { obj.operator$panic() } -> std::Meta::is_convertible_to<string>;
-    } || requires {
-        { T::operator$panic() } -> std::Meta::is_convertible_to<string>;
-    };
-
     /// \concept PanickingStatic
     ///
     /// A concept to determine whether a type `T` implements a static panic operator
@@ -114,6 +88,28 @@ namespace Interface {
     concept PanickingInstance = requires(T obj) {
         { obj.operator$panic() } -> std::Meta::is_convertible_to<string>;
     };
+
+        /// \concept Panicking
+    ///
+    /// A concept to determine whether a type `T` can invoke the panic operator.
+    /// A type satisfies the `Panicking` concept if it implements either:
+    /// - A static panic operator (`T::operator$panic`).
+    /// - An instance panic operator (`T.operator$panic`).
+    ///
+    /// ### Details
+    /// - The panic operator must return a `string` or a type convertible to `string`.
+    ///
+    /// ### Example
+    /// ```cpp
+    /// class Error {
+    /// public:
+    ///     string operator$panic() { return "Error occurred"; }
+    /// };
+    ///
+    /// static_assert(Panic::Interface::Panicking<Error>);
+    /// ```
+    template <typename T>
+    concept Panicking = PanickingStatic<T> || PanickingInstance<T>;
 }  // namespace Interface
 }  // namespace Panic
 

@@ -123,6 +123,8 @@ class Frame {
     void initialize(const T *obj);
 
   public:
+    bool show_trace = true;
+
     template <typename T>
     inline Frame(T obj, const char *filename, usize lineno);
 
