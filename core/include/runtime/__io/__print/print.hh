@@ -31,8 +31,10 @@ inline void enable_utf8_output() {
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+    libcxx::setlocale(LC_ALL, ".UTF-8");
 #else
-    setlocale(LC_ALL, "");
+    if (!libcxx::setlocale(LC_ALL, "en_US.UTF-8"))
+        libcxx::setlocale(LC_ALL, "C.UTF-8");
 #endif
 }
 
